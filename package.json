@@ -1,0 +1,17 @@
+{
+  "name": "portfolio-v100",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root orchestrator for the portfolio-v100 frontend (Vite/React) and backend (Fastify).",
+  "scripts": {
+    "install:all": "npm install && npm --prefix frontend install && npm --prefix backend install",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build:ts",
+    "build": "npm run build:frontend && npm run build:backend",
+    "start": "npm run build && npm --prefix backend start",
+    "dev": "concurrently -k -n \"frontend,backend\" -c \"magenta.bold,cyan.bold\" \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}

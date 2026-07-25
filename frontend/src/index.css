@@ -1,0 +1,345 @@
+@import "tailwindcss";
+
+/* ============================================================================
+ * Tailwind v4 theme (CSS-first). Migrated from the old tailwind.config.ts,
+ * which Tailwind v4 no longer loads automatically. Everything that maps to a
+ * v4 theme namespace lives in @theme below; utilities without a namespace
+ * (z-index tokens, responsive border widths, skeleton sizes, bg images,
+ * all-unset) are defined as @utility further down.
+ * ==========================================================================*/
+@theme {
+  /* -- Breakpoints (screens) ------------------------------------------------ */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  --breakpoint-3xl: 1920px; /* Full HD */
+  --breakpoint-4xl: 2560px; /* 2K / QHD */
+  --breakpoint-5xl: 3840px; /* 4K UHD */
+
+  /* -- Font families -------------------------------------------------------- */
+  --font-sans: inter, sans-serif;
+  --font-highlight: Rubik, sans-serif;
+  --font-formula: var(--font-source-sans-3), sans-serif;
+  --font-interTight: var(--font-inter-tight), sans-serif;
+  --font-ibmPlexSans: var(--font-ibm-plex-sans), sans-serif;
+
+  /* -- Font weights --------------------------------------------------------- */
+  --font-weight-light: 300;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* -- Font sizes (with line-heights) --------------------------------------- */
+  --text-4xs: 0.375rem;
+  --text-4xs--line-height: 0.525rem;
+  --text-3\.5xs: 0.4375rem;
+  --text-3\.5xs--line-height: 0.6125rem;
+  --text-3xs: 0.5rem;
+  --text-3xs--line-height: 0.7rem;
+  --text-2\.5xs: 0.5625rem;
+  --text-2\.5xs--line-height: 0.7875rem;
+  --text-2\.75xs: 0.59375rem;
+  --text-2\.75xs--line-height: 0.83125rem;
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 0.875rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.0625rem;
+  --text-lg--line-height: 1.5625rem;
+  --text-xl: 1.125rem;
+  --text-xl--line-height: 1.625rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+  --text-7xl: 4.5rem;
+  --text-7xl--line-height: 1;
+  --text-8xl: 6rem;
+  --text-8xl--line-height: 1;
+  --text-9xl: 7.875rem;
+  --text-9xl--line-height: 1;
+
+  /* -- Border radius -------------------------------------------------------- */
+  --radius-sm: 0.15rem;
+  --radius-md: 0.45rem;
+  --radius-lg: 0.6rem;
+  --radius-xl: 0.9rem;
+  --radius-2xl: 1.35rem;
+  --radius-3xl: 1.875rem;
+
+  /* -- Spacing --------------------------------------------------------------
+   * v4 generates the full numeric scale dynamically from the multiplier, so we
+   * only declare the named steps and the few numeric steps that diverge from
+   * n * 0.25rem. */
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.5rem;
+  --spacing-15: 3.8rem;
+  --spacing-112: 28.125rem;
+  --spacing-138: 34.375rem;
+  --spacing-182: 45.375rem;
+
+  /* -- Box shadows ---------------------------------------------------------- */
+  --shadow-light-blue: 0px 0px 10px 0px rgba(28, 159, 255, 0.4);
+  --shadow-3d: 15px 15px 30px #bebebe80, -15px -15px 30px #ffffff80;
+  --shadow-modal: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+
+  /* -- Animations ----------------------------------------------------------- */
+  --animate-slide-down: ud-slide-down 200ms ease-out forwards;
+  --animate-slide-in-left: ud-slide-in-left 200ms ease-out forwards;
+  --animate-chat-bubble-grow: ud-chat-bubble-grow 200ms ease-out forwards;
+  --animate-typing-dot: ud-typing-dot 1.4s ease-in-out infinite;
+  --animate-scale-in: ud-scale-in 300ms ease-out backwards;
+  --animate-fade-in: ud-fade-in 120ms ease-out backwards;
+
+  /* -- Colors --------------------------------------------------------------- */
+  --color-ud-primary-100: #f7fcff;
+  --color-ud-primary-200: #eaf9ff;
+  --color-ud-primary-300: #d6f3ff;
+  --color-ud-primary-400: #b8ebff;
+  --color-ud-primary-500: #93deff;
+  --color-ud-primary-600: #6bcffb;
+  --color-ud-primary-700: #48beeb;
+  --color-ud-primary-800: #2e9cc6;
+
+  --color-ud-secondary-100: #f7f8fa;
+  --color-ud-secondary-200: #eceef2;
+  --color-ud-secondary-300: #d9dce2;
+  --color-ud-secondary-400: #bec3cc;
+  --color-ud-secondary-500: #a1a7b3;
+  --color-ud-secondary-600: #606470;
+  --color-ud-secondary-700: #50545f;
+  --color-ud-secondary-800: #40444e;
+
+  --color-ud-neutral-0: #f7f7f7; /* Fundo principal */
+  --color-ud-neutral-100: #ffffff; /* Cards, modais */
+  --color-ud-neutral-200: #f1f2f4;
+  --color-ud-neutral-300: #e6e8ec;
+  --color-ud-neutral-400: #d5d8dd;
+  --color-ud-neutral-500: #bec3ca;
+  --color-ud-neutral-600: #9ea3ac;
+  --color-ud-neutral-700: #7b808a;
+  --color-ud-neutral-800: #606470;
+  --color-ud-neutral-900: #4a4e59;
+  --color-ud-neutral-950: #323643;
+  --color-ud-neutral-999: #232631;
+  --color-ud-neutral-1000: #000000;
+
+  --color-ud-border-color-weak: #d5d8dd;
+  --color-ud-border-color-strong: #606470;
+
+  --color-ud-state-selected: #323643;
+  --color-ud-state-hovered: #eaf9ff;
+
+  --color-ud-semantic-info: #93deff;
+  --color-ud-semantic-info-light: #eaf9ff;
+  --color-ud-semantic-error: #dc3545;
+  --color-ud-semantic-error-light: #fdecec;
+  --color-ud-semantic-success: #22c55e;
+  --color-ud-semantic-success-light: #eaf8ef;
+  --color-ud-semantic-warning: #f59e0b;
+  --color-ud-semantic-warning-light: #fff4dd;
+
+  --color-ud-auxiliary-purple: #7c5cfc;
+  --color-ud-auxiliary-purple-light: #f1eeff;
+  --color-ud-auxiliary-orange: #f97316;
+  --color-ud-auxiliary-orange-light: #fff1e8;
+  --color-ud-auxiliary-pink: #ec4899;
+  --color-ud-auxiliary-pink-light: #fdecf5;
+  --color-ud-auxiliary-brown: #8b5e3c;
+  --color-ud-auxiliary-brown-light: #f6f1ed;
+  --color-ud-auxiliary-lime: #a3e635;
+  --color-ud-auxiliary-lime-light: #f5fcd9;
+  --color-ud-auxiliary-bluish-gray: #606470;
+  --color-ud-auxiliary-bluish-gray-light: #eff2f5;
+
+  --color-ud-budget-state-text-closed: #606470;
+  --color-ud-budget-state-text-indraft: #7b808a;
+  --color-ud-budget-state-text-running: #323643;
+
+  --color-ud-budget-state-closed: #e6e8ec;
+  --color-ud-budget-state-indraft: #f2f3f5;
+  --color-ud-budget-state-running: #eaf9ff;
+
+  --color-ud-budget-marker-main: #323643;
+  --color-ud-budget-marker-second: #93deff;
+  --color-ud-budget-marker-third: #606470;
+  --color-ud-budget-marker-fourth: #ffffff;
+}
+
+/* ============================================================================
+ * Keyframes referenced by the --animate-* tokens above.
+ * ==========================================================================*/
+@keyframes ud-darken-background {
+  0% { opacity: 0; }
+  100% { opacity: 0.9; }
+}
+@keyframes ud-slide-down {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(0); }
+}
+@keyframes ud-slide-in-left {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0); }
+}
+@keyframes ud-chat-bubble-grow {
+  0% { opacity: 0; transform: scaleX(0); }
+  100% { opacity: 1; transform: scaleX(1); }
+}
+@keyframes ud-typing-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4px); }
+}
+@keyframes ud-scale-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ud-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ============================================================================
+ * Utilities without a v4 theme namespace.
+ * ==========================================================================*/
+
+/* Bare `rounded` kept its old DEFAULT value from the v3 config. */
+@utility rounded { border-radius: 0.3rem; }
+
+/* Semantic z-index tokens (numeric z-0..z-50 work natively in v4). */
+@utility z-base { z-index: 0; }
+@utility z-raised { z-index: 1; }
+@utility z-above { z-index: 10; }
+@utility z-dropdown { z-index: 100; }
+@utility z-sticky { z-index: 200; }
+@utility z-fixed { z-index: 300; }
+@utility z-slideover-backdrop { z-index: 400; }
+@utility z-slideover { z-index: 500; }
+@utility z-modal-backdrop { z-index: 600; }
+@utility z-modal { z-index: 700; }
+@utility z-popover { z-index: 800; }
+@utility z-tooltip { z-index: 900; }
+@utility z-toast { z-index: 1000; }
+@utility z-loading { z-index: 1100; }
+@utility z-max { z-index: 9999; }
+
+/* Responsive border widths (viewport-relative, min pixel floor). */
+@utility border-px { border-width: 0.0625rem; }
+@utility border-2 { border-width: max(0.1vh, 2px); }
+@utility border-4 { border-width: max(0.2vh, 4px); }
+@utility border-8 { border-width: max(0.4vh, 8px); }
+
+/* Skeleton heights matching each text size's line-height. */
+@utility h-text-4xs { height: 0.525rem; }
+@utility h-text-3\.5xs { height: 0.6125rem; }
+@utility h-text-3xs { height: 0.7rem; }
+@utility h-text-2\.5xs { height: 0.7875rem; }
+@utility h-text-2\.75xs { height: 0.83125rem; }
+@utility h-text-2xs { height: 0.875rem; }
+@utility h-text-xs { height: 1rem; }
+@utility h-text-sm { height: 1.25rem; }
+@utility h-text-base { height: 1.5rem; }
+@utility h-text-lg { height: 1.5625rem; }
+@utility h-text-xl { height: 1.625rem; }
+@utility h-text-2xl { height: 2rem; }
+@utility h-text-3xl { height: 2.25rem; }
+@utility h-text-4xl { height: 2.5rem; }
+
+/* Vertical margins matching (line-height - font-size) / 2 for each text size. */
+@utility my-text-4xs { margin-block: 0.075rem; }
+@utility my-text-3\.5xs { margin-block: 0.0875rem; }
+@utility my-text-3xs { margin-block: 0.1rem; }
+@utility my-text-2\.5xs { margin-block: 0.1125rem; }
+@utility my-text-2\.75xs { margin-block: 0.11875rem; }
+@utility my-text-2xs { margin-block: 0.125rem; }
+@utility my-text-xs { margin-block: 0.125rem; }
+@utility my-text-sm { margin-block: 0.1875rem; }
+@utility my-text-base { margin-block: 0.25rem; }
+@utility my-text-lg { margin-block: 0.25rem; }
+@utility my-text-xl { margin-block: 0.25rem; }
+@utility my-text-2xl { margin-block: 0.25rem; }
+@utility my-text-3xl { margin-block: 0.1875rem; }
+@utility my-text-4xl { margin-block: 0.125rem; }
+
+/* Background images. */
+@utility bg-ud-login-background { background-image: url(/img/shapes.png); }
+@utility bg-ud-green-gradient {
+  background-image: linear-gradient(to right, #19b09f, #35d3bc);
+}
+
+/* Misc. */
+@utility transition-width { transition-property: width; }
+@utility all-unset { all: unset; }
+
+/* ============================================================================
+ * Base custom properties / global styles.
+ * ==========================================================================*/
+:root {
+  --text: #6b6375;
+  --text-h: #08060d;
+  --bg: #fff;
+  --border: #e5e4e7;
+  --code-bg: #f4f3ec;
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+  --social-bg: rgba(244, 243, 236, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  cursor: pointer;
+}
+
+html {
+    /* Single source of truth for the sticky-header offset, consumed both by
+     * scroll-padding-top (native/deep-link anchoring) and by scrollToHash (JS).
+     * The sticky Header is ~76px tall; 96px leaves a small breathing gap.
+     * Note: no `scroll-behavior: smooth` — the native smooth-scroll engine is
+     * unreliable on Chromium/Windows, so scrollToHash animates via rAF instead. */
+    --scroll-offset: 96px;
+    scroll-padding-top: var(--scroll-offset);
+}
+
+body {
+  color: var(--text-ud-neutral-950);
+  margin: 0;
+  padding: 0;
+  background-color: red;
+  
+}
