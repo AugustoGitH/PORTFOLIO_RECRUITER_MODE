@@ -26,7 +26,7 @@ export const CongratulationsSection = (props: PropsWithClassName) => {
             description={intl.t("ShareYourOpinion")}
           />
         </div>
-        <img src="/src/assets/profile/augusto_congrulations_02.png" width={300} />
+        <img src="/src/assets/profile/augusto_congrulations_02.png" width={350} />
       </div>
     </Container>
   )

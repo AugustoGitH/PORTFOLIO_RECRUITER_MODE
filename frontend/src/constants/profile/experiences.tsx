@@ -50,7 +50,7 @@ export const ENTERPRISE = {
   budgetXpert: {
     title: "BudgetXpert",
     image: {
-      src: "https://media.licdn.com/dms/image/v2/D4D0BAQGKKPeQhui--Q/company-logo_100_100/B4DZVo5nCwHwAQ-/0/1741221687851/budgetxpert_logo?e=1786579200&v=beta&t=p2q6vX0JVAX0f_KNPd88pf5edWzDqGsc3ud2YxTwiWk",
+      src: "/src/assets/enterprise/budgetxpert_logo.jpg",
       alt: "Logo da BudgetXpert"
     }
   },
@@ -58,7 +58,7 @@ export const ENTERPRISE = {
   saludii: {
     title: "Saludii",
     image: {
-      src: "https://media.licdn.com/dms/image/v2/C4D0BAQFb-g0q8LtEpA/company-logo_100_100/company-logo_100_100/0/1630521800034/saludii_logo?e=1786579200&v=beta&t=UdnVg0CkFV5JEwgcyiLHyOK6txeAv7J7Kih0qQ6uhs4",
+      src: "/src/assets/enterprise/saludii_logo.jpg",
       alt: "Logo da Saludii"
     }
   },
@@ -66,7 +66,7 @@ export const ENTERPRISE = {
   techLegion: {
     title: "Tech Legion",
     image: {
-      src: "https://media.licdn.com/dms/image/v2/D4D0BAQHeSacWwchD2A/company-logo_100_100/company-logo_100_100/0/1681307234062/techlegionbr_logo?e=1786579200&v=beta&t=epKIWrPkxZHQPQW-3gRs9hW9URDOHZXfrZGuJcyNngk",
+      src: "/src/assets/enterprise/techlegionbr_logo.jpg",
       alt: "Logo da Tech Legion"
     }
   },
@@ -74,7 +74,7 @@ export const ENTERPRISE = {
   drtSistemas: {
     title: "DRT Sistemas",
     image: {
-      src: "https://media.licdn.com/dms/image/v2/C4D0BAQGz80cGPVmHRg/company-logo_100_100/company-logo_100_100/0/1670289779840?e=1786579200&v=beta&t=WtnOqvyAUtFlshU2Eb4xDexfRgOsqNc_WOhTxEIFBZM",
+      src: "/src/assets/enterprise/drt_logo.jpg",
       alt: "Logo da DRT Sistemas"
     }
   },
@@ -82,7 +82,7 @@ export const ENTERPRISE = {
   elysTech: {
     title: "Elys Tech",
     image: {
-      src: "https://media.licdn.com/dms/image/v2/D4D0BAQEClgY4T2Yq6A/company-logo_100_100/B4DZwudaK6IwAU-/0/1770305987799/elkys_logo?e=1786579200&v=beta&t=fpNK6AyTAkzrKhUs8jZmgWTAYXW9vz4gL61kwVMhIHI",
+      src: "/src/assets/enterprise/elkys_logo.jpg",
       alt: "Logo da Elys Tech"
     }
   },
@@ -90,7 +90,7 @@ export const ENTERPRISE = {
   workana: {
     title: "Workana",
     image: {
-      src: "https://media.licdn.com/dms/image/v2/C560BAQGoqkevfsjWqw/company-logo_100_100/company-logo_100_100/0/1644840712528/workana_logo?e=1786579200&v=beta&t=vxwN-TmkpOUuO4el6P-RXadiIBy4Lz0vJdVKbwqqm6k",
+      src: "/src/assets/enterprise/workana_logo.jpg",
       alt: "Logo da Workana"
     }
   },
@@ -98,7 +98,7 @@ export const ENTERPRISE = {
   getNinjas: {
     title: "GetNinjas",
     image: {
-      src: "https://media.licdn.com/dms/image/v2/D4D0BAQGwQZKoXhVFhg/company-logo_100_100/B4DZ5k21w1JcAU-/0/1779808558367/getninjas_logo?e=1786579200&v=beta&t=Q2CPfOzuWlKVa31HeA_8BPRacUrSoC9VNc5YB-aMe1E",
+      src: "/src/assets/enterprise/getninjas_logo.jpg",
       alt: "Logo da GetNinjas"
     }
   },
