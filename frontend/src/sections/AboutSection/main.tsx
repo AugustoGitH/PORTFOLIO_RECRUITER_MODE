@@ -17,7 +17,7 @@ export const AboutSection = (props: PropsWithClassName) => {
         <div className="flex justify-between items-end gap-4">
           <div>
             <h1 className="text-4xl font-bold text-ud-neutral-950">Portfolio</h1>
-            <h2 className="text-2xl font-bold text-ud-neutral-950 mt-10">Olá, eu sou <InfoWrapper direction="right" info={intl.t("WestphalOrigin")}>{ABOUT.name}</InfoWrapper></h2>
+            <h2 className="text-2xl font-bold text-ud-neutral-950 mt-10">{intl.t("Greeting")} <InfoWrapper direction="right" info={intl.t("WestphalOrigin")}>{ABOUT.name}</InfoWrapper></h2>
             {ABOUT.description.content(ABOUT, intl.t).map((description, index) => (
               <p key={index} className={index === 0 ? "mt-2" : "mt-1"} dangerouslySetInnerHTML={{
                 __html: description
@@ -36,7 +36,7 @@ export const AboutSection = (props: PropsWithClassName) => {
               </Button>
             </div>
           </div>
-          <img className="object-cover" src="src/assets/profile/augusto_main_profile.png" alt="Augusto Caetano Westphal" width={250} />
+          <img className="object-cover" src="src/assets/profile/augusto_main_profile.png" alt="Augusto Caetano Westphal" width={280} />
         </div>
         <MetricsHeader className="mt-10" />
       </div>

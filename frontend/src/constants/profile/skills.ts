@@ -50,27 +50,27 @@ export type Skill = {
 // tabs ARE the kinds — there is no "all" tab.
 export const SKILL_TABS: TabEntry<SkillKind>[] = [
   {
-    label: "Front-End",
+    label: "FrontEnd",
     value: SkillKind.Frontend,
     icon: PanelTopIcon
   }, {
-    label: "Back-End",
+    label: "BackEnd",
     value: SkillKind.Backend,
     icon: ServerIcon
   }, {
-    label: "Banco de Dados",
+    label: "Database",
     value: SkillKind.DataBase,
     icon: DatabaseIcon
   }, {
-    label: "Testes",
+    label: "Tests",
     value: SkillKind.Tests,
     icon: BadgeCheckIcon
   }, {
-    label: "Arquitetura",
+    label: "Architecture",
     value: SkillKind.Architecture,
     icon: BlocksIcon
   }, {
-    label: "Ferramentas",
+    label: "Tools",
     value: SkillKind.Tools,
     icon: WrenchIcon
   }

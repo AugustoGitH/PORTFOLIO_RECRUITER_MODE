@@ -1,8 +1,9 @@
 import type { PropsWithChildren } from "react";
 import type { PropsWithClassName } from "../../../utils/types";
+import type { Term } from "../../../constants/intl";
 
 export type TabEntry<V extends number = number> = {
-  label: string;
+  label: Term;
   value: V
   icon?: React.ComponentType<{ size?: number }>;
 }

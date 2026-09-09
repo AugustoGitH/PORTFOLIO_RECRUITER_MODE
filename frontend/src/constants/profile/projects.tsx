@@ -15,6 +15,7 @@ import type { TagEntry } from "../../components/action/Tag/types";
 import { BsGithub, BsWhatsapp } from "react-icons/bs";
 import { IoNutrition } from "react-icons/io5";
 import type { Link } from "../../utils/types";
+import type { Term } from "../intl";
 
 export enum ProjectKind {
   All,
@@ -25,7 +26,7 @@ export enum ProjectKind {
 
 export type Project = {
   icon?: React.ComponentType<{ size?: number }>;
-  description?: string
+  description?: Term
   title: string
   value: string
   skill?: TagEntry
@@ -96,7 +97,7 @@ export const PROJECTS: Project[] = [
   {
     icon: MicrochipIcon,
     title: "Tech Legion",
-    description: "Desenvolvi voluntariamente e de forma independente o <b>site institucional da TechLegion</b>, incluindo um <b>blog completo</b> com <b>dashboard de gerenciamento</b>, <b>controle de permissões</b> e sistema de publicação de conteúdo.",
+    description: "TechLegionWebsiteDescription",
     value: "tech-legion",
     kind: ProjectKind.Volunteer,
     links: [
@@ -123,7 +124,7 @@ export const PROJECTS: Project[] = [
   {
     icon: LinkIcon,
     title: "Onlinks",
-    description: "Desenvolvi voluntariamente o <b>Onlinks</b>, uma plataforma para criação de <b>páginas de links personalizadas</b> com suporte a <b>múltiplos perfis</b> e gerenciamento centralizado de conteúdo.",
+    description: "OnlinksDescription",
     value: "onlinks",
     kind: ProjectKind.Volunteer,
     links: [
@@ -150,7 +151,7 @@ export const PROJECTS: Project[] = [
   {
     icon: PuzzleIcon,
     title: "CodeQuiz",
-    description: "Desenvolvi o <b>QuizDev</b>, uma plataforma para <b>criação e compartilhamento de desafios de programação</b>, permitindo que usuários criem quizzes, testem seus conhecimentos e desafiem outros desenvolvedores.",
+    description: "CodeQuizDescription",
     value: "codequiz",
     kind: ProjectKind.Personal,
     links: [
@@ -177,7 +178,7 @@ export const PROJECTS: Project[] = [
   {
     icon: BriefcaseBusinessIcon,
     title: "Portfolio/Bio Links",
-    description: "Desenvolvi meu <b>portfólio pessoal</b> com foco em <b>experiência do usuário</b>, apresentando minha trajetória, projetos e habilidades por meio de uma interface moderna, interativa e altamente personalizável.",
+    description: "PortfolioBioLinksDescription",
     value: "portfolio-bio-links",
     kind: ProjectKind.Personal,
     links: [
@@ -198,7 +199,7 @@ export const PROJECTS: Project[] = [
   {
     icon: PanelLeftIcon,
     title: "Portfolio CMS",
-    description: "Desenvolvi um <b>portfólio com CMS próprio</b>, permitindo o gerenciamento de projetos, sincronização com o <b>GitHub</b> e acompanhamento de métricas como visualizações e favoritos.",
+    description: "PortfolioCMSDescription",
     value: "portfolio-cms",
     kind: ProjectKind.Personal,
     links: [

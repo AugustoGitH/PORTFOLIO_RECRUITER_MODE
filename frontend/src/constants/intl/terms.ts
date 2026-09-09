@@ -272,5 +272,63 @@ DefaultMode: {
 RecruitmentMode: {
   ptbr: "Modo Recrutamento",
   en: "Recruitment Mode"
+},
+Greeting: {
+  ptbr: "Olá, eu sou",
+  en: "Hi, I'm"
+},
+TechLegionWebsiteDescription: {
+  ptbr:
+    "Desenvolvi voluntariamente e de forma independente o <b>site institucional da TechLegion</b>, incluindo um <b>blog completo</b> com <b>dashboard de gerenciamento</b>, <b>controle de permissões</b> e sistema de publicação de conteúdo.",
+  en:
+    "Volunteered independently to develop the <b>TechLegion institutional website</b>, including a <b>full-featured blog</b> with a <b>management dashboard</b>, <b>permission control</b>, and a content publishing system."
+},
+OnlinksDescription: {
+  ptbr:
+    "Desenvolvi voluntariamente o <b>Onlinks</b>, uma plataforma para criação de <b>páginas de links personalizadas</b> com suporte a <b>múltiplos perfis</b> e gerenciamento centralizado de conteúdo.",
+  en:
+    "Volunteered to develop <b>Onlinks</b>, a platform for creating <b>customized link pages</b> with support for <b>multiple profiles</b> and centralized content management."
+},
+CodeQuizDescription: {
+  ptbr:
+    "Desenvolvi o <b>QuizDev</b>, uma plataforma para <b>criação e compartilhamento de desafios de programação</b>, permitindo que usuários criem quizzes, testem seus conhecimentos e desafiem outros desenvolvedores.",
+  en:
+    "Developed <b>QuizDev</b>, a platform for <b>creating and sharing programming challenges</b>, allowing users to create quizzes, test their knowledge, and challenge other developers."
+},
+PortfolioBioLinksDescription: {
+  ptbr:
+    "Desenvolvi meu <b>portfólio pessoal</b> com foco em <b>experiência do usuário</b>, apresentando minha trajetória, projetos e habilidades por meio de uma interface moderna, interativa e altamente personalizável.",
+  en:
+    "Developed my <b>personal portfolio</b> with a focus on <b>user experience</b>, showcasing my career path, projects, and skills through a modern, interactive, and highly customizable interface."
+},
+PortfolioCMSDescription: {
+  ptbr:
+    "Desenvolvi um <b>portfólio com CMS próprio</b>, permitindo o gerenciamento de projetos, sincronização com o <b>GitHub</b> e acompanhamento de métricas como visualizações e favoritos.",
+  en:
+    "Developed a <b>portfolio with its own CMS</b>, enabling project management, synchronization with <b>GitHub</b>, and tracking metrics such as views and favorites."
+},
+FrontEnd: {
+  ptbr: "Front-End",
+  en: "Front-End"
+},
+BackEnd: {
+  ptbr: "Back-End",
+  en: "Back-End"
+},
+Database: {
+  ptbr: "Banco de Dados",
+  en: "Database"
+},
+Tests: {
+  ptbr: "Testes",
+  en: "Tests"
+},
+Architecture: {
+  ptbr: "Arquitetura",
+  en: "Architecture"
+},
+Tools: {
+  ptbr: "Ferramentas",
+  en: "Tools"
 }
 } as const
