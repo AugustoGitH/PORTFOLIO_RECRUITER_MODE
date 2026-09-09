@@ -2,7 +2,7 @@ import { Schema } from "../../utils/types"
 
 export enum ViewType  {
   Portfolio,
-  Curriculum
+  Resume
 }
 
 export type View = Schema<{
