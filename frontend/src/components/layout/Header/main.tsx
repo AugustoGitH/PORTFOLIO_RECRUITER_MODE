@@ -1,7 +1,6 @@
 import { CheckIcon, MenuIcon, UsersIcon } from "lucide-react"
-import { useEffect } from "react"
 import { ABOUT, GROUP_SECTION_LINKS } from "../../../constants/profile"
-import { scrollToHash } from "../../../utils/element"
+import { useHashNavigation } from "../../../hooks/navigation"
 import { useINTLContext } from "../../../providers/intl"
 import { Button } from "../../action/Button"
 import { LanguageSelect, VerticalMenuButton } from "./components"
@@ -9,16 +8,7 @@ import { RecruiterModeButton } from "../../../features/recruiter"
 
 export const Header = () => {
   const intl = useINTLContext()
-
-  useEffect(() => {
-    if (window.location.hash) scrollToHash(window.location.hash)
-  }, [])
-
-  const handleAnchorClick = (href: string) => (event: React.MouseEvent) => {
-    if (!href.startsWith("#")) return
-    event.preventDefault()
-    scrollToHash(href)
-  }
+  const navigation = useHashNavigation()
 
   return (
     <div className="w-full  px-2 pt-2  sticky top-0 left-0 z-50 bg-ud-neutral-100">
@@ -33,7 +23,7 @@ export const Header = () => {
         <nav className="flex items-center gap-6">
           {
             GROUP_SECTION_LINKS.main.map(link => (
-              <a href={link.href} title={intl.t(link.title)} onClick={handleAnchorClick(link.href)} className="flex gap-2">
+              <a href={link.href} title={intl.t(link.title)} onClick={navigation.handleAnchorClick(link.href)} className="flex transition hover:text-ud-auxiliary-purple gap-2">
                 <link.icon size={18} />
                 <span className="text-xs font-bold">{intl.t(link.title)}</span>
               </a>
