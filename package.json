@@ -1,20 +1,38 @@
 {
   "name": "portfolio-v100",
-  "version": "1.0.0",
   "private": true,
-  "description": "Root orchestrator for the portfolio-v100 frontend (Vite/React) and backend (Fastify).",
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "install:all": "npm install && npm --prefix frontend install && npm --prefix backend install",
-    "build:frontend": "npm --prefix frontend run build",
-    "build:backend": "npm --prefix backend run build:ts",
-    "build": "npm run build:frontend && npm run build:backend",
-    "start": "npm run build && npm --prefix backend start",
-    "dev": "concurrently -k -n \"frontend,backend\" -c \"magenta.bold,cyan.bold\" \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\""
-  },
-  "devDependencies": {
-    "concurrently": "^9.0.0"
+    "dev": "next dev -p 5173",
+    "build": "next build --webpack",
+    "lint": "eslint .",
+    "start": "next start -p 5173",
+    "install:all": "npm install"
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.34.52"
+    "@react-pdf/renderer": "^4.9.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.23.0",
+    "mongodb": "^7.6.0",
+    "next": "latest",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-icons": "^5.7.0",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/postcss": "^4.3.1",
+    "@types/node": "^24.12.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.6.0",
+    "typescript": "~5.9.2",
+    "typescript-eslint": "^8.59.2"
   }
 }

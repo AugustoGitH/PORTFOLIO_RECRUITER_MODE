@@ -2,7 +2,7 @@
 
 **Status:** rascunho para discussão
 **Última atualização:** 2026-09-07
-**Escopo:** `frontend/` (seções, providers, features) + `backend/` (rotas de análise e métrica)
+**Escopo:** aplicação da raiz (seções, providers, features e Route Handlers de análise e métrica)
 
 ---
 
@@ -79,7 +79,7 @@ O recrutador lê trajetória antes de lista de tecnologia; a lista de skills ser
 *confirmar*, não para descobrir.
 
 > ⚠️ Isto exige que a lista de seções vire **dado**, não JSX fixo.
-> Hoje está hardcoded em `frontend/src/pages/Main/main.tsx`.
+> Hoje está hardcoded em `src/screens/Main/main.tsx`.
 
 ### 5.2 Por seção
 
@@ -193,8 +193,8 @@ O recrutador analisa, gosta, e **encaminha para o gestor**. Se o contexto vive n
 (`?mode=recruiter&role=backend`, ou um id curto para uma vaga analisada), a segunda pessoa
 cai direto na visão já personalizada.
 
-É o maior multiplicador de valor da feature, e é o que dá sentido à métrica
-`incrementViewResume` já esboçada no backend.
+É o maior multiplicador de valor da feature, e é o que dá sentido à futura métrica
+de visualização de currículo.
 
 ### 7.3 Pontos de entrada
 
@@ -203,18 +203,17 @@ cai direto na visão já personalizada.
 - **Painel de vaga** — `RecruiterFormButton`, hoje renderizado pelo provider em **qualquer
   modo**. Deve passar a viver **dentro** do modo recrutador, como refinamento L2.
 
-### 7.4 Backend
+### 7.4 Route Handlers
 
-Não existe nada de IA hoje — `backend/src/routes` tem apenas `metric` e um `feedback` vazio.
+Não existe integração de IA hoje. As métricas Fastify anteriores eram stubs e foram removidas.
 L2 exige:
 
-- `POST /recruiter/analyze` — recebe descrição ou URL, devolve `JobAnalysis`.
-- `GET /recruiter/analysis/:id` — permite a URL compartilhável de §7.2.
+- `POST /api/recruiter/analyze` — recebe descrição ou URL, devolve `JobAnalysis`.
+- `GET /api/recruiter/analysis/:id` — permite a URL compartilhável de §7.2.
 - geração/entrega do CV.
 - **controle de custo e abuso**: é endpoint público que chama LLM. Rate limit e limite de
   tamanho de entrada são requisito, não melhoria.
-- `incrementViewResume` (diretório existe vazio em
-  `backend/src/routes/metric/view/incrementViewResume/`).
+- persistência da visualização de currículo em MongoDB.
 
 ---
 
@@ -265,11 +264,11 @@ Congratulations → Contato; toggle persistido na URL.
 Duas perguntas (área + senioridade); filtro/reordenação determinística; contexto na URL.
 
 **Fase 3 — L2**
-Rota de análise no backend; match summary com lacunas; ranking com justificativa;
+Route Handler de análise no Next; match summary com lacunas; ranking com justificativa;
 rate limit; métrica.
 
 **Fase 4 — CV**
-Geração e entrega; `incrementViewResume`; URL compartilhável da análise.
+Geração e entrega; métrica de visualização do currículo; URL compartilhável da análise.
 
 ---
 
@@ -294,9 +293,9 @@ Geração e entrega; `incrementViewResume`; URL compartilhável da análise.
 | `RecruiterModeProvider` | existe; `offRecruiterMode` vazio, `onRecruiterMode` só faz scroll |
 | Consumo de `isRecruiterMode` nas seções | **nenhum** |
 | `RecruiterFormButton` | apenas casca visual: sem estado, sem `onSubmit`, `reset()` vazio, ambos os botões `type="submit"` |
-| Ordem das seções | hardcoded em `pages/Main/main.tsx` |
+| Ordem das seções | hardcoded em `screens/Main/main.tsx` |
 | Termos i18n | já existem em `constants/intl/terms.ts` (`Recruiter`, `RecruitmentMode`, `DefaultMode`, `AnalyzeJob`, `AnswerQuestions`, `JobDescriptionOrLink`, …) |
 | Vocabulário de skills | duplicado e já divergente (`redwood`) |
 | `Project.skills` | campo singular, opcional, **não preenchido** |
-| Backend de análise | inexistente |
-| `incrementViewResume` | diretório vazio |
+| API de análise | inexistente |
+| Métrica de visualização de currículo | inexistente |

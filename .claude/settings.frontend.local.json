@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/augusto/applications/portfolio-v100/**)",
+      "Read(//home/augusto/applications/portfolio-v100/backend/**)",
+      "Bash(npx vite *)"
+    ]
+  }
+}
