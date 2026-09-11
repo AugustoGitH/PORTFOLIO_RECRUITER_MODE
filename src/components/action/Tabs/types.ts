@@ -6,8 +6,10 @@ export type TabEntry<V extends number = number> = {
   label: Term;
   value: V
   icon?: React.ComponentType<{ size?: number }>;
+  indicator?: boolean
 }
 
 export type TabsProps<V extends number = number> = PropsWithClassName<PropsWithChildren<{
   tabs: TabEntry<V>[];
+  initialTab?: V
 }>>

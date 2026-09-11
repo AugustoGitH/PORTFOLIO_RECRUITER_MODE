@@ -4,6 +4,7 @@ import { TiSocialLinkedin } from "react-icons/ti"
 import type { Link } from "../../utils/types"
 import type { INTLTranslateFunction } from "../../providers/intl"
 import type { Term } from "../intl"
+import type { SkillValue } from "./skills"
 
 export type About = {
   name: string
@@ -12,6 +13,13 @@ export type About = {
     content: (about: About, t: INTLTranslateFunction) => string[]
   },
   link: Record<string, Link>
+}
+
+export type RecruiterProfile = {
+  seniority: Term
+  availability: Term
+  location: Term
+  primaryStack: SkillValue[]
 }
 
 export const ABOUT: About = {
@@ -49,4 +57,11 @@ export const ABOUT: About = {
 
 export const GROUP_LINKS = {
   main: [ABOUT.link.github, ABOUT.link.linkedin, ABOUT.link.loucoDaSyntax]
+}
+
+export const RECRUITER_PROFILE: RecruiterProfile = {
+  seniority: "MidLevel",
+  availability: "Remote",
+  location: "GuarapariES",
+  primaryStack: ["react", "nextjs", "graphql", "typescript", "claude-code"],
 }

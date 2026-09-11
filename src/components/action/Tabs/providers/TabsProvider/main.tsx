@@ -6,7 +6,7 @@ const TabsContext = createContext({} as TabsContextValue)
 export const useTabsContext = () => useContext(TabsContext)
 
 export const TabsProvider = (props: TabsProviderProps) => {
-  const [currentTab, setCurrentTab] = useState(0)
+  const [currentTab, setCurrentTab] = useState(props.initialTab ?? 0)
   const [hasNavigated, setHasNavigated] = useState(false)
 
   const navigateToTab = (tabIndex: number) => {
@@ -31,4 +31,3 @@ export const TabsProvider = (props: TabsProviderProps) => {
     </TabsContext.Provider>
   )
 }
-

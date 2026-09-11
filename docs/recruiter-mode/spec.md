@@ -1,8 +1,8 @@
-# Recruiter Mode — Especificação
+# Leitura por audiência — Especificação
 
 **Status:** rascunho para discussão
-**Última atualização:** 2026-09-07
-**Escopo:** aplicação da raiz (seções, providers, features e Route Handlers de análise e métrica)
+**Última atualização:** 2026-09-10
+**Escopo:** aplicação da raiz (seções, providers, evidência de perfil e, opcionalmente, análise de vaga)
 
 ---
 
@@ -16,24 +16,64 @@ Um recrutador não tem essa pergunta. Ele tem uma só, e tem pressa:
 > **"Essa pessoa serve para o que eu preciso, e eu consigo provar isso rápido?"**
 
 Hoje, para respondê-la, ele precisa navegar 6 tabs de skills, filtrar projetos por tipo e
-somar mentalmente as datas das experiências. O portfólio faz ele trabalhar.
+somar mentalmente as datas das experiências. O portfólio faz ele trabalhar. Além disso, uma
+lista de logos é uma alegação sem lastro: não distingue produção de tutorial.
 
 ## 2. Objetivo
 
-Inverter o esforço: o recrutador informa (ou não) o que procura, e **o portfólio se
-reorganiza para responder à pergunta dele** — evidência primeiro, ordem por relevância,
-veredito explícito.
+Permitir que a pessoa escolha **como quer ler** o mesmo portfólio. Para recrutadores, a
+aplicação reorganiza os fatos para responder ao encaixe na vaga. A unidade de conteúdo deixa
+de ser uma afirmação e passa a ser uma **cadeia de evidência auditável**: cada skill aponta
+para as experiências, projetos e depoimentos que a sustentam.
 
 ## 3. Não-objetivos
 
 - Não é um chat/assistente sobre o portfólio.
-- Não é um gerador de currículo genérico — o CV produzido é sempre **para uma vaga/contexto**.
-- Não substitui o modo padrão; é uma segunda leitura dos **mesmos dados**.
+- Não é um gerador de currículo genérico.
+- Não substitui o modo padrão; são leituras dos **mesmos dados**.
 - A IA **não escreve fatos novos** sobre o candidato (ver §8).
+- Não infere que uma tecnologia foi aprendida “do zero” por ela não aparecer em registros
+  anteriores; essa afirmação exige fonte editorial explícita.
 
 ---
 
-## 4. Conceito central: a escada de contexto
+## 3.1 Estrutura: audiência, não interruptor
+
+“Modo recrutador” é a primeira leitura especializada, não uma arquitetura presa a um boolean.
+Enquanto só a leitura de recrutamento estiver publicada, o header usa um CTA explícito e
+destacado — **“Sou recrutador(a)”**. Um seletor genérico só entra quando as demais leituras
+também entregarem conteúdo próprio.
+
+| Audiência | Pergunta central | O que sobe |
+|---|---|---|
+| Recrutador | “Encaixa na vaga?” | fit, trajetória, disponibilidade, contato |
+| Tech lead | “Quero revisar o código dele?” | decisões, trade-offs, código e arquitetura |
+| Cliente / founder | “Resolve meu problema?” | produtos entregues, autonomia e resultado |
+| Curioso / par | “Quem é essa pessoa?” | narrativa atual |
+
+A primeira entrega publica apenas `default` e `recruiter`. `tech-lead` e `client` entram como
+contratos extensíveis, sem seletor público até haver uma leitura distinta para entregar.
+
+---
+
+## 4. Conceitos centrais
+
+### 4.1 Cadeia de evidência — piso L0
+
+O registro canônico de skills permite derivar um grafo de citações, sem IA:
+
+> React — 4 anos · 3 experiências profissionais · 6 projetos
+> BudgetXpert (set/24–hoje) · Saludii · DRT Sistemas
+
+Contagens e duração nunca são digitadas: são derivadas de `EXPERIENCES` e `PROJECTS`. Cada
+referência é clicável e navegável; o caminho inverso mostra, num projeto ou experiência, quais
+skills e, no L2, quais requisitos ele sustenta. Isso transforma logos em currículo auditável e
+impede inflação estruturalmente.
+
+Quando houver L2, a análise pode apontar para a implementação pública do próprio match
+(repositório ou trecho relevante), como demonstração técnica, não como marketing.
+
+### 4.2 Escada de contexto
 
 O erro a evitar é tornar a análise de vaga a única porta de entrada. Nem todo recrutador
 tem uma vaga formal aberta, e muitos não podem/querem colar a descrição interna da empresa.
@@ -65,15 +105,14 @@ o que cada seção mostra, em que ordem os itens aparecem, e em que ordem as se�
 
 ### 5.1 Ordem das seções
 
-| Modo padrão (narrativa) | Modo recrutador (veredito) |
-|---|---|
-| About | About (ficha) |
-| Skills | **Match summary** *(só L2)* |
-| Projects | Experiences |
-| Experiences | Projects |
-| Testimonials | Skills |
-| Congratulations/Feedback | Testimonials |
-| | Contato / CV |
+| Narrativa | Recrutamento L0/L1 | Com vaga L2 |
+|---|---|---|
+| About | About (ficha) | About (ficha) |
+| Skills | Experiences | **Match summary** |
+| Projects | Projects | Experiences |
+| Experiences | Skills / cadeia de evidência | Projects |
+| Testimonials | Testimonials | Skills / cadeia de evidência |
+| Congratulations/Feedback | Contato | Testimonials + contato |
 
 O recrutador lê trajetória antes de lista de tecnologia; a lista de skills serve para
 *confirmar*, não para descobrir.
@@ -106,11 +145,21 @@ O recrutador lê trajetória antes de lista de tecnologia; a lista de skills ser
   **o porquê** ("Node + PostgreSQL — 3 dos 5 requisitos").
 - ⚠️ Bloqueado por dados hoje (ver §6.2).
 
-**Skills** — `sections/SkillsSection`
+**Skills / cadeia de evidência** — `sections/SkillsSection`
 - Padrão: 6 tabs de partição (`SKILL_TABS`) que o recrutador precisa percorrer.
-- Recrutador L1: a resposta "backend" pré-seleciona a tab e reordena.
+- Recrutador L0: cada skill mostra duração derivada, quantidade de experiências profissionais,
+  projetos e referências navegáveis. A seção não declara domínio: ela o demonstra.
+- Recrutador L1: a resposta "backend" pré-seleciona a tab e reordena essa evidência.
 - Recrutador L2: skills que batem sobem e ganham destaque; o resto colapsa em
-  "também trabalha com…".
+  "também trabalha com…". Projetos e experiências indicam os requisitos que cobrem.
+
+**Velocidade de aprendizado** — bloco dentro de Skills ou Match summary
+- Mostra apenas tecnologias com anotação editorial explícita: tecnologia, experiência/projeto,
+  data e entrega verificável.
+- Exemplo seguro: “Redwood.js — aprendi para Saludii em 2024 e entreguei em produção”. Não
+  usar duração (“em três semanas”) sem fonte factual.
+- No L2, uma lacuna pode apontar para esse histórico como evidência de aprendizagem, mas nunca
+  transforma uma tecnologia ausente em skill dominada.
 
 **Testimonials** — `sections/TestimonialsSection`
 - Padrão: fechamento simpático.
@@ -120,6 +169,8 @@ O recrutador lê trajetória antes de lista de tecnologia; a lista de skills ser
 **Congratulations/Feedback** — `sections/CongratulationsSection`
 - "Deixe um like / dê feedback" não faz sentido para quem está avaliando um candidato.
 - Recrutador: a seção **troca de papel** — vira contato, agendar conversa, baixar CV.
+- Pode conter um **contra-CV** curto e factual: “provavelmente não me chame se…”. Ele declara
+  contextos/stack não buscados, sem julgar a vaga.
 
 ---
 
@@ -165,7 +216,24 @@ Para um match honesto, a presença da skill não basta. Faltam hoje:
   experiências que a referenciam, se §6.1 for feito;
 - **senioridade** declarada;
 - **modelo de contratação / disponibilidade** (PJ/CLT, remoto, timezone) — hoje inexistente
-  e necessário para a ficha do About.
+e necessário para a ficha do About.
+
+### 6.4 Evidência e aprendizado em contexto (novos)
+
+Criar seletores puros que derivem `SkillEvidence` de `SKILLS`, `EXPERIENCES`, `PROJECTS`,
+`COURSES` e, quando estruturados, depoimentos. A fonte guarda fatos e vínculos; totais,
+duração e contagens são calculados. O cálculo de duração deve tratar sobreposição de datas para
+não inflar tempo. Cursos reforçam aprendizado, mas nunca entram no total de experiência.
+
+Para a narrativa de aprendizado, criar `SKILL_LEARNING_EVIDENCE`: cada item referencia
+`SkillValue`, uma experiência ou projeto canônico e um termo i18n com a entrega comprovável.
+Validar as referências. Ausência do registro significa “não afirmar”, não “não aprendeu”.
+
+### 6.5 Critérios de fit mútuo (novo)
+
+Adicionar em `constants/profile/` preferências declaradas: remoto/híbrido, tipo de produto,
+modelo de contratação e, quando apropriado divulgar, faixa. A análise compara apenas esses
+critérios e apresenta linguagem neutra: “remoto atende ao que busco”, nunca juízo da vaga.
 
 ---
 
@@ -174,31 +242,46 @@ Para um match honesto, a presença da skill não basta. Faltam hoje:
 ### 7.1 Estado
 
 `providers/recruiterMode` hoje guarda apenas `isRecruiterMode: boolean`; `onRecruiterMode`
-só faz `scrollTo(top)` e `offRecruiterMode` está vazio. Precisa evoluir para carregar o
-**contexto**, não só o interruptor:
+só faz `scrollTo(top)` e `offRecruiterMode` está vazio. Deve evoluir para contexto de leitura,
+não só interruptor:
 
 ```ts
+type Audience = "default" | "recruiter" | "tech-lead" | "client"
+
 type RecruiterContext =
   | { level: 0 }
-  | { level: 1; role: SkillKind; seniority: Seniority }
+  | { level: 1; roles: SkillKind[]; seniority: Seniority }
   | { level: 2; jobId: string; analysis: JobAnalysis }
+
+type PortfolioReadingContext = {
+  audience: Audience
+  recruiter: RecruiterContext | null
+}
 ```
 
-As seções consomem esse contexto para decidir conteúdo e ordem. Hoje **nenhuma seção lê
-`isRecruiterMode`** — o único consumidor é o próprio botão.
+As seções consomem esse contexto para decidir conteúdo e ordem. A primeira implementação de L0
+mantém apenas as audiências `default` e `recruiter`, expondo `isRecruiterMode` como compatibilidade
+para as seções existentes.
 
-### 7.2 Estado na URL
+### 7.2 Estado na URL — requisito explícito da Fase 1
 
 O recrutador analisa, gosta, e **encaminha para o gestor**. Se o contexto vive na URL
-(`?mode=recruiter&role=backend`, ou um id curto para uma vaga analisada), a segunda pessoa
-cai direto na visão já personalizada.
+(`?audience=recruiter&roles=frontend,backend`, ou um id curto para uma vaga analisada), a segunda pessoa
+cai direto na visão já personalizada. A persistência inclui o próprio toggle.
 
-É o maior multiplicador de valor da feature, e é o que dá sentido à futura métrica
-de visualização de currículo.
+Atualizar a URL ao entrar, sair ou refinar a leitura, sem criar histórico a cada interação:
+
+- L0: `?audience=recruiter`;
+- L1: `?audience=recruiter&roles=frontend,backend&seniority=…`;
+- L2: `?audience=recruiter&analysis=<id-curto>`.
+
+Na carga, parâmetros válidos restauram estado; ausentes ou inválidos retornam com segurança à
+leitura narrativa. A convenção também comporta futuras leituras, como `?audience=tech-lead`.
 
 ### 7.3 Pontos de entrada
 
-- **Header** — `RecruiterModeButton` (existe, `components/layout/Header/main.tsx:34`).
+- **Header** — CTA destacado “Sou recrutador(a)”. Quando estiver no modo, a ação vira
+  “Visão geral”.
 - **Convite discreto no modo padrão** — "é recrutador? veja o portfólio adaptado" → liga o modo.
 - **Painel de vaga** — `RecruiterFormButton`, hoje renderizado pelo provider em **qualquer
   modo**. Deve passar a viver **dentro** do modo recrutador, como refinamento L2.
@@ -241,10 +324,11 @@ com filas em X") é infinitamente melhor do que ele descobrir sozinho.
 A feature existe para gerar conversa, não pageview. Sinais, em ordem de importância:
 
 1. contatos iniciados a partir do modo recrutador;
-2. CVs gerados / baixados (`incrementViewResume`);
+2. navegações da cadeia de evidência (skill → fato e fato → skill);
 3. URLs personalizadas **compartilhadas e reabertas** (prova de §7.2);
 4. distribuição L0 / L1 / L2 — valida a hipótese da escada;
-5. tempo até a primeira ação no modo recrutador vs. modo padrão.
+5. tempo até a primeira ação no modo recrutador vs. modo padrão;
+6. CVs gerados / baixados, somente se a Fase 4 for justificada por demanda.
 
 ---
 
@@ -252,23 +336,26 @@ A feature existe para gerar conversa, não pageview. Sinais, em ordem de import�
 
 Cada fase é entregável e testável sozinha.
 
-**Fase 0 — Fundação de dados** *(caminho crítico, sem UI)*
+**Fase 0 — Fundação de dados — concluída** *(caminho crítico, sem UI)*
 Registro canônico de skills (§6.1); `Project.skills` em array e preenchido (§6.2);
 asserção de integridade do vocabulário.
 
-**Fase 1 — L0**
-Lista de seções como dado; `isRecruiterMode` consumido pelas seções; ficha do About;
-Congratulations → Contato; toggle persistido na URL.
+**Fase 1 — Fundação de leitura + L0**
+Provider de audiência/contexto; lista de seções como dado; `?audience=recruiter` persistido e
+restaurado; ficha do About; Experiences → Projects → Skills → Testimonials → Contact; cadeia
+de evidência navegável. `tech-lead` e `client` ficam como contratos extensíveis, sem UI.
 
-**Fase 2 — L1**
-Duas perguntas (área + senioridade); filtro/reordenação determinística; contexto na URL.
+**Fase 2 — L1 + aprendizado verificável**
+Duas perguntas (área + senioridade); filtro/reordenação determinística; contexto na URL;
+registro de aprendizado em contexto e validação de referências.
 
 **Fase 3 — L2**
-Route Handler de análise no Next; match summary com lacunas; ranking com justificativa;
-rate limit; métrica.
+Route Handler de análise no Next; match summary com lacunas e fit mútuo; ranking com
+justificativa; rate limit; métrica.
 
-**Fase 4 — CV**
-Geração e entrega; métrica de visualização do currículo; URL compartilhável da análise.
+**Fase 4 — CV (condicional)**
+Adiar até haver demanda mensurável. Se priorizada: geração e entrega; métrica de visualização;
+URL compartilhável da análise. A página de evidência é o artefato principal.
 
 ---
 
@@ -276,26 +363,31 @@ Geração e entrega; métrica de visualização do currículo; URL compartilháv
 
 | # | Decisão | Recomendação |
 |---|---|---|
-| 1 | Toggle e formulário são um fluxo ou dois? | **Um só** — o toggle entra no modo, o form refina (§7.3) |
+| 1 | Seletor e formulário são um fluxo ou dois? | **Um só** — a audiência `recruiter` entra na leitura, o form refina (§7.3) |
 | 2 | L0 precisa ser bom sem nenhum contexto? | **Sim, e determinístico** — sustenta a feature sem IA |
 | 3 | Quais perguntas em L1? | **Duas**: área/stack e senioridade. Contratação é resposta sua, não pergunta dele |
-| 4 | O CV é PDF, página, ou ambos? | Em aberto — PDF é o que circula internamente na empresa |
+| 4 | O CV é PDF, página, ou ambos? | Adiar até haver demanda; a página de evidência vem primeiro |
 | 5 | Onde e com que provedor roda a IA? | Em aberto — define custo e §7.4 |
 | 6 | O modo recrutador altera também o visual? | Recomendo **não** na v1 — é reorganização de conteúdo |
+| 7 | Outras audiências entram já? | **Contrato agora, UI depois** — não publicar leitura vazia |
 
 ---
 
-## 12. Estado atual do código (verificado em 2026-09-07)
+## 12. Estado atual do código (verificado em 2026-09-10)
 
 | Item | Estado |
 |---|---|
-| `RecruiterModeButton` no header | existe e funciona |
-| `RecruiterModeProvider` | existe; `offRecruiterMode` vazio, `onRecruiterMode` só faz scroll |
-| Consumo de `isRecruiterMode` nas seções | **nenhum** |
-| `RecruiterFormButton` | apenas casca visual: sem estado, sem `onSubmit`, `reset()` vazio, ambos os botões `type="submit"` |
-| Ordem das seções | hardcoded em `screens/Main/main.tsx` |
-| Termos i18n | já existem em `constants/intl/terms.ts` (`Recruiter`, `RecruitmentMode`, `DefaultMode`, `AnalyzeJob`, `AnswerQuestions`, `JobDescriptionOrLink`, …) |
-| Vocabulário de skills | duplicado e já divergente (`redwood`) |
-| `Project.skills` | campo singular, opcional, **não preenchido** |
+| Leitura de recrutamento no header | existe e alterna `audience` entre `default` e `recruiter` |
+| Estado de L0 | persistido e restaurado por `?audience=recruiter` |
+| Ordem das seções | dirigida por `SECTION_ORDER`; recrutamento sobe experiências, projetos e evidências |
+| About | ficha objetiva com experiência derivada e stack baseada nas evidências |
+| Skills | cadeia determinística: duração sem sobreposição, experiências e projetos navegáveis |
+| Projects e Contact | recrutamento inicia em projetos profissionais e troca feedback por contato |
+| `RecruiterFormButton` | permanece sem fluxo e não é mais renderizado globalmente; reservado para L1/L2 |
+| Vocabulário de skills | canônico, incluindo `redwood`; experiências e projetos usam `SkillValue[]` |
+| `Project.skills` | array obrigatório e preenchido |
+| Contexto L1 | áreas e senioridade da vaga, persistidas em `roles` e `seniority` na URL |
+| Reordenação L1 | experiências e projetos são ordenados pela quantidade de skills da área; a tab correspondente abre automaticamente |
+| Aprendizado em contexto | Redwood.js na Saludii: MVP entregue ao uso de dezenas de nutricionistas |
 | API de análise | inexistente |
 | Métrica de visualização de currículo | inexistente |

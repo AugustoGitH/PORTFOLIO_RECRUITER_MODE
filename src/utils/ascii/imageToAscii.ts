@@ -62,7 +62,7 @@ const inkCoverage = (
  * downscaler: line art has strokes thinner than a cell, and averaging is what turns a
  * one-pixel stroke into a mid-density glyph instead of dropping it.
  */
-export const imageToAscii = (image: HTMLImageElement, columns: number): AsciiRow[] => {
+export const imageToAscii = (image: HTMLImageElement, columns: number, fixedRows?: number): AsciiRow[] => {
   const width = image.naturalWidth
   const height = image.naturalHeight
 
@@ -79,7 +79,7 @@ export const imageToAscii = (image: HTMLImageElement, columns: number): AsciiRow
   context.drawImage(image, 0, 0)
 
   const pixels = context.getImageData(0, 0, width, height).data
-  const rows = Math.max(1, Math.round(columns * (height / width) * CHAR_ASPECT))
+  const rows = fixedRows ?? Math.max(1, Math.round(columns * (height / width) * CHAR_ASPECT))
   const cellWidth = width / columns
   const cellHeight = height / rows
   const grid: AsciiRow[] = []

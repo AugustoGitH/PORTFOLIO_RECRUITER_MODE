@@ -17,12 +17,14 @@ const getElementProps = <T extends ButtonProps>(props: T) => {
 
 export const Button = (_props: ButtonProps) => {
   const { children, startAdornment, className, loading, ...props } = _props
-  const isLoading = Boolean(loading)
+  const isLoading = typeof loading === "object" ? loading.state : Boolean(loading)
+  const isDisabled = isLoading
   const loadingLabel = typeof loading === "object" ? loading.verb : children
   const buttonClassName = cn("flex items-center gap-2 border border-ud-neutral-300 py-1 px-2 rounded-sm text-sm transition", {
     "bg-ud-auxiliary-purple text-ud-neutral-0 font-bold border-ud-auxiliary-purple hover:bg-transparent hover:text-ud-auxiliary-purple": props.highlight,
     "hover:border-ud-neutral-950 hover:text-ud-neutral-950": !props.highlight,
-    "cursor-not-allowed border-ud-neutral-300 bg-ud-neutral-300 text-ud-secondary-600 animate-pulse hover:border-ud-neutral-300 hover:text-ud-secondary-600": isLoading,
+    "pointer-events-none border-ud-neutral-300 bg-ud-neutral-300 text-ud-secondary-600 ": isDisabled,
+    "animate-pulse": isLoading,
   }, className)
 
   const content = (

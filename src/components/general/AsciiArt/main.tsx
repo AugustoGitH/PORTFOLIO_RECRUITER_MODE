@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react"
 import { useAsciiArt, useAsciiReveal } from "../../../hooks/media"
 import { useOnceInView } from "../../../hooks/observer"
 import { cn } from "../../../utils/tailwind"
-import { CHAR_ASPECT } from "../../../utils/ascii"
+import { CHAR_ASPECT, type AsciiRow } from "../../../utils/ascii"
 import type { AsciiArtProps } from "./types"
 
 const DEFAULT_COLUMNS = 120
@@ -12,6 +13,24 @@ const TRANSITION = "transition-all duration-500 ease-out motion-reduce:transitio
 // "inline-block" so transform actually applies (inline boxes ignore it); only needed on the
 // cell an idle tick just touched, everything else stays a plain inline span.
 const PULSE = "inline-block animate-glyph-pop motion-reduce:animate-none"
+type ArtLayout = {
+  width: number
+  rows?: number
+  overflowAlign: "left" | "center" | "right"
+}
+
+const AsciiRows = ({ rows }: { rows: AsciiRow[] | null }) => rows?.map((row, rowIndex) => (
+  <span key={rowIndex} className="block">
+    {row.map((run, runIndex) => (
+      <span
+        key={run.pulseId ?? runIndex}
+        className={cn(run.tone === "accent" ? ACCENT : undefined, run.pulseId && PULSE)}
+      >
+        {run.text}
+      </span>
+    ))}
+  </span>
+))
 
 /**
  * Renders an image as a block of monospace characters, in the two tones of the palette:
@@ -28,11 +47,22 @@ const PULSE = "inline-block animate-glyph-pop motion-reduce:animate-none"
 export const AsciiArt = (props: AsciiArtProps) => {
   const columns = props.columns ?? DEFAULT_COLUMNS
   const variant = props.variant ?? DEFAULT_VARIANT
-  const target = useAsciiArt({ src: props.src, columns })
-  const { ref, inView } = useOnceInView<HTMLPreElement>()
+  const baseWidth = props.baseWidth ?? props.width
+  const overflowAlign = props.overflowAlign ?? "right"
+  const target = useAsciiArt({ src: props.src, columns, rows: props.rows })
+  const { ref, inView } = useOnceInView<HTMLDivElement>()
 
-  const fontSize = props.width / (columns * CHAR_ASPECT)
-  const cell = { width: props.width / columns, height: fontSize }
+  const [activeSource, setActiveSource] = useState(props.src)
+  const [activeLayout, setActiveLayout] = useState<ArtLayout>({
+    width: props.width,
+    rows: props.rows,
+    overflowAlign,
+  })
+  const [pendingLayout, setPendingLayout] = useState<ArtLayout | null>(null)
+
+  const fontSize = activeLayout.width / (columns * CHAR_ASPECT)
+  const baseFontSize = baseWidth / (columns * CHAR_ASPECT)
+  const cell = { width: activeLayout.width / columns, height: fontSize }
   const ascii = useAsciiReveal({
     rows: target.rows,
     play: inView,
@@ -40,32 +70,72 @@ export const AsciiArt = (props: AsciiArtProps) => {
     cell: variant === "converge" ? cell : undefined,
   })
 
+  // Keep the current footprint while a replacement bitmap decodes. A geometry change waits one
+  // committed frame before changing its CSS dimensions, letting the same ASCII grid morph while
+  // width, height and glyph size interpolate instead of replacing the drawing on hover.
+  if (target.source === props.src && activeSource !== props.src) {
+    const changesGeometry = activeLayout.width !== props.width || activeLayout.rows !== props.rows
+
+    setActiveSource(props.src)
+    if (changesGeometry) setPendingLayout({ width: props.width, rows: props.rows, overflowAlign })
+    else setActiveLayout({ width: props.width, rows: props.rows, overflowAlign })
+  }
+
+  useEffect(() => {
+    if (!pendingLayout) return
+
+    const frame = requestAnimationFrame(() => {
+      setActiveLayout(pendingLayout)
+      setPendingLayout(null)
+    })
+
+    return () => cancelAnimationFrame(frame)
+  }, [pendingLayout])
+
+  const getHorizontalPosition = (layout: ArtLayout) => layout.overflowAlign === "left"
+    ? { left: 0 }
+    : layout.overflowAlign === "center"
+      ? { left: "50%", transform: "translateX(-50%)" }
+      : { right: 0 }
+
+  const getArtStyle = (layout: ArtLayout) => {
+    const layoutFontSize = layout.width / (columns * CHAR_ASPECT)
+
+    return {
+      ...props.style,
+      ...getHorizontalPosition(layout),
+      width: layout.width,
+      minWidth: layout.width,
+      maxWidth: layout.width,
+      boxSizing: "border-box" as const,
+      height: layout.rows ? layout.rows * layoutFontSize : variant === "converge" ? (target.rows?.length ?? 0) * layoutFontSize : undefined,
+      fontSize: layoutFontSize,
+      position: "absolute" as const,
+    }
+  }
+
   return (
-    <pre
+    <div
       ref={ref}
       role="img"
       aria-label={props.alt}
       style={{
-        ...props.style,
-        width: props.width,
-        height: variant === "converge" ? (target.rows?.length ?? 0) * cell.height : undefined,
-        fontSize,
-        position: variant === "converge" ? "relative" : undefined,
+        width: baseWidth,
+        minWidth: baseWidth,
+        maxWidth: baseWidth,
+        flexShrink: 0,
+        boxSizing: "border-box",
+        height: props.baseRows ? props.baseRows * baseFontSize : props.rows ? props.rows * baseFontSize : variant === "converge" ? (target.rows?.length ?? 0) * baseFontSize : undefined,
+        position: "relative",
       }}
-      className={cn("m-0 font-mono leading-none select-none text-ud-neutral-999", props.className)}
+      className="shrink-0"
     >
-      {ascii.variant === "decode" && ascii.rows?.map((row, rowIndex) => (
-        <span key={rowIndex} className="block">
-          {row.map((run, runIndex) => (
-            <span
-              key={run.pulseId ?? runIndex}
-              className={cn(run.tone === "accent" ? ACCENT : undefined, run.pulseId && PULSE)}
-            >
-              {run.text}
-            </span>
-          ))}
-        </span>
-      ))}
+      <pre
+        aria-hidden="true"
+        style={getArtStyle(activeLayout)}
+        className={cn("pointer-events-none m-0 font-mono leading-none select-none text-ud-neutral-999 transition-[width,height,font-size] duration-[1140ms] ease-out motion-reduce:transition-none", props.className)}
+      >
+      {ascii.variant === "decode" && <AsciiRows rows={ascii.rows} />}
 
       {ascii.variant === "sweep" && ascii.rows?.map((row, rowIndex) => (
         <span
@@ -104,6 +174,7 @@ export const AsciiArt = (props: AsciiArtProps) => {
           {char.char}
         </span>
       ))}
-    </pre>
+      </pre>
+    </div>
   )
 }

@@ -12,6 +12,7 @@ export const Tab = <V extends number = number>(props: TabProps<V>) => {
       <div className="flex items-center gap-1 mx-2 ">
         {props.tab.icon && <props.tab.icon size={18} />}
         <span className="text-sm">{intl.t(props.tab.label)}</span>
+        {props.tab.indicator && <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-ud-auxiliary-purple" />}
       </div>
     </button>
   )

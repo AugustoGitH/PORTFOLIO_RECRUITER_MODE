@@ -11,11 +11,11 @@ import {
   PanelLeftIcon
 } from "lucide-react"
 import type { TabEntry } from "../../components/action/Tabs";
-import type { TagEntry } from "../../components/action/Tag/types";
 import { BsGithub, BsWhatsapp } from "react-icons/bs";
 import { IoNutrition } from "react-icons/io5";
 import type { Link } from "../../utils/types";
 import type { Term } from "../intl";
+import type { SkillValue } from "./skills";
 
 export enum ProjectKind {
   All,
@@ -29,7 +29,7 @@ export type Project = {
   description?: Term
   title: string
   value: string
-  skill?: TagEntry
+  skills: SkillValue[]
   links?: Link[]
   kind: Exclude<ProjectKind, ProjectKind.All>
 }
@@ -62,6 +62,7 @@ export const PROJECTS: Project[] = [
     description: "ZapFlowDescription",
     value: "zap-flow",
     kind: ProjectKind.Professional,
+    skills: ["nextjs", "nestjs", "postgresql", "rest", "solid", "design-patterns", "clean-code"],
   },
   {
     icon: IoNutrition,
@@ -69,6 +70,7 @@ export const PROJECTS: Project[] = [
     description: "SaludiiDescription",
     value: "saludii",
     kind: ProjectKind.Professional,
+    skills: ["redwood", "remix", "graphql", "prisma", "postgresql", "solid", "design-patterns", "clean-code"],
     links: [
       {
         href: "https://saludii.com/para-nutricionistas#nutritionSection",
@@ -85,6 +87,7 @@ export const PROJECTS: Project[] = [
     description: "BudgetXpertDescription",
     value: "budget-xpert",
     kind: ProjectKind.Professional,
+    skills: ["nextjs", "react", "typescript", "graphql", "sql-server", "storybook", "vitest", "pytest", "claude-code", "solid", "design-patterns", "clean-code"],
     links: [
       {
         href: "https://budgetxpert.com/br",
@@ -100,6 +103,7 @@ export const PROJECTS: Project[] = [
     description: "TechLegionWebsiteDescription",
     value: "tech-legion",
     kind: ProjectKind.Volunteer,
+    skills: ["react", "nextjs", "code-review", "rest", "solid", "design-patterns", "clean-code"],
     links: [
       {
         href: "https://www.linkedin.com/feed/update/urn:li:activity:7095622376691777536/",
@@ -127,6 +131,7 @@ export const PROJECTS: Project[] = [
     description: "OnlinksDescription",
     value: "onlinks",
     kind: ProjectKind.Volunteer,
+    skills: ["react", "nextjs", "rest", "solid", "design-patterns", "clean-code"],
     links: [
       {
         href: "https://www.linkedin.com/feed/update/urn:li:activity:7178782843492331521/?originTrackingId=oTeEBqIOQualcn3xYI7Q%2Bg%3D%3D",
@@ -154,6 +159,7 @@ export const PROJECTS: Project[] = [
     description: "CodeQuizDescription",
     value: "codequiz",
     kind: ProjectKind.Personal,
+    skills: ["react", "nodejs", "rest", "codex", "solid", "design-patterns", "clean-code"],
     links: [
       {
         href: "https://www.linkedin.com/feed/update/urn:li:activity:7050885870089908224/?originTrackingId=tltcKXPtQ82H3vhMTxFpYQ%3D%3D",
@@ -181,6 +187,7 @@ export const PROJECTS: Project[] = [
     description: "PortfolioBioLinksDescription",
     value: "portfolio-bio-links",
     kind: ProjectKind.Personal,
+    skills: ["react", "typescript", "codex", "solid", "design-patterns", "clean-code"],
     links: [
       {
         href: "https://augustowestphal.netlify.app/",
@@ -202,6 +209,7 @@ export const PROJECTS: Project[] = [
     description: "PortfolioCMSDescription",
     value: "portfolio-cms",
     kind: ProjectKind.Personal,
+    skills: ["react", "nodejs", "mongodb", "codex", "solid", "design-patterns", "clean-code"],
     links: [
       {
         href: "https://www.linkedin.com/feed/update/urn:li:activity:7041787445163483136/?originTrackingId=UR1fCSU1RwiyDXkQclivqw%3D%3D",

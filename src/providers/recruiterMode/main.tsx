@@ -1,13 +1,54 @@
-import { createContext, useContext, useState } from "react"
-import type { RecruiterModeContextValue, RecruiterModeProviderProps } from "./types"
-import { RecruiterFormButton } from "../../features/recruiter"
+import { createContext, useContext, useEffect, useState } from "react"
+import type { PortfolioAudience, RecruiterModeContextValue, RecruiterModeProviderProps, RecruiterRole, RecruiterSeniority } from "./types"
 
 const RecruiterModeContext = createContext({} as RecruiterModeContextValue)
+
+const RECRUITER_ROLES: RecruiterRole[] = ["frontend", "backend", "database", "tests", "architecture", "tools"]
+const RECRUITER_SENIORITIES: RecruiterSeniority[] = ["junior", "mid-level", "senior"]
 
 export const useRecruiterModeContext = () => useContext(RecruiterModeContext)
 
 export const RecruiterModeProvider = (props: RecruiterModeProviderProps) => {
-  const [isRecruiterMode, setIsRecruiterMode] = useState(false)
+  const [audience, setAudience] = useState<PortfolioAudience>("default")
+  const [roles, setRoles] = useState<RecruiterRole[]>([])
+  const [seniority, setSeniority] = useState<RecruiterSeniority | null>(null)
+  const [hasRestoredReading, setHasRestoredReading] = useState(false)
+  const isRecruiterMode = audience === "recruiter"
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      const parameters = new URLSearchParams(window.location.search)
+      setAudience(parameters.get("audience") === "recruiter" ? "recruiter" : "default")
+      const queryRoles = (parameters.get("roles") ?? parameters.get("role") ?? "").split(",")
+      const querySeniority = parameters.get("seniority")
+      setRoles(queryRoles.filter((role): role is RecruiterRole => RECRUITER_ROLES.includes(role as RecruiterRole)))
+      setSeniority(RECRUITER_SENIORITIES.includes(querySeniority as RecruiterSeniority) ? querySeniority as RecruiterSeniority : null)
+      setHasRestoredReading(true)
+    })
+
+    return () => window.clearTimeout(timeoutId)
+  }, [])
+
+  useEffect(() => {
+    if (!hasRestoredReading) return
+
+    const url = new URL(window.location.href)
+
+    if (isRecruiterMode) {
+      url.searchParams.set("audience", "recruiter")
+      if (roles.length) url.searchParams.set("roles", roles.join(","))
+      else url.searchParams.delete("roles")
+      url.searchParams.delete("role")
+      if (seniority) url.searchParams.set("seniority", seniority)
+      else url.searchParams.delete("seniority")
+    } else {
+      url.searchParams.delete("audience")
+      url.searchParams.delete("roles")
+      url.searchParams.delete("seniority")
+    }
+
+    window.history.replaceState(window.history.state, "", url)
+  }, [hasRestoredReading, isRecruiterMode, roles, seniority])
 
   const onRecruiterMode = () => {
     window.scrollTo({
@@ -16,33 +57,32 @@ export const RecruiterModeProvider = (props: RecruiterModeProviderProps) => {
     })
   }
 
-  const offRecruiterMode = () => {
-
-  }
-
   const changeRecruiterMode = (state: boolean | ((prevState: boolean) => boolean)) => {
-    setIsRecruiterMode(prevState => {
-      const currentState = typeof state === "function" ? state(prevState) : state
+    setAudience((previousAudience) => {
+      const currentState = typeof state === "function" ? state(previousAudience === "recruiter") : state
 
       if (currentState) onRecruiterMode()
-      if (!currentState) offRecruiterMode()
 
-      return currentState
+      return currentState ? "recruiter" : "default"
     })
   }
 
   const toggleRecruiterMode = () => changeRecruiterMode(prevState => !prevState)
 
   const value: RecruiterModeContextValue = {
+    audience,
     isRecruiterMode,
+    roles,
+    seniority,
     changeRecruiterMode,
-    toggleRecruiterMode
+    toggleRecruiterMode,
+    setRoles,
+    setSeniority,
   }
 
   return (
     <RecruiterModeContext.Provider value={value}>
       {props.children}
-      <RecruiterFormButton />
     </RecruiterModeContext.Provider>
   )
 }

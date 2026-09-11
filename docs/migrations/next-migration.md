@@ -26,13 +26,17 @@ Esta migração não redesenha o portfólio, não altera o conteúdo editorial e
 - A rota `/` é fornecida por `src/app/page.tsx`; a única tela monta seis seções em `src/screens/Main/main.tsx`.
 - Há providers para idioma, popover e modo recrutador. Muitos componentes dependem de estado, `window` ou hooks e permanecerão client-side inicialmente.
 - O conteúdo editorial pertence a `src/constants/profile/` e os textos traduzíveis a `src/constants/intl/terms.ts`.
-- A conexão MongoDB, os modelos `Like` e `View` e o health check ficam em `src/libs/backend/` e `src/app/api/`.
+- A conexão MongoDB e os modelos `Like` e `View` ficam em `backend/`; health check e adaptadores HTTP ficam em `src/app/api/`.
 - Há trabalho local não commitado na arte ASCII. Ele não será incorporado, descartado nem refeito como efeito colateral desta migração.
 
 ## 4. Arquitetura-alvo
 
 ```text
 ./
+├── backend/
+│   ├── metrics/
+│   ├── security/
+│   └── libs/db/mongo/
 ├── public/
 ├── src/
 │   ├── app/
@@ -44,10 +48,6 @@ Esta migração não redesenha o portfólio, não altera o conteúdo editorial e
 │   ├── components/
 │   ├── constants/
 │   ├── features/
-│   ├── libs/
-│   │   └── backend/
-│   │       ├── models/
-│   │       └── mongodb.ts
 │   ├── providers/
 │   └── ...
 ├── next.config.ts
@@ -101,7 +101,7 @@ O diretório `src/app/` assume o papel de `main.tsx` como ponto de entrada. `App
 
 **Objetivo:** mover somente APIs que têm comportamento real ou são necessárias ao produto.
 
-1. Criar `src/libs/backend/mongodb.ts` com cliente reutilizável e leitura de `MONGO_URL` sem expor segredo ao cliente.
+1. Criar `backend/libs/db/mongo` com cliente reutilizável e leitura de `MONGO_URL` sem expor segredo ao cliente.
 2. Migrar `GET /api/health` para `src/app/api/health/route.ts`.
 3. Definir e implementar de fato o contrato de métricas antes de migrar os endpoints correspondentes; handlers atuais retornam objetos vazios e não devem ser copiados como se fossem produto concluído.
 4. Migrar feedback, métricas e futuras APIs do recruiter mode uma a uma, com schema de entrada, resposta e testes de integração.
@@ -109,22 +109,22 @@ O diretório `src/app/` assume o papel de `main.tsx` como ponto de entrada. `App
 
 **Concluída quando:** as APIs em uso respondem no Next, persistem no MongoDB quando necessário e possuem testes do comportamento público.
 
-**Implementação atual:** `src/libs/backend/mongodb.ts` usa o driver oficial, é exclusivo do servidor e cria a conexão sob demanda. `GET /api/health` já está no Next e continua independente do banco. Métricas não foram migradas porque os handlers eram stubs sem consumidores ou persistência.
+**Implementação atual:** `backend/libs/db/mongo` usa o driver oficial, é exclusivo do servidor e cria a conexão sob demanda. `GET /api/health` já está no Next e continua independente do banco. Métricas não foram migradas porque os handlers eram stubs sem consumidores ou persistência.
 
-**Modelos preservados:** `Like`, `View`, `ViewType` e seus helpers de coleção foram movidos para `src/libs/backend/models/`. A coleção de views foi corrigida para `views`; o helper antigo apontava incorretamente para `likes`.
+**Modelos preservados:** `Like`, `View`, `ViewType` e seus helpers de coleção foram movidos para `backend/metrics/models/`. A coleção de views foi corrigida para `views`; o helper antigo apontava incorretamente para `likes`.
 
 ### Fase 4 — remoção controlada do Fastify
 
 **Objetivo:** encerrar o backend separado sem remover capacidades ativas.
 
-1. Confirmar que nenhuma chamada, script de deploy ou variável depende de `backend/`.
+1. Confirmar que nenhuma chamada, script de deploy ou variável depende do antigo serviço Fastify.
 2. Remover proxy Vite, CORS específico do Fastify e scripts de execução concorrente.
 3. Preservar o `docker-compose.yml` como provisionamento local do MongoDB.
 4. Atualizar README e instruções de ambiente para o deploy único.
 
 **Concluída quando:** o projeto inicia, compila e serve o portfólio e a API somente pelo Next.
 
-**Implementação:** os modelos MongoDB foram movidos para `src/libs/backend/models/`; o diretório Fastify, suas dependências, scripts e documentação foram removidos. `backend/.env` foi preservado localmente como `.env.local` quando presente.
+**Implementação:** os modelos MongoDB foram movidos para `backend/metrics/models/`; o diretório Fastify, suas dependências, scripts e documentação foram removidos. `backend/.env` legado foi preservado localmente como `.env.local` quando presente.
 
 ### Fase 5 — qualidade e publicação
 
@@ -139,7 +139,7 @@ O diretório `src/app/` assume o papel de `main.tsx` como ponto de entrada. `App
 | Risco | Prevenção |
 | --- | --- |
 | Regressão de UI durante troca de framework | Fase 1 mantém a tela inteira como client-side inicialmente; otimização vem depois. |
-| Perder modelos ao retirar Fastify | `Like`, `View` e seus helpers de coleção foram preservados em `src/libs/backend/models/`. |
+| Perder modelos ao retirar Fastify | `Like`, `View` e seus helpers de coleção foram preservados em `backend/metrics/models/`. |
 | Expor `MONGO_URL` | Conexão fica em módulo server-only; variáveis públicas usam apenas prefixo `NEXT_PUBLIC_` quando necessário. |
 | Consumir a franquia Plus em uma tentativa longa | Uma fase por sessão, checkpoint ao final e nenhuma execução paralela por padrão. |
 | Perder o trabalho ASCII local | Fase 0 exige checkpoint próprio antes de mexer em dependências ou estrutura. |

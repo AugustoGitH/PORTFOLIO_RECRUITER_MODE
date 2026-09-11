@@ -25,6 +25,7 @@ import type { AsciiArtInput, AsciiArtOutput } from './types'
 export const useAsciiArt = (input: AsciiArtInput): AsciiArtOutput => {
   // #region States
   const [rows, setRows] = useState<AsciiRow[] | null>(null)
+  const [source, setSource] = useState<string | null>(null)
 
   // #endregion
 
@@ -40,18 +41,21 @@ export const useAsciiArt = (input: AsciiArtInput): AsciiArtOutput => {
     image
       .decode()
       .then(() => {
-        if (active) setRows(imageToAscii(image, input.columns))
+        if (active) {
+          setRows(imageToAscii(image, input.columns, input.rows))
+          setSource(input.src)
+        }
       })
       .catch(() => {
-        if (active) setRows(null)
+        // Keep the current art visible if a replacement cannot be decoded.
       })
 
     return () => {
       active = false
     }
-  }, [input.src, input.columns])
+  }, [input.src, input.columns, input.rows])
 
   // #endregion
 
-  return { rows }
+  return { rows, source }
 }

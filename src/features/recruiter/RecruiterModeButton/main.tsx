@@ -12,6 +12,6 @@ export const RecruiterModeButton = () => {
     startAdornment={<UserRoundSearch size={15} />}
     highlight={!recruiterMode.isRecruiterMode}
   >
-    {recruiterMode.isRecruiterMode ? intl.t("DefaultMode") : intl.t("RecruitmentMode")}
+    {recruiterMode.isRecruiterMode ? intl.t("GeneralReading") : intl.t("Recruiter")}
   </Button>
 }

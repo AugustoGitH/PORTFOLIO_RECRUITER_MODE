@@ -1,11 +1,13 @@
-import { StaticResumeCatalog, getResumeFilename, renderResume, toResumeProfile, type ResumeLocale } from "../../../../features/resume"
+import { StaticResumeCatalog, getResumeFilename, renderResume, toResumeProfile, type ResumeLocale } from "@backend/resume"
+import { metricsController, metricsService } from "@backend/metrics"
+import { withRateLimit } from "@backend/security"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 const supportedLocales: ResumeLocale[] = ["ptbr", "en"]
 
-export async function GET(request: Request, context: { params: Promise<{ slug: string }> }) {
+async function download(request: Request, context: { params: Promise<{ slug: string }> }) {
   const locale = new URL(request.url).searchParams.get("locale")
 
   if (!locale || !supportedLocales.includes(locale as ResumeLocale)) {
@@ -28,6 +30,12 @@ export async function GET(request: Request, context: { params: Promise<{ slug: s
       chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk)
     }
 
+    try {
+      await metricsService.recordResumeDownload(metricsController.getVisitorId(request), locale, slug)
+    } catch (metricsError) {
+      console.error("Unable to record resume download", metricsError)
+    }
+
     return new Response(Buffer.concat(chunks), {
       headers: {
         "Content-Type": "application/pdf",
@@ -40,3 +48,5 @@ export async function GET(request: Request, context: { params: Promise<{ slug: s
     return Response.json({ error: "Unable to render resume" }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(download, { visitor: 3, ip: 10 })

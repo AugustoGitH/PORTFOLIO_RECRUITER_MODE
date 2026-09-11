@@ -64,7 +64,7 @@ const TabsInner = <V extends number = number>(props: TabsProps<V>) => {
 
 export const Tabs = <V extends number = number>(props: TabsProps<V>) => {
   return (
-    <TabsProvider>
+    <TabsProvider initialTab={props.initialTab}>
       <TabsInner {...props} />
     </TabsProvider>
   )

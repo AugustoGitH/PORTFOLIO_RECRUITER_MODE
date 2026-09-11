@@ -53,5 +53,6 @@ export const SECTIONS: Record<string, Section> = {
 }
 
 export const GROUP_SECTION_LINKS = {
-  main: [SECTIONS.about, SECTIONS.skills, SECTIONS.projects,  SECTIONS.experiences, SECTIONS.testimonials, SECTIONS.feedback,]
+  main: [SECTIONS.about, SECTIONS.skills, SECTIONS.projects, SECTIONS.experiences, SECTIONS.testimonials, SECTIONS.feedback],
+  recruiter: [SECTIONS.about, SECTIONS.experiences, SECTIONS.projects, SECTIONS.skills, SECTIONS.testimonials, SECTIONS.feedback],
 }

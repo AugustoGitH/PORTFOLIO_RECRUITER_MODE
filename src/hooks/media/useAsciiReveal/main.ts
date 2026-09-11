@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { RAMP, type AsciiRow, type AsciiRun } from '../../../utils/ascii'
 
@@ -15,6 +15,9 @@ const REVEAL_TOTAL_MS = MIN_DELAY_MS + WAVE_SPAN_MS
 
 /** How often "decode" refreshes unresolved rows with a fresh random glyph. */
 const DECODE_TICK_MS = 60
+
+/** How long an individual cell takes to settle into its next-source glyph. */
+const MORPH_CELL_MS = 220
 
 /** How often the settled idle shimmer refreshes its batch of nudged glyphs. */
 const IDLE_TICK_MS = 160
@@ -46,6 +49,58 @@ const shiftGlyph = (char: string, delta: number) => {
 
   return index === -1 ? char : RAMP[Math.min(RAMP.length - 1, Math.max(0, index + delta))]
 }
+
+type AsciiCell = { char: string; tone: AsciiRun["tone"] }
+
+const toCells = (row: AsciiRow | undefined): AsciiCell[] =>
+  row?.flatMap((run) => Array.from(run.text, (char) => ({ char, tone: run.tone }))) ?? []
+
+const toRuns = (cells: AsciiCell[]): AsciiRow => cells.reduce<AsciiRow>((runs, cell) => {
+  const previous = runs[runs.length - 1]
+
+  if (previous?.tone === cell.tone) previous.text += cell.char
+  else runs.push({ text: cell.char, tone: cell.tone })
+
+  return runs
+}, [])
+
+const glyphIndex = (char: string) => {
+  if (char === " ") return RAMP.length
+
+  const index = RAMP.indexOf(char)
+  return index === -1 ? RAMP.length : index
+}
+
+const interpolateCell = (from: AsciiCell, to: AsciiCell, progress: number): AsciiCell => {
+  const index = Math.round(glyphIndex(from.char) + (glyphIndex(to.char) - glyphIndex(from.char)) * progress)
+  const char = index === RAMP.length ? " " : RAMP[index]
+
+  if (char === " ") return { char, tone: "blank" }
+
+  const tone = progress < 0.5
+    ? (from.tone === "blank" ? to.tone : from.tone)
+    : (to.tone === "blank" ? from.tone : to.tone)
+
+  return { char, tone }
+}
+
+/** Turns one source grid into another without replacing the rendered block. Both grids normally
+ * have the same dimensions; missing cells are treated as blank so the fallback remains safe. */
+const morphRows = (from: AsciiRow[], to: AsciiRow[], elapsed: number): AsciiRow[] => Array.from({ length: Math.max(from.length, to.length) }, (_, rowIndex) => {
+  const sourceCells = toCells(from[rowIndex])
+  const targetCells = toCells(to[rowIndex])
+  const columns = Math.max(sourceCells.length, targetCells.length)
+  const delay = waveDelay(rowIndex, Math.max(from.length, to.length))
+  const progress = Math.min(1, Math.max(0, (elapsed - delay) / MORPH_CELL_MS))
+
+  return toRuns(Array.from({ length: columns }, (_, columnIndex) =>
+    interpolateCell(
+      sourceCells[columnIndex] ?? { char: " ", tone: "blank" },
+      targetCells[columnIndex] ?? { char: " ", tone: "blank" },
+      progress,
+    )
+  ))
+})
 
 /** Fresh id for every pulse, so using it as a React key forces the touched cell to remount and
  * replay its CSS pop animation instead of silently updating text on the same node. */
@@ -220,9 +275,38 @@ const useIdleChars = (baseChars: AsciiChar[] | null, active: boolean): AsciiChar
  * first. Cheapest variant — only run strings mutate, nothing moves. */
 const useDecodeReveal = (target: AsciiRow[] | null, play: boolean) => {
   const [rows, setRows] = useState<AsciiRow[] | null>(null)
+  const previousTarget = useRef<AsciiRow[] | null>(null)
 
   useEffect(() => {
     if (!play || !target) return
+
+    const previous = previousTarget.current
+    previousTarget.current = target
+
+    if (previous && previous !== target) {
+      if (prefersReducedMotion()) {
+        const frame = requestAnimationFrame(() => setRows(target))
+        return () => cancelAnimationFrame(frame)
+      }
+
+      const start = performance.now()
+      const totalMs = REVEAL_TOTAL_MS + MORPH_CELL_MS
+      const tick = () => {
+        const elapsed = performance.now() - start
+        setRows(morphRows(previous, target, elapsed))
+
+        if (elapsed >= totalMs) {
+          clearInterval(interval)
+          setRows(target)
+        }
+      }
+      const interval = setInterval(tick, DECODE_TICK_MS)
+      tick()
+
+      return () => clearInterval(interval)
+    }
+
+    if (previous === target) return
 
     if (prefersReducedMotion()) {
       // Deferred a frame (rather than set synchronously here) to keep this effect's only
@@ -239,7 +323,10 @@ const useDecodeReveal = (target: AsciiRow[] | null, play: boolean) => {
 
       setRows(target.map((row, rowIndex) => (elapsed >= waveDelay(rowIndex, rowCount) ? row : row.map(scrambleRun))))
 
-      if (elapsed >= REVEAL_TOTAL_MS) clearInterval(interval)
+      if (elapsed >= REVEAL_TOTAL_MS) {
+        clearInterval(interval)
+        setRows(target)
+      }
     }
 
     tick()
@@ -248,7 +335,7 @@ const useDecodeReveal = (target: AsciiRow[] | null, play: boolean) => {
     return () => clearInterval(interval)
   }, [play, target])
 
-  return useIdleRows(rows, useSettled(play, REVEAL_TOTAL_MS))
+  return useIdleRows(rows, useSettled(play, REVEAL_TOTAL_MS) && rows === target)
 }
 
 /** "sweep": each row slides up and fades in, bottom row first. Pure CSS (transform/opacity) —

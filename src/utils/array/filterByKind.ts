@@ -7,7 +7,7 @@
  * omit `allKind` and always filter by the exact kind.
  */
 export const filterByKind = <T extends { kind: number }>(
-  items: T[],
+  items: readonly T[],
   kind: number,
   allKind?: number,
-): T[] => (kind === allKind ? items : items.filter((item) => item.kind === kind))
+): T[] => (kind === allKind ? Array.from(items) : items.filter((item) => item.kind === kind))

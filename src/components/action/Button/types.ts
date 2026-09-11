@@ -1,4 +1,5 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, PropsWithChildren, ReactNode } from "react";
+import { PropsWithClassName } from "../../../utils/types";
 
 export type ButtonBaseProps = {
   highlight?: boolean
@@ -9,6 +10,7 @@ export type ButtonBaseProps = {
    */
   loading?: boolean | {
     verb: ReactNode
+    state: boolean
   }
 }
 
@@ -20,4 +22,4 @@ export type LinkButtonProps = PropsWithChildren<AnchorHTMLAttributes<HTMLAnchorE
   href: string
 }> & ButtonBaseProps
 
-export type ButtonProps = NativeButtonProps | LinkButtonProps
+export type ButtonProps = PropsWithClassName<NativeButtonProps | LinkButtonProps>

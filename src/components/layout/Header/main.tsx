@@ -3,9 +3,11 @@ import { useINTLContext } from "../../../providers/intl"
 import { LanguageSelect, VerticalMenuButton } from "./components"
 import { RecruiterModeButton } from "../../../features/recruiter"
 import { NavItems } from "../NavItems"
+import { useRecruiterModeContext } from "../../../providers/recruiterMode"
 
 export const Header = () => {
   const intl = useINTLContext()
+  const { isRecruiterMode } = useRecruiterModeContext()
 
   return (
     <div className="w-full  px-2 pt-2  sticky top-0 left-0 z-50 bg-ud-neutral-100">
@@ -18,7 +20,7 @@ export const Header = () => {
           </div>
         </div>
         <nav className="flex items-center gap-6">
-          <NavItems links={GROUP_SECTION_LINKS.main} variant="header" />
+          <NavItems links={GROUP_SECTION_LINKS[isRecruiterMode ? "recruiter" : "main"]} variant="header" />
         </nav>
         <div className="flex items-center gap-4">
           <RecruiterModeButton />

@@ -27,7 +27,7 @@ O ponto de entrada do App Router é `src/app/`: `layout.tsx` define o documento 
 | Texto traduzível | `src/constants/intl/terms.ts` | Registro de termos PT/EN consumido por `useINTLContext().t(...)`. |
 | Comportamento reutilizável | `src/hooks/`, `src/utils/` | Hooks de UI/navegação e funções puras. |
 | APIs internas | `src/app/api/` | Route Handlers do Next; há health check em `api/health/route.ts`. |
-| Backend interno | `src/libs/backend/` | Código server-only do Next, incluindo MongoDB e modelos. |
+| Backend interno | `backend/` | Código server-only de domínio e infraestrutura, incluído no build do Next. |
 
 Arquitetura de renderização atual:
 
@@ -49,7 +49,7 @@ flowchart TD
 ## Convenções de código
 
 - Pastas de componentes, hooks e módulos usam `main.tsx` ou `main.ts` para implementação, `types.ts` para contrato e `index.ts` para exportação pública. Em subáreas, há barrels adicionais para agrupamento.
-- Imports são relativos; não há alias de paths configurado.
+- Use `@/` para módulos em `src/` e `@backend/` para módulos server-only em `backend/`; não atravesse a fronteira com imports relativos longos.
 - `PropsWithClassName` e tipos comuns ficam em `src/utils/types/`; classes condicionais devem usar `cn` de `src/utils/tailwind`.
 - Tailwind v4 é carregado por `@tailwindcss/postcss`. `src/app/globals.css` importa `src/index.css`, onde vivem os tokens `ud-*`, incluindo cores, espaçamento, sombras, z-index e animações. Reutilize tokens antes de criar valores arbitrários.
 - A navegação de seção é baseada em hashes. `useHashNavigation` e `scrollToHash` cuidam do scroll e do offset do header; links novos precisam acompanhar `GROUP_SECTION_LINKS` em `constants/profile/page.ts` e um `id` compatível na seção.
@@ -73,9 +73,9 @@ Hoje as skills de experiências são `TagEntry` literais, e projetos possuem `sk
 
 `GET /api/health` está em `src/app/api/health/route.ts` e não é uma dependência de renderização da página principal. Não há API ou servidor separado fora do Next.
 
-`src/libs/backend/mongodb.ts` exporta `getMongoClient()` e `getMongoDb()` para Route Handlers e Server Components. O módulo importa `server-only`, reutiliza a conexão durante o hot reload e só exige `MONGO_URL` quando alguma rota realmente acessa o banco. Copie `.env.example` para `.env.local` e não use o prefixo `NEXT_PUBLIC_` nessa variável.
+`backend/libs/db/mongo` exporta `getMongoClient()` e `getMongoDb()` para Route Handlers e Server Components. O módulo importa `server-only`, reutiliza a conexão durante o hot reload e só exige `MONGO_URL` quando alguma rota realmente acessa o banco. Copie `.env.example` para `.env.local` e não use o prefixo `NEXT_PUBLIC_` nessa variável.
 
-Os modelos que existiam no backend foram preservados em `src/libs/backend/models/`. Use `getLikesCollection(await getMongoDb())` e `getViewsCollection(await getMongoDb())` dentro de código server-side. `View` agora aponta para a coleção `views`, corrigindo o helper antigo que, por engano, apontava views para `likes`.
+Os modelos de cada domínio ficam junto do módulo: métricas usam `backend/metrics/models/`. Use `getLikesCollection(await getMongoDb())` e `getViewsCollection(await getMongoDb())` dentro de código server-side. `View` agora aponta para a coleção `views`, corrigindo o helper antigo que, por engano, apontava views para `likes`.
 
 O idioma inicial é `ptbr` no servidor para manter a hidratação determinística. Depois da hidratação, `INTLProvider` restaura a preferência salva em `localStorage`.
 

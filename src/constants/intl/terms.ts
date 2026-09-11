@@ -41,9 +41,9 @@ FreelancerDescription: {
 },
 TechLeadDescription: {
   ptbr:
-    "Atuei como <b>desenvolvedor Full Stack</b> e <b>Tech Lead</b>, participando do desenvolvimento de soluções para clientes e conduzindo tecnicamente projetos e equipes.",
+    "Atuei como <b>desenvolvedor Full Stack</b> e <b>Tech Lead</b>, conduzindo um pequeno time, compartilhando conceitos técnicos em calls com voluntários e desenvolvendo soluções para <b>clientes reais</b> em projetos captados pela Tech Legion.",
   en:
-    "Worked as a <b>Full-Stack Developer</b> and <b>Tech Lead</b>, contributing to the development of client solutions while providing technical leadership for projects and teams."
+    "Worked as a <b>Full-Stack Developer</b> and <b>Tech Lead</b>, leading a small team, sharing technical concepts with volunteers in calls, and building solutions for <b>real clients</b> through projects brought in by Tech Legion."
 },
 ZapFlowDescription: {
   ptbr:
@@ -66,6 +66,14 @@ TechLeadFrontendDescription: {
 Experiences: {
   ptbr: "Experiências",
   en: "Experiences"
+},
+ProfessionalTimeline: {
+  ptbr: "Trajetória profissional",
+  en: "Professional timeline"
+},
+ProfessionalExperienceTotal: {
+  ptbr: "Experiência profissional comprovada: {duration}",
+  en: "Verified professional experience: {duration}"
 },
 About: {
   ptbr: "Sobre",
@@ -131,6 +139,10 @@ ResumeSummary: {
   ptbr: "Resumo profissional",
   en: "Professional summary"
 },
+ResumeProfessionalSummary: {
+  ptbr: "Desenvolvedor Web Full-Stack com experiência na criação de aplicações modernas, escaláveis e de alta performance, atuando com foco em qualidade técnica, produtividade e experiência do usuário.",
+  en: "Full-Stack Web Developer experienced in building modern, scalable, high-performance applications, with a focus on technical quality, productivity, and user experience."
+},
 ResumeTechnologies: {
   ptbr: "Tecnologias",
   en: "Technologies"
@@ -172,6 +184,14 @@ FeedbackDescription: {
 LeaveALike: {
   ptbr: "Deixar um like",
   en: "Leave a Like"
+},
+Liked: {
+  ptbr: "Curtido",
+  en: "Liked"
+},
+Liking: {
+  ptbr: "Curtindo",
+  en: "Liking"
 },
 GiveFeedback: {
   ptbr: "Dar um feedback",
@@ -280,6 +300,130 @@ DefaultMode: {
 RecruitmentMode: {
   ptbr: "Modo Recrutamento",
   en: "Recruitment Mode"
+},
+GeneralReading: {
+  ptbr: "Visão geral",
+  en: "Overview"
+},
+ProfessionalProfile: {
+  ptbr: "Ficha profissional",
+  en: "Professional profile"
+},
+Role: {
+  ptbr: "Atuação",
+  en: "Role"
+},
+Seniority: {
+  ptbr: "Senioridade",
+  en: "Seniority"
+},
+Junior: {
+  ptbr: "Júnior",
+  en: "Junior"
+},
+Senior: {
+  ptbr: "Sênior",
+  en: "Senior"
+},
+RefineRecruiterReading: {
+  ptbr: "Refine esta leitura",
+  en: "Refine this view"
+},
+RecruiterQuestionsDescription: {
+  ptbr: "Selecione uma ou mais áreas e a senioridade da vaga para priorizar as evidências mais relevantes.",
+  en: "Select one or more role areas and the seniority to prioritize the most relevant evidence."
+},
+RoleOrStack: {
+  ptbr: "Área ou stack da vaga",
+  en: "Job role or stack"
+},
+JobSeniority: {
+  ptbr: "Senioridade da vaga",
+  en: "Job seniority"
+},
+SeniorityComparison: {
+  ptbr: "Vaga: {vacancy}. Perfil declarado: {profile}.",
+  en: "Role: {vacancy}. Declared profile: {profile}."
+},
+MidLevel: {
+  ptbr: "Pleno (mid-level)",
+  en: "Mid-level"
+},
+Availability: {
+  ptbr: "Disponibilidade",
+  en: "Availability"
+},
+Remote: {
+  ptbr: "Remoto",
+  en: "Remote"
+},
+Location: {
+  ptbr: "Localização",
+  en: "Location"
+},
+GuarapariES: {
+  ptbr: "Guarapari, ES",
+  en: "Guarapari, ES, Brazil"
+},
+Experience: {
+  ptbr: "Experiência",
+  en: "Experience"
+},
+PrimaryStack: {
+  ptbr: "Stack com evidências",
+  en: "Evidence-backed stack"
+},
+EvidenceBySkill: {
+  ptbr: "Evidências por habilidade",
+  en: "Evidence by skill"
+},
+ProfessionalExperiences: {
+  ptbr: "experiência(s) profissional(is)",
+  en: "professional experience(s)"
+},
+ProjectsBuilt: {
+  ptbr: "projeto(s)",
+  en: "project(s)"
+},
+Evidence: {
+  ptbr: "Evidências",
+  en: "Evidence"
+},
+Courses: {
+  ptbr: "Cursos e certificações",
+  en: "Courses and certifications"
+},
+LearningInContext: {
+  ptbr: "Aprendizado em contexto",
+  en: "Learning in context"
+},
+SaludiiRedwoodLearningDelivery: {
+  ptbr: "Aprendi Redwood.js para contribuir com um MVP entregue ao uso de dezenas de nutricionistas.",
+  en: "Learned Redwood.js to contribute to an MVP delivered for use by dozens of nutritionists."
+},
+ZapFlowNestLearningDelivery: {
+  ptbr: "Aprendi NestJS para contribuir com o MVP ZapFlow, entregue ao uso de milhares de pessoas.",
+  en: "Learned NestJS to contribute to the ZapFlow MVP, delivered for use by thousands of people."
+},
+ZapFlowPostgresLearningDelivery: {
+  ptbr: "Aprendi PostgreSQL para contribuir com o MVP ZapFlow, entregue ao uso de milhares de pessoas.",
+  en: "Learned PostgreSQL to contribute to the ZapFlow MVP, delivered for use by thousands of people."
+},
+BudgetXpertSqlServerLearningDelivery: {
+  ptbr: "Aprendi SQL Server para contribuir com uma plataforma usada por dezenas de empresas de médio e grande porte.",
+  en: "Learned SQL Server to contribute to a platform used by dozens of mid-sized and large companies."
+},
+ShowHiddenSkills: {
+  ptbr: "Ver mais {count} habilidade(s)",
+  en: "Show {count} more skill(s)"
+},
+ContactMe: {
+  ptbr: "Vamos conversar",
+  en: "Let's talk"
+},
+RecruiterContactDescription: {
+  ptbr: "Encontrou evidências relevantes? Estou disponível para conversar sobre contexto, desafios e próximos passos.",
+  en: "Found relevant evidence? I'm available to discuss context, challenges, and next steps."
 },
 Greeting: {
   ptbr: "Olá, eu sou",

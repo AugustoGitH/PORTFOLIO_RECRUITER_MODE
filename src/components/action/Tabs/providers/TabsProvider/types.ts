@@ -8,4 +8,6 @@ export type TabsContextValue = {
     isCurrentTab: (tabIndex: number) => boolean
 }
 
-export type TabsProviderProps = PropsWithChildren
+export type TabsProviderProps = PropsWithChildren<{
+  initialTab?: number
+}>

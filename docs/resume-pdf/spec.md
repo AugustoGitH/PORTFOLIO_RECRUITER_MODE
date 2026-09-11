@@ -1,9 +1,10 @@
 # Currículo em PDF — Especificação
 
-**Status:** Fase 1 implementada; validação visual e testes automatizados pendentes
+**Status:** Fase 1 implementada; modelo `standard` em revisão editorial
 **Última atualização:** 2026-09-10
 
-**Escopo inicial:** download de um currículo padrão pelo CTA `Currículo` da seção About.
+**Escopo inicial:** download de um currículo padrão pelo CTA `Currículo` da seção About,
+com uma única página e conteúdo limitado para leitura rápida por recrutadores.
 
 ---
 
@@ -85,6 +86,26 @@ dados. A composição inicial usa:
 | Competências | `SKILLS` | Agrupar pelos `SkillKind`; não duplicar o vocabulário de skills. |
 | Projetos | `PROJECTS` | Fora da primeira versão, até que os vínculos de skills planejados pelo modo recrutador estejam completos. |
 
+### Limites editoriais obrigatórios da v1
+
+- O resumo profissional deve ocupar no máximo **quatro linhas renderizadas** no PDF. O limite
+  vale para o bloco visual, não para a quantidade de frases ou parágrafos no dado de origem.
+- A experiência profissional deve conter no máximo **quatro experiências**. A seleção precisa
+  ser determinística: primeiro pela prioridade editorial explícita e, em caso de empate, pela
+  data inicial mais recente. Experiências voluntárias não entram nessa contagem, mas também não
+  devem ser incluídas automaticamente se fizerem o documento ultrapassar uma página.
+- O documento final deve ter **exatamente uma folha A4**. O mapper deve rejeitar ou reduzir o
+  conteúdo antes da renderização quando os limites não puderem ser atendidos; não é aceitável
+  deixar uma segunda página parcial.
+- Não truncar uma descrição no meio de uma palavra. Quando o conteúdo exceder o orçamento do
+  template, aplicar as regras editoriais de seleção e compactação definidas no mapper e registrar
+  a decisão em teste; nunca remover fatos silenciosamente.
+
+"Mais relevante" é uma decisão editorial, não uma inferência do renderer. Cada experiência
+profissional deverá receber uma prioridade explícita na fonte canônica (por exemplo,
+`resumePriority`, de 0 a 100). Até essa informação existir, a implementação deve falhar em
+modo de desenvolvimento/teste em vez de escolher quatro itens arbitrariamente.
+
 Os registros atuais não possuem, de forma estruturada, cargo por experiência nem dados de
 contato como e-mail/localização. A primeira versão não deve inventá-los a partir de texto.
 Caso sejam necessários no layout escolhido, devem ser acrescentados como fatos explícitos em
@@ -98,10 +119,10 @@ PDF.
 
 ## 4. Modelo de domínio proposto
 
-Criar uma área isolada, por exemplo `src/features/resume/`, com os seguintes limites:
+Criar uma área server-only isolada em `backend/resume/`, com os seguintes limites:
 
 ```text
-features/resume/
+backend/resume/
   catalog/        # quais variantes podem ser servidas
   data/           # perfil editorial -> ResumeProfile
   documents/      # templates @react-pdf/renderer, sem dependência de UI web
@@ -185,25 +206,38 @@ antes de haver uma estratégia de versão do conteúdo/template.
 
 ## 6. Template `standard` (v1)
 
+### Referência visual
+
+O primeiro modelo deve usar como referência o arquivo
+[`MinimalistaNeutro.pdf`](./MinimalistaNeutro.pdf), agora disponível no repositório em
+`docs/resume-pdf/MinimalistaNeutro.pdf`. A referência é um PDF de uma página em formato A4
+(595,5 × 842,25 pt), com título “Currículo Profissional Simples Preto e Branco”.
+
+Ela orienta hierarquia, densidade, margens, tipografia, tratamento monocromático e uso de espaço
+em branco; não autoriza copiar elementos que não sejam necessários para um currículo ATS. Uma
+revisão visual detalhada ainda deve ser feita no leitor de PDF antes de congelar medidas e
+valores de fonte no template.
+
 O primeiro template deve priorizar leitura por recrutadores e sistemas ATS:
 
 1. Cabeçalho: nome, papel profissional e links públicos selecionados.
-2. Resumo profissional factual.
-3. Experiência em ordem cronológica decrescente, com período, organização, tipo, descrição e
-   tecnologias relevantes.
-4. Competências agrupadas por categoria.
-5. Rodapé com número de página e URL do portfólio, se ela estiver declarada como dado público.
+2. Resumo profissional factual, limitado a quatro linhas renderizadas.
+3. Experiência profissional: quatro itens mais relevantes, em ordem de prioridade e depois
+   cronológica, com período, organização, descrição e tecnologias relevantes.
+4. Competências agrupadas por categoria, compactadas para caber na mesma folha.
+5. Rodapé opcional com URL do portfólio; não reservar uma segunda página para nenhum elemento.
 
 Requisitos visuais:
 
-- A4, margens consistentes e no máximo duas páginas na configuração inicial.
+- A4, margens consistentes e exatamente uma página na configuração inicial.
 - Texto real, pesquisável e copiável; não gerar o currículo como imagem/canvas.
 - Contraste suficiente, sem depender apenas de cor para distinguir categorias.
-- Quebras de página previsíveis: experiência não deve iniciar no fim de uma página sem espaço
-  para seu conteúdo mínimo.
-- A implementação atual usa a família padrão Helvetica do renderer, sem depender de fonte
-  instalada no servidor. Registrar uma fonte TTF embutida continua pendente caso a identidade
-  tipográfica precise sair das fontes padrão do PDF.
+- Quebras de página previsíveis: o template deve impedir qualquer segunda página e não iniciar
+  uma experiência sem espaço para seu conteúdo mínimo.
+- O template registra as versões TTF incorporadas na referência para reproduzir sua identidade:
+  Poppins Bold/Regular/SemiBold para títulos e metadados e Times NR MT Pro Regular/Bold para o
+  corpo. A leitura é feita no servidor a partir do arquivo de referência, sem depender de fontes
+  instaladas no ambiente de deploy.
 
 O template não precisa reproduzir o design do site. A identidade deve ser sóbria e estável para
 leitura/impressão.
@@ -244,22 +278,29 @@ na URL, conforme a especificação desse modo.
 do About e as skills atuais; a centralização das skills permanece trabalho independente do modo
 recrutador.
 
-### Fase 1 — currículo padrão estático — implementada
+### Fase 1 — currículo padrão estático — parcialmente implementada
 
 - [x] Adicionar `@react-pdf/renderer`.
 - [x] Implementar catálogo estático, mapper, template `standard` e Route Handler Node.
 - [x] Conectar o botão `Currículo` ao endpoint com o locale atual.
 - [x] Produzir PDF PT-BR e EN a partir dos mesmos fatos.
+- [ ] Adicionar prioridade editorial e selecionar somente as quatro experiências profissionais
+      mais relevantes.
+- [ ] Garantir limite de quatro linhas para o resumo e exatamente uma página A4.
 
 Verificado: `npm run build` e `npx tsc --noEmit` passam com a rota incluída no build. A inspeção
 manual dos documentos e a confirmação da assinatura `%PDF` ficam na Fase 2, pois o servidor local
 não estava acessível neste ambiente de execução.
 
-### Fase 2 — qualidade e observabilidade
+### Fase 2 — qualidade visual, limites e observabilidade
 
 - Testes unitários do mapper (locale, ordem, exclusões e remoção de HTML).
+- Testes unitários dos limites (quatro experiências profissionais, prioridade e resumo).
 - Teste de integração da rota (status, headers e assinatura `%PDF`).
-- Revisão visual manual dos dois documentos em leitor desktop e mobile.
+- Revisão visual manual dos dois documentos em leitor desktop e mobile, comparando com
+  `MinimalistaNeutro.pdf` quando a referência estiver disponível no ambiente.
+- Verificar programaticamente que o PDF possui uma única página e que o bloco de resumo não
+  ultrapassa quatro linhas no template escolhido.
 - Métrica de download, se o contrato de métricas já estiver definido.
 
 ### Fase 3 — catálogo remoto/admin
