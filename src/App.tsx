@@ -5,7 +5,6 @@ import { INTLProvider } from "./providers/intl"
 import { Main } from "./screens/Main"
 import { RecruiterModeProvider } from "./providers/recruiterMode"
 import type { MainProps } from "./screens/Main"
-import { QueryProvider } from "./providers/query"
 
 // This is the temporary client boundary for the existing interactive SPA.
 // Individual sections can move below server-rendered boundaries once their
@@ -13,15 +12,13 @@ import { QueryProvider } from "./providers/query"
 function App(props: MainProps) {
 
   return (
-    <QueryProvider>
-      <INTLProvider>
-        <PopoverProvider>
-          <RecruiterModeProvider>
-            <Main {...props} />
-          </RecruiterModeProvider>
-        </PopoverProvider>
-      </INTLProvider>
-    </QueryProvider>
+    <INTLProvider>
+      <PopoverProvider>
+        <RecruiterModeProvider>
+          <Main {...props} />
+        </RecruiterModeProvider>
+      </PopoverProvider>
+    </INTLProvider>
   )
 }
 

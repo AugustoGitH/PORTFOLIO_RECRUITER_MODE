@@ -4,6 +4,7 @@ import { PropsWithClassName } from "../../../utils/types";
 export type ButtonBaseProps = {
   highlight?: boolean
   startAdornment?: React.ReactNode
+  endAdornment?: React.ReactNode
   /**
    * Disables the action while its result is pending. Use `verb` for a custom
    * gerund label; the component renders the animated ellipsis.

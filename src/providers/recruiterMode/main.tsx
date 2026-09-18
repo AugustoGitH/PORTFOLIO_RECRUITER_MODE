@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import type { PortfolioAudience, RecruiterModeContextValue, RecruiterModeProviderProps, RecruiterRole, RecruiterSeniority } from "./types"
 
 const RecruiterModeContext = createContext({} as RecruiterModeContextValue)
@@ -9,6 +10,7 @@ const RECRUITER_SENIORITIES: RecruiterSeniority[] = ["junior", "mid-level", "sen
 export const useRecruiterModeContext = () => useContext(RecruiterModeContext)
 
 export const RecruiterModeProvider = (props: RecruiterModeProviderProps) => {
+  const router = useRouter()
   const [audience, setAudience] = useState<PortfolioAudience>("default")
   const [roles, setRoles] = useState<RecruiterRole[]>([])
   const [seniority, setSeniority] = useState<RecruiterSeniority | null>(null)
@@ -47,8 +49,9 @@ export const RecruiterModeProvider = (props: RecruiterModeProviderProps) => {
       url.searchParams.delete("seniority")
     }
 
-    window.history.replaceState(window.history.state, "", url)
-  }, [hasRestoredReading, isRecruiterMode, roles, seniority])
+    const nextPath = `${url.pathname}${url.search}`
+    if (nextPath !== `${window.location.pathname}${window.location.search}`) router.replace(nextPath, { scroll: false })
+  }, [hasRestoredReading, isRecruiterMode, roles, seniority, router])
 
   const onRecruiterMode = () => {
     window.scrollTo({

@@ -171,6 +171,9 @@ O recrutador lê trajetória antes de lista de tecnologia; a lista de skills ser
 - Recrutador: a seção **troca de papel** — vira contato, agendar conversa, baixar CV.
 - Pode conter um **contra-CV** curto e factual: “provavelmente não me chame se…”. Ele declara
   contextos/stack não buscados, sem julgar a vaga.
+- Quando o recrutador procura outro perfil, o modo pode oferecer indicações editoriais
+  consentidas conforme a [spec de indicações de desenvolvedores](../developer-recommendations/spec.md).
+  Isso é um bloco complementar, não substitui a leitura e evidência de Augusto.
 
 ---
 

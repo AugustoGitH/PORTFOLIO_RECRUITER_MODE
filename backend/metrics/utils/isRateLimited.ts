@@ -1,7 +1,7 @@
 const attempts = new Map<string, { startedAt: number; count: number }>()
-const windowMs = 60_000
+const DEFAULT_WINDOW_MS = 60_000
 
-export const isRateLimited = (key: string, limit: number) => {
+export const isRateLimited = (key: string, limit: number, windowMs = DEFAULT_WINDOW_MS) => {
   const now = Date.now()
   const current = attempts.get(key)
   if (!current || now - current.startedAt >= windowMs) {

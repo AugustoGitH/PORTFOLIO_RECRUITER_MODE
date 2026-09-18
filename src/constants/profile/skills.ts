@@ -11,6 +11,7 @@ import {
   SiStyledcomponents,
   SiMui,
   SiBootstrap,
+  SiJquery,
   SiApollographql,
   SiNodedotjs,
   SiExpress,
@@ -33,6 +34,12 @@ import {
   SiVitest,
   SiPytest,
   SiAnthropic,
+  SiElectron,
+  SiTestinglibrary,
+  SiMocha,
+  SiChai,
+  SiWordpress,
+  SiRedwoodjs,
 } from "react-icons/si";
 
 export enum SkillKind {
@@ -94,8 +101,8 @@ export const SKILLS = [
   { icon: SiBootstrap, title: "Bootstrap", value: "bootstrap", kind: SkillKind.Frontend },
   { icon: SiApollographql, title: "Apollo", value: "apollo", kind: SkillKind.Frontend },
   { icon: SiRemix, title: "Remix", value: "remix", kind: SkillKind.Frontend },
-  { title: "jQuery", value: "jquery", kind: SkillKind.Frontend },
-  { title: "Electron", value: "electron", kind: SkillKind.Frontend },
+  { icon: SiJquery, title: "jQuery", value: "jquery", kind: SkillKind.Frontend },
+  { icon: SiElectron, title: "Electron", value: "electron", kind: SkillKind.Frontend },
 
   { icon: SiNodedotjs, title: "Node.js", value: "nodejs", kind: SkillKind.Backend },
   { icon: SiExpress, title: "Express.js", value: "express", kind: SkillKind.Backend },
@@ -111,9 +118,9 @@ export const SKILLS = [
   { icon: SiSequelize, title: "Sequelize", value: "sequelize", kind: SkillKind.DataBase },
 
   { icon: SiJest, title: "Jest", value: "jest", kind: SkillKind.Tests },
-  { title: "React Testing Library", value: "react-testing-library", kind: SkillKind.Tests },
-  { title: "Mocha", value: "mocha", kind: SkillKind.Tests },
-  { title: "Chai", value: "chai", kind: SkillKind.Tests },
+  { icon: SiTestinglibrary, title: "React Testing Library", value: "react-testing-library", kind: SkillKind.Tests },
+  { icon: SiMocha, title: "Mocha", value: "mocha", kind: SkillKind.Tests },
+  { icon: SiChai, title: "Chai", value: "chai", kind: SkillKind.Tests },
   { icon: SiSelenium, title: "Selenium", value: "selenium", kind: SkillKind.Tests },
   { icon: SiVitest, title: "Vitest", value: "vitest", kind: SkillKind.Tests },
   { icon: SiPytest, title: "Pytest", value: "pytest", kind: SkillKind.Tests },
@@ -126,13 +133,13 @@ export const SKILLS = [
   { icon: SiGithub, title: "GitHub", value: "github", kind: SkillKind.Tools },
   { icon: SiEslint, title: "ESLint", value: "eslint", kind: SkillKind.Tools },
   { icon: SiStorybook, title: "Storybook", value: "storybook", kind: SkillKind.Tools },
-  { title: "WordPress", value: "wordpress", kind: SkillKind.Tools },
+  { icon: SiWordpress, title: "WordPress", value: "wordpress", kind: SkillKind.Tools },
   { icon: SiAnthropic, title: "Claude Code", value: "claude-code", kind: SkillKind.Tools },
   { icon: BotIcon, title: "Codex", value: "codex", kind: SkillKind.Tools },
 
   // These entries were previously declared only inside experiences. Keeping
   // them here makes the catalog complete before recruiter matching is added.
-  { title: "Redwood.js", value: "redwood", kind: SkillKind.Architecture },
+  { icon: SiRedwoodjs, title: "Redwood.js", value: "redwood", kind: SkillKind.Architecture },
   { title: "REST API", value: "rest", kind: SkillKind.Architecture },
   { title: "Code Review", value: "code-review", kind: SkillKind.Tools },
   { title: "VPS", value: "vps", kind: SkillKind.Tools },

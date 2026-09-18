@@ -27,3 +27,15 @@ export type AsciiArtProps = PropsWithClassName<PropsWithStyle<{
    * @default "decode" */
   variant?: AsciiRevealVariant
 }>>
+
+export type ArtLayout = {
+  width: number
+  rows?: number
+  overflowAlign: "left" | "center" | "right"
+}
+
+export type ArtState = {
+  source: string
+  layout: ArtLayout
+  pendingLayout: ArtLayout | null
+}

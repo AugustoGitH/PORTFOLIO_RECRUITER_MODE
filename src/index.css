@@ -19,11 +19,7 @@
   --breakpoint-5xl: 3840px; /* 4K UHD */
 
   /* -- Font families -------------------------------------------------------- */
-  --font-sans: inter, sans-serif;
-  --font-highlight: Rubik, sans-serif;
-  --font-formula: var(--font-source-sans-3), sans-serif;
-  --font-interTight: var(--font-inter-tight), sans-serif;
-  --font-ibmPlexSans: var(--font-ibm-plex-sans), sans-serif;
+  --font-sans: var(--font-inter), sans-serif;
 
   /* -- Font weights --------------------------------------------------------- */
   --font-weight-light: 300;
@@ -305,8 +301,8 @@
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: var(--font-inter), sans-serif;
+  --heading: var(--font-inter), sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
   font: 18px/145% var(--sans);
@@ -346,6 +342,12 @@ body {
   color: var(--text-ud-neutral-950);
   margin: 0;
   padding: 0;
-  background-color: red;
-  
+  background-color: var(--color-ud-neutral-100);
+}
+
+.portfolio-hero {
+  background-image:
+    linear-gradient(rgba(35, 38, 49, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(35, 38, 49, 0.025) 1px, transparent 1px);
+  background-size: 32px 32px, 32px 32px;
 }

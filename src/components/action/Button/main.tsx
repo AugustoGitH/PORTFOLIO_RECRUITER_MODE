@@ -1,27 +1,15 @@
 import { cn } from "../../../utils/tailwind"
-import type { ButtonProps, LinkButtonProps } from "./types"
+import type { ButtonProps } from "./types"
+import { getElementProps, isLinkButton } from "./utils"
 
-const isLinkButton = (props: ButtonProps): props is LinkButtonProps => Boolean(props.href)
-
-const getElementProps = <T extends ButtonProps>(props: T) => {
-  const elementProps = { ...props }
-
-  delete elementProps.children
-  delete elementProps.startAdornment
-  delete elementProps.className
-  delete elementProps.loading
-  delete elementProps.highlight
-
-  return elementProps
-}
 
 export const Button = (_props: ButtonProps) => {
-  const { children, startAdornment, className, loading, ...props } = _props
+  const { children, startAdornment, endAdornment, className, loading, ...props } = _props
   const isLoading = typeof loading === "object" ? loading.state : Boolean(loading)
   const isDisabled = isLoading
   const loadingLabel = typeof loading === "object" ? loading.verb : children
-  const buttonClassName = cn("flex items-center gap-2 border border-ud-neutral-300 py-1 px-2 rounded-sm text-sm transition", {
-    "bg-ud-auxiliary-purple text-ud-neutral-0 font-bold border-ud-auxiliary-purple hover:bg-transparent hover:text-ud-auxiliary-purple": props.highlight,
+  const buttonClassName = cn("flex items-center gap-2 border border-ud-neutral-300 py-2 px-2 rounded-sm text-sm font-medium transition", {
+    "bg-ud-auxiliary-purple text-ud-neutral-0 border-ud-auxiliary-purple hover:bg-transparent hover:text-ud-auxiliary-purple": props.highlight,
     "hover:border-ud-neutral-950 hover:text-ud-neutral-950": !props.highlight,
     "pointer-events-none border-ud-neutral-300 bg-ud-neutral-300 text-ud-secondary-600 ": isDisabled,
     "animate-pulse": isLoading,
@@ -46,6 +34,7 @@ export const Button = (_props: ButtonProps) => {
           </span>
         )}
       </span>
+      {endAdornment}
     </>
   )
 

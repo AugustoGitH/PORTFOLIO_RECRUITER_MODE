@@ -9,8 +9,3 @@ export type DisplayProps = PropsWithClassName<PropsWithStyle<{
   step?: number
 }>>
 
-export type DigitReelProps = {
-  digit: number
-  duration: number
-  delay: number
-}

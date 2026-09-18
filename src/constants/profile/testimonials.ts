@@ -6,14 +6,14 @@ import { ENTERPRISE } from "./experiences"
 export type Testimonial = {
   value: string
   enterprise: {
-    name: string
-    image: Image
+    name?: string
+    image?: Image
   }
-  description: Term
+  description: string
   author: {
     name: string
-    position: Term
-    image: Image
+    position?: string
+    image?: Image
   }
 }
 

@@ -1,4 +1,5 @@
 import { useMemo } from "react"
+import { usePathname } from "next/navigation"
 import { useHashNavigation } from "../../../hooks/navigation"
 import { useINTLContext } from "../../../providers/intl"
 import { cn } from "../../../utils/tailwind"
@@ -6,6 +7,8 @@ import type { NavItemsProps } from "./types"
 
 export const NavItems = (props: NavItemsProps) => {
   const intl = useINTLContext()
+  const pathname = usePathname()
+  const isHome = pathname === "/"
   const sectionHrefs = useMemo(() => props.links.map(link => link.href), [props.links])
   const navigation = useHashNavigation(sectionHrefs)
 
@@ -15,12 +18,12 @@ export const NavItems = (props: NavItemsProps) => {
     return (
       <a
         key={link.value}
-        href={link.href}
+        href={isHome ? link.href : `/${link.href}`}
         title={intl.t(link.title)}
-        aria-current={isCurrent ? "location" : undefined}
-        onClick={navigation.handleAnchorClick(link.href)}
+        aria-current={isHome && isCurrent ? "location" : undefined}
+        onClick={isHome ? navigation.handleAnchorClick(link.href) : undefined}
         className={cn("transition-colors hover:text-ud-auxiliary-purple", {
-          "text-ud-auxiliary-purple": isCurrent,
+          "text-ud-auxiliary-purple": isHome && isCurrent,
           "flex items-center gap-2": props.variant === "header"
         })}
       >

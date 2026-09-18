@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useState } from "react"
 import { INTL_TERMS, type Term } from "../../constants/intl"
 import type { INTLContextValue, INTLProviderProps, INTLTranslateFunction, Language } from "./types"
 import { STORAGE_KEY } from "./constants"
@@ -24,7 +24,7 @@ export const INTLProvider = (props: INTLProviderProps) => {
     setLanguageState(next)
   }
 
-  const t = <
+  const t = useCallback(<
     T extends Term,
     SK extends string = "{",
     EK extends string = "}",
@@ -37,7 +37,7 @@ export const INTLProvider = (props: INTLProviderProps) => {
     const output = (entry ? entry[language] : term) as T
 
     return variants ? template<T, SK, EK, Variants>(output, variants) : output
-  }
+  }, [language])
 
   const value: INTLContextValue = {
     language,

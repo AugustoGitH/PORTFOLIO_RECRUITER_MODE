@@ -54,6 +54,8 @@ export const ADMIN_PERMISSIONS = [
   "metrics.read",
   "feedback.read",
   "feedback.moderate",
+  "recommendation.read",
+  "recommendation.manage",
   "resume.catalog.read",
   "resume.catalog.manage",
   "admin.users.read",
@@ -301,6 +303,25 @@ Além dos gates definidos em `docs/backend/spec.md`, as rotas `/api/admin/**` de
 - possibilidade de MFA (TOTP ou, preferencialmente, WebAuthn) antes de expor operações destrutivas
   ou adicionar mais usuários.
 
+### Endurecimento de exposição do admin (opcional)
+
+O caminho `/admin` não é um segredo nem uma fronteira de segurança. Renomeá-lo para uma URL menos
+previsível ou removê-lo da navegação pública pode reduzir o ruído de scanners, mas não substitui
+sessão, autorização, rate limit ou MFA. A rota pode receber `X-Robots-Tag: noindex, nofollow`,
+mas cabeçalhos de indexação também não são controle de acesso.
+
+Se a área passar a conter dados ou operações de alto impacto, adicionar uma camada antes da
+aplicação: Access/Zero Trust, VPN (por exemplo, Tailscale), autenticação no proxy reverso ou
+allowlist de IP quando o IP do operador for estável. A sequência passa a ser:
+
+```text
+Internet -> Access/VPN com MFA -> /admin -> login local -> JWE + permissões
+```
+
+Essa camada é complementar e fica fora da Fase 1. Ela não permite remover os gates de autorização
+da aplicação: cada Route Handler, Server Action e acesso a dado sensível continua verificando a
+sessão e a permissão requerida.
+
 ## 9. Fases de entrega
 
 ### Fase 1 — fundação autenticada
@@ -348,3 +369,6 @@ Além dos gates definidos em `docs/backend/spec.md`, as rotas `/api/admin/**` de
   dos claims nos runtimes compatíveis com o Next.
 - [`argon2`](https://github.com/ranisalt/node-argon2) oferece hash e verificação de senha com
   Argon2id como padrão.
+- A [OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
+  recomenda negar acesso por padrão e validar a autorização em cada requisição; uma camada de
+  Access/VPN é defesa adicional, não substituta desses gates.

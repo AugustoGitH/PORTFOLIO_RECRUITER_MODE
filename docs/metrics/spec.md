@@ -13,7 +13,7 @@ Exibir no portfólio, em tempo de execução, os seguintes indicadores:
 - `views`: visualizações do portfólio;
 - `likes`: quantidade de visitantes que deram like;
 - `resumeDownloads`: currículos gerados e servidos pela API;
-- `professionalFeedbacks`: permanece fora desta integração até existir um fluxo de feedback persistido.
+- `professionalFeedbacks`: permanece fora desta integração até a Fase 2 de [feedbacks persistidos](../feedback/spec.md), quando contará somente itens publicados.
 
 Os contadores devem ser agregados no servidor, persistidos no MongoDB e consumidos pelo frontend sem bloquear a renderização inicial da página.
 

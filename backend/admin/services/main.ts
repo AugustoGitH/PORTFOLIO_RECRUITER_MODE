@@ -3,6 +3,7 @@ import * as argon2 from "argon2"
 import { randomUUID } from "crypto"
 import { adminRepository } from "@backend/admin/repositories"
 import { encryptAdminSession, type AdminClaims } from "@backend/admin/session"
+import type { AdminPermission } from "@backend/admin/authorization/permissions"
 
 export const adminAuthService = {
   async login(emailInput: string, password: string) {
@@ -18,4 +19,12 @@ export const adminAuthService = {
     const claims: AdminClaims = { sub: user._id.toHexString(), sid, roles: user.roleIds, permissions, av: user.authorizationVersion, pv: user.passwordVersion }
     return { token: await encryptAdminSession(claims), permissions }
   },
+  async verify(claims: AdminClaims) {
+    const [session, user] = await Promise.all([adminRepository.findSession(claims.sid), adminRepository.findUserById(claims.sub)])
+    if (!session || session.revokedAt || session.expiresAt <= new Date() || !user || user.status !== "active") return null
+    if (session.userId.toHexString() !== claims.sub || session.authorizationVersion !== claims.av || session.passwordVersion !== claims.pv || user.authorizationVersion !== claims.av || user.passwordVersion !== claims.pv) return null
+    return { userId: claims.sub, permissions: claims.permissions }
+  },
+  async logout(sessionId: string) { await adminRepository.revokeSession(sessionId) },
+  hasPermission(session: { permissions: AdminPermission[] }, permission: AdminPermission) { return session.permissions.includes(permission) },
 }

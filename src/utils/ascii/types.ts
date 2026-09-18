@@ -12,3 +12,21 @@ export type AsciiRun = {
 }
 
 export type AsciiRow = AsciiRun[]
+
+export type AsciiArtState = {
+  active: boolean
+  art: {
+    src: string
+    alt: string
+    width?: number
+    rows?: number
+  }
+}
+
+export type CreateAsciiArtOptions = {
+  baseWidth: number
+  baseRows: number
+  columns: number
+  width?: number
+  states: AsciiArtState[]
+}

@@ -5,7 +5,7 @@ import { getAdminRolesCollection, getAdminSessionsCollection, getAdminUsersColle
 
 export const adminRepository = {
   async findUserByEmail(email: string) { return getAdminUsersCollection(await getMongoDb()).findOne({ email }) },
-  async findUserById(id: string) { return getAdminUsersCollection(await getMongoDb()).findOne({ _id: new ObjectId(id) }) },
+  async findUserById(id: string) { return ObjectId.isValid(id) ? getAdminUsersCollection(await getMongoDb()).findOne({ _id: new ObjectId(id) }) : null },
   async findRoles(ids: string[]) { return getAdminRolesCollection(await getMongoDb()).find({ roleId: { $in: ids } }).toArray() },
   async createSession(session: Omit<AdminSession, "_id">) { await getAdminSessionsCollection(await getMongoDb()).insertOne(session as AdminSession) },
   async findSession(sessionId: string) { return getAdminSessionsCollection(await getMongoDb()).findOne({ sessionId }) },

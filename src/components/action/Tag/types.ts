@@ -8,4 +8,5 @@ import type { PropsWithClassName, PropsWithStyle } from "../../../utils/types"
 
 export type TagProps = PropsWithClassName<PropsWithStyle<{
   tag: TagEntry
+  description?: string
 }>>

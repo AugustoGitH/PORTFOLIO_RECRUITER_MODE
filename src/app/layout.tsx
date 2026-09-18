@@ -1,6 +1,15 @@
 import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import { QueryProvider } from "../providers/query"
 
 import "./globals.css"
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+})
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://augustowestphal.netlify.app"
 
@@ -32,8 +41,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR">
-      <body>{children}</body>
+    <html lang="pt-BR" className={inter.variable}>
+      <body><QueryProvider>{children}</QueryProvider></body>
     </html>
   )
 }

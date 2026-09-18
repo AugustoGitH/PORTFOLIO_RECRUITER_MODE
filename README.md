@@ -12,6 +12,9 @@ Portfólio pessoal de Augusto Westphal, executado como uma aplicação Next.js �
 | `docs/backend/spec.md` | Arquitetura em camadas, gates de segurança e contratos backend. |
 | `docs/recruiter-mode/spec.md` | Especificação do modo recrutador e seu faseamento. |
 | `docs/admin/spec.md` | Especificação do painel administrativo, autenticação e autorização. |
+| `docs/feedback/spec.md` | Especificação de feedbacks profissionais persistidos e imagens. |
+| `docs/portfolio-feedback/spec.md` | Especificação de mensagens rápidas enviadas pelo formulário do portfólio. |
+| `docs/developer-recommendations/spec.md` | Especificação de indicações de desenvolvedores no modo recrutador. |
 | `docs/metrics/spec.md` | Especificação de integração das métricas, likes e downloads de currículo. |
 | `docs/migrations/next-migration.md` | Plano de migração da SPA para Next.js. |
 | `ACII.spec.md` | Especificação em andamento do recurso visual ASCII. |

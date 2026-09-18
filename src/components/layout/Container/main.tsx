@@ -4,7 +4,7 @@ import type { ContainerProps } from "./types";
 export const Container = (props: ContainerProps) => {
   return (
     <section id={props.id} className={cn("w-full flex justify-center px-4 py-10", props.className)}>
-      <div className="w-200">
+      <div className="w-full max-w-[calc(64rem-2rem)]">
         {props.children}
       </div>
     </section>

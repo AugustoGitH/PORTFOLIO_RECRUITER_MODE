@@ -54,6 +54,8 @@ flowchart TD
 - Tailwind v4 é carregado por `@tailwindcss/postcss`. `src/app/globals.css` importa `src/index.css`, onde vivem os tokens `ud-*`, incluindo cores, espaçamento, sombras, z-index e animações. Reutilize tokens antes de criar valores arbitrários.
 - A navegação de seção é baseada em hashes. `useHashNavigation` e `scrollToHash` cuidam do scroll e do offset do header; links novos precisam acompanhar `GROUP_SECTION_LINKS` em `constants/profile/page.ts` e um `id` compatível na seção.
 - O projeto usa TypeScript estrito para símbolos não usados no frontend. Rode lint e build depois de alterar imports ou tipos.
+- Código novo deve ser formatado e identado de forma legível: uma declaração, propriedade ou elemento JSX por linha quando a expressão deixar de ser curta. Não compacte componentes, schemas, objetos ou funções em linhas únicas; legibilidade e revisão têm prioridade sobre reduzir linhas.
+- Mutações HTTP em componentes cliente usam `useMutation` do TanStack Query e a instância `http` de `src/libs/http/`; não implemente estados manuais de `fetch`, `pending` e erro. Garanta que a rota esteja abaixo de `QueryProvider`.
 
 ## Conteúdo e internacionalização
 
@@ -66,6 +68,15 @@ O frontend é guiado por dados: não espalhe fatos de perfil ou strings de inter
 - `terms.ts`: cada termo suporta ao menos PT/EN e pode receber interpolação.
 
 Hoje as skills de experiências são `TagEntry` literais, e projetos possuem `skill?` singular que ainda não é preenchido. A [spec do recruiter mode](recruiter-mode/spec.md) propõe centralizar esse vocabulário antes de implementar matching; não crie uma terceira fonte de skills.
+
+## Testes
+
+O projeto usa Vitest. Todo arquivo de teste deve ficar ao lado do módulo que exercita, com o sufixo `.test.ts` ou `.test.tsx`: por exemplo, `backend/feedback/services/main.test.ts` testa `main.ts` e `src/app/api/feedbacks/route.test.ts` testa o Route Handler correspondente. Não concentre testes em uma pasta global; mocks compartilhados podem ficar em `tests/mocks/`.
+
+```bash
+npm test
+npm run test:watch
+```
 
 ## Estado e integração com a API
 
@@ -101,3 +112,4 @@ Há mudanças locais não commitadas para converter imagens de perfil em arte de
 | Novo dado de perfil | `src/constants/profile/`, mantendo tipo explícito. |
 | Novo endpoint consumido | `src/app/api/` para Route Handlers ou uma feature/service próxima ao domínio; documente o contrato e mantenha o consumidor em `fetch`. |
 | Mudança no modo recrutador | Leia primeiro `docs/recruiter-mode/spec.md`; o objetivo é reorganizar fatos existentes, sem inventá-los. |
+| Blog editorial | Leia primeiro a [spec do blog](blog/spec.md); o conteúdo público é Markdown seguro e imagens entram somente pelo upload administrativo. |

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { RAMP, type AsciiRow, type AsciiRun } from '../../../utils/ascii'
+import { RAMP } from "@/constants/ascii"
+import type { AsciiRow, AsciiRun } from "@/utils/ascii"
 
 import type { AsciiChar, AsciiRevealInput, AsciiRevealOutput } from './types'
 
