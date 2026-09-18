@@ -7,6 +7,7 @@ export const getElementProps = <T extends ButtonProps>(props: T) => {
 
   delete elementProps.children
   delete elementProps.startAdornment
+  delete elementProps.endAdornment
   delete elementProps.className
   delete elementProps.loading
   delete elementProps.highlight
