@@ -8,6 +8,7 @@ export const AsciiRows = (props: AsciiRowsProps) => props.rows?.map((row, rowInd
       <span
         key={run.pulseId ?? runIndex}
         className={cn(run.tone === "accent" ? ACCENT : undefined, run.pulseId && PULSE)}
+        style={run.color ? { color: run.color } : undefined}
       >
         {run.text}
       </span>

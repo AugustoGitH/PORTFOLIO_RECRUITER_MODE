@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import { imageToAscii, type AsciiRow } from '../../../utils/ascii'
+import { imageToAscii, mergeAsciiRegion, type AsciiRow } from '../../../utils/ascii'
 
 import type { AsciiArtInput, AsciiArtOutput } from './types'
 
@@ -23,28 +23,43 @@ import type { AsciiArtInput, AsciiArtOutput } from './types'
  * const ascii = useAsciiArt({ src: profileImage, columns: 84 })
  */
 export const useAsciiArt = (input: AsciiArtInput): AsciiArtOutput => {
+  const { src, columns, rows: fixedRows, stableSrc, morphRegion, palette = "duotone" } = input
   // #region States
   const [rows, setRows] = useState<AsciiRow[] | null>(null)
   const [source, setSource] = useState<string | null>(null)
+  const cachedRows = useRef(new Map<string, AsciiRow[]>())
 
   // #endregion
 
   // #region Effects
   useEffect(() => {
     let active = true
-    const image = new Image()
 
-    image.src = input.src
+    const loadRows = async (imageSrc: string) => {
+      const cacheKey = `${imageSrc}:${columns}:${fixedRows ?? "auto"}:${palette}`
+      const cached = cachedRows.current.get(cacheKey)
+      if (cached) return cached
 
-    // decode() resolves only once the bitmap is ready, which drawImage requires to
-    // sample anything other than an empty canvas.
-    image
-      .decode()
-      .then(() => {
-        if (active) {
-          setRows(imageToAscii(image, input.columns, input.rows))
-          setSource(input.src)
-        }
+      const image = new Image()
+      image.src = imageSrc
+      // The canvas must sample a decoded bitmap, especially on the first hover.
+      await image.decode()
+      const converted = imageToAscii(image, columns, fixedRows, palette)
+      cachedRows.current.set(cacheKey, converted)
+      return converted
+    }
+
+    Promise.all([
+      loadRows(src),
+      stableSrc && morphRegion && stableSrc !== src ? loadRows(stableSrc) : Promise.resolve(null),
+    ])
+      .then(([nextRows, stableRows]) => {
+        if (!active) return
+
+        setRows(stableRows && morphRegion
+          ? mergeAsciiRegion(stableRows, nextRows, morphRegion)
+          : nextRows)
+        setSource(src)
       })
       .catch(() => {
         // Keep the current art visible if a replacement cannot be decoded.
@@ -53,7 +68,7 @@ export const useAsciiArt = (input: AsciiArtInput): AsciiArtOutput => {
     return () => {
       active = false
     }
-  }, [input.src, input.columns, input.rows])
+  }, [src, columns, fixedRows, stableSrc, morphRegion, palette])
 
   // #endregion
 

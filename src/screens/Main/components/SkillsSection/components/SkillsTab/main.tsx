@@ -1,7 +1,7 @@
-import Image from "next/image"
 import { TabWrapper, useTabsContext } from "../../../../../../components/action/Tabs"
 import { Tag } from "../../../../../../components/action/Tag"
 import { Chip } from "../../../../../../components/action/Chip"
+import { ResponsiveAsciiArt } from "../../../../../../components/general/AsciiArt"
 import { Stagger } from "../../../../../../components/wrapper/Stagger"
 import type { SkillsTabProps } from "./types"
 import { getSkillByValue, SKILLS, SkillKind } from "../../../../../../constants/profile"
@@ -27,12 +27,14 @@ export const SkillsTab = (props: SkillsTabProps) => {
     <TabWrapper tabIndex={props.tab.value}>
       <div className="grid gap-5 rounded-md border border-ud-neutral-300 bg-ud-neutral-100 p-4 md:grid-cols-[minmax(0,30%)_minmax(0,1fr)] md:gap-6 md:p-5">
         <div className="flex self-start items-center justify-center border-b border-ud-neutral-300 pb-4 md:border-r md:border-b-0 md:pr-5 md:pb-0">
-          <Image
+          <ResponsiveAsciiArt
             src="/assets/profile/skills-code-coffee.png"
             alt={intl.t("SkillsArtworkAlt")}
-            width={300}
-            height={208}
-            className="h-auto w-full max-w-[260px]"
+            initialWidth={260}
+            columns={110}
+            rows={46}
+            palette="source"
+            wrapperClassName="max-w-[260px] overflow-hidden"
           />
         </div>
         <div className="min-w-0">

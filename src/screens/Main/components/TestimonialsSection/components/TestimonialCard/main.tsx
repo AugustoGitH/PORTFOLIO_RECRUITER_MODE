@@ -1,7 +1,7 @@
-import Image from "next/image"
 import type { TestimonialCardProps } from "./types"
 import { Building2Icon, UserRoundIcon } from "lucide-react"
 import { Chip } from "../../../../../../components/action/Chip"
+import { ResponsiveAsciiArt } from "../../../../../../components/general/AsciiArt"
 import { useINTLContext } from "../../../../../../providers/intl"
 import { cn } from "../../../../../../utils/tailwind"
 
@@ -47,12 +47,14 @@ export const TestimonialCard = (props: TestimonialCardProps) => {
           <span className="block text-2xs text-ud-secondary-600">{props.testimonial.author.position}</span>
         </div>
         {props.featured && (
-          <Image
+          <ResponsiveAsciiArt
             src="/assets/profile/testimonials-laptop.png"
             alt={intl.t("TestimonialsLaptopAlt")}
-            width={140}
-            height={100}
-            className="absolute -right-1 -bottom-2 h-auto w-32"
+            initialWidth={128}
+            columns={72}
+            rows={30}
+            palette="source"
+            wrapperClassName="absolute -right-1 -bottom-2 w-32"
           />
         )}
       </div>

@@ -26,6 +26,7 @@ export type AsciiChar = {
   key: string
   char: string
   tone: AsciiTone
+  color?: string
   finalX: number
   finalY: number
   startX: number

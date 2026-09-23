@@ -51,16 +51,16 @@ const shiftGlyph = (char: string, delta: number) => {
   return index === -1 ? char : RAMP[Math.min(RAMP.length - 1, Math.max(0, index + delta))]
 }
 
-type AsciiCell = { char: string; tone: AsciiRun["tone"] }
+type AsciiCell = { char: string; tone: AsciiRun["tone"]; color?: string }
 
 const toCells = (row: AsciiRow | undefined): AsciiCell[] =>
-  row?.flatMap((run) => Array.from(run.text, (char) => ({ char, tone: run.tone }))) ?? []
+  row?.flatMap((run) => Array.from(run.text, (char) => ({ char, tone: run.tone, color: run.color }))) ?? []
 
 const toRuns = (cells: AsciiCell[]): AsciiRow => cells.reduce<AsciiRow>((runs, cell) => {
   const previous = runs[runs.length - 1]
 
-  if (previous?.tone === cell.tone) previous.text += cell.char
-  else runs.push({ text: cell.char, tone: cell.tone })
+  if (previous?.tone === cell.tone && previous.color === cell.color) previous.text += cell.char
+  else runs.push({ text: cell.char, tone: cell.tone, color: cell.color })
 
   return runs
 }, [])
@@ -82,7 +82,7 @@ const interpolateCell = (from: AsciiCell, to: AsciiCell, progress: number): Asci
     ? (from.tone === "blank" ? to.tone : from.tone)
     : (to.tone === "blank" ? from.tone : to.tone)
 
-  return { char, tone }
+  return { char, tone, color: progress < 0.5 ? from.color : to.color }
 }
 
 /** Turns one source grid into another without replacing the rendered block. Both grids normally
@@ -127,9 +127,9 @@ const perturbOneCell = (rows: AsciiRow[]): AsciiRow[] => {
     const after = run.text.slice(charIndex + 1)
 
     const splitRuns: AsciiRun[] = [
-      ...(before ? [{ text: before, tone: run.tone }] : []),
-      { text: nextChar, tone: run.tone, pulseId: ++pulseSeq },
-      ...(after ? [{ text: after, tone: run.tone }] : []),
+      ...(before ? [{ text: before, tone: run.tone, color: run.color }] : []),
+      { text: nextChar, tone: run.tone, color: run.color, pulseId: ++pulseSeq },
+      ...(after ? [{ text: after, tone: run.tone, color: run.color }] : []),
     ]
 
     const nextRow = row.slice(0, runIndex).concat(splitRuns, row.slice(runIndex + 1))
@@ -199,6 +199,7 @@ const buildChars = (rows: AsciiRow[], cell: { width: number; height: number }): 
             key: `${rowIndex}-${runIndex}-${charOffset}`,
             char,
             tone: run.tone,
+            color: run.color,
             finalX,
             finalY,
             startX: finalX + Math.cos(angle) * radius,

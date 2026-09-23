@@ -1,6 +1,9 @@
 import { BLANK_INK, CHAR_ASPECT, RAMP, SOLID_INK } from "@/constants/ascii/config"
 import type { AsciiRow, AsciiRun, AsciiTone } from "./types"
 
+const SOURCE_COLOR_STEP = 12
+const SOURCE_OPACITY_STEPS = 16
+
 
 /** Fraction of the cell covered by ink, 0 for untouched background and 1 for solid black. */
 const inkCoverage = (
@@ -31,6 +34,40 @@ const inkCoverage = (
   return samples ? total / samples : 0
 }
 
+/** Average a cell in premultiplied alpha so transparent edge pixels keep their color. */
+const sourceColor = (
+  pixels: Uint8ClampedArray,
+  width: number,
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
+) => {
+  let red = 0
+  let green = 0
+  let blue = 0
+  let alpha = 0
+  let samples = 0
+
+  for (let y = top; y < bottom; y++) {
+    for (let x = left; x < right; x++) {
+      const index = (y * width + x) * 4
+      const opacity = pixels[index + 3] / 255
+      red += pixels[index] * opacity
+      green += pixels[index + 1] * opacity
+      blue += pixels[index + 2] * opacity
+      alpha += opacity
+      samples++
+    }
+  }
+
+  const opacity = samples ? Math.round(alpha / samples * SOURCE_OPACITY_STEPS) / SOURCE_OPACITY_STEPS : 0
+  if (!alpha || opacity === 0) return null
+
+  const quantize = (value: number) => Math.min(255, Math.round(value / SOURCE_COLOR_STEP) * SOURCE_COLOR_STEP)
+  return `rgb(${quantize(red / alpha)} ${quantize(green / alpha)} ${quantize(blue / alpha)} / ${opacity})`
+}
+
 /**
  * Converts an already-decoded image into a grid of characters, grouped into runs of
  * the same tone.
@@ -39,7 +76,7 @@ const inkCoverage = (
  * downscaler: line art has strokes thinner than a cell, and averaging is what turns a
  * one-pixel stroke into a mid-density glyph instead of dropping it.
  */
-export const imageToAscii = (image: HTMLImageElement, columns: number, fixedRows?: number): AsciiRow[] => {
+export const imageToAscii = (image: HTMLImageElement, columns: number, fixedRows?: number, palette: "duotone" | "source" = "duotone"): AsciiRow[] => {
   const width = image.naturalWidth
   const height = image.naturalHeight
 
@@ -69,23 +106,32 @@ export const imageToAscii = (image: HTMLImageElement, columns: number, fixedRows
     for (let column = 0; column < columns; column++) {
       const left = Math.floor(column * cellWidth)
       const right = Math.min(width, Math.ceil((column + 1) * cellWidth))
-      const coverage = inkCoverage(pixels, width, left, top, right, bottom)
-
       let character = " "
       let tone: AsciiTone = "blank"
+      let color: string | undefined
 
-      if (coverage > BLANK_INK) {
-        const density = Math.min(1, coverage / SOLID_INK)
-        const index = Math.min(RAMP.length - 1, Math.floor((1 - density) * RAMP.length))
+      if (palette === "source") {
+        color = sourceColor(pixels, width, left, top, right, bottom) ?? undefined
+        if (color) {
+          character = "█"
+          tone = "ink"
+        }
+      } else {
+        const coverage = inkCoverage(pixels, width, left, top, right, bottom)
 
-        character = RAMP[index]
-        tone = coverage >= SOLID_INK ? "ink" : "accent"
+        if (coverage > BLANK_INK) {
+          const density = Math.min(1, coverage / SOLID_INK)
+          const index = Math.min(RAMP.length - 1, Math.floor((1 - density) * RAMP.length))
+
+          character = RAMP[index]
+          tone = coverage >= SOLID_INK ? "ink" : "accent"
+        }
       }
 
       const previous = runs[runs.length - 1]
 
-      if (previous && previous.tone === tone) previous.text += character
-      else runs.push({ text: character, tone })
+      if (previous && previous.tone === tone && previous.color === color) previous.text += character
+      else runs.push({ text: character, tone, color })
     }
 
     grid.push(runs)

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { useAsciiArt, useAsciiReveal } from "../../../hooks/media"
 import { useOnceInView } from "../../../hooks/observer"
 import { cn } from "../../../utils/tailwind"
-import { type AsciiRow } from "../../../utils/ascii"
 import type { ArtLayout, AsciiArtProps } from "./types"
 import { CHAR_ASPECT } from "@/constants/ascii"
 import { ACCENT, DEFAULT_COLUMNS, DEFAULT_VARIANT, PULSE, TRANSITION } from "./constants"
@@ -34,7 +33,14 @@ export const AsciiArt = (_props: AsciiArtProps) => {
     overflowAlign: "right",
   })
 
-  const target = useAsciiArt({ src: props.src, columns: props.columns, rows: props.rows })
+  const target = useAsciiArt({
+    src: props.src,
+    columns: props.columns,
+    rows: props.rows,
+    palette: props.palette,
+    stableSrc: props.stableSrc,
+    morphRegion: props.morphRegion,
+  })
   const { ref, inView } = useOnceInView<HTMLDivElement>()
 
   const [activeSource, setActiveSource] = useState(props.src)
@@ -59,9 +65,10 @@ export const AsciiArt = (_props: AsciiArtProps) => {
   // Keep the current footprint while a replacement bitmap decodes. A geometry change waits one
   // committed frame before changing its CSS dimensions, letting the same ASCII grid morph while
   // width, height and glyph size interpolate instead of replacing the drawing on hover.
-  if (target.source === props.src && activeSource !== props.src) {
-    const changesGeometry = activeLayout.width !== props.width || activeLayout.rows !== props.rows
+  const changesGeometry = activeLayout.width !== props.width || activeLayout.rows !== props.rows
+  const geometryQueued = pendingLayout?.width === props.width && pendingLayout.rows === props.rows
 
+  if (target.source === props.src && (activeSource !== props.src || (changesGeometry && !geometryQueued))) {
     setActiveSource(props.src)
     if (changesGeometry) setPendingLayout({ width: props.width, rows: props.rows, overflowAlign: props.overflowAlign })
     else setActiveLayout({ width: props.width, rows: props.rows, overflowAlign: props.overflowAlign })
@@ -83,6 +90,9 @@ export const AsciiArt = (_props: AsciiArtProps) => {
     const layoutFontSize = layout.width / (props.columns * CHAR_ASPECT)
 
     return {
+      // A slight stroke closes subpixel seams between adjacent glyph cells without hiding the
+      // characters. This keeps the artwork continuous instead of exposing a visible square grid.
+      WebkitTextStroke: "0.06em currentColor",
       ...props.style,
       ...getHorizontalPosition(layout),
       width: layout.width,
@@ -98,8 +108,9 @@ export const AsciiArt = (_props: AsciiArtProps) => {
   return (
     <div
       ref={ref}
-      role="img"
-      aria-label={props.alt}
+      role={props.alt ? "img" : undefined}
+      aria-label={props.alt || undefined}
+      aria-hidden={props.alt ? undefined : true}
       style={{
         width: props.baseWidth,
         minWidth: props.baseWidth,
@@ -128,6 +139,7 @@ export const AsciiArt = (_props: AsciiArtProps) => {
               <span
                 key={run.pulseId ?? runIndex}
                 className={cn(run.tone === "accent" ? ACCENT : undefined, run.pulseId && PULSE)}
+                style={run.color ? { color: run.color } : undefined}
               >
                 {run.text}
               </span>
@@ -146,6 +158,7 @@ export const AsciiArt = (_props: AsciiArtProps) => {
             )}
             style={{
               opacity: ascii.revealed ? 1 : 0,
+              color: char.color,
               transitionDelay: `${char.delayMs}ms`,
               transform: ascii.revealed
                 ? `translate(${char.finalX}px, ${char.finalY}px)`

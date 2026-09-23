@@ -6,6 +6,8 @@ export type AsciiTone = "ink" | "accent" | "blank"
 export type AsciiRun = {
   text: string
   tone: AsciiTone
+  /** Source color for artwork that needs its original palette. */
+  color?: string
   /** Set only for the tiny, isolated run an idle shimmer tick just touched. Always a fresh
    * number, so using it as the React key forces a remount and restarts its CSS pop animation. */
   pulseId?: number

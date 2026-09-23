@@ -1,4 +1,5 @@
 import type { AsciiRevealVariant } from "../../../hooks/media/useAsciiReveal"
+import type { AsciiRegion } from "../../../utils/ascii"
 import type { PropsWithClassName, PropsWithStyle } from "../../../utils/types"
 
 export type AsciiArtProps = PropsWithClassName<PropsWithStyle<{
@@ -16,9 +17,14 @@ export type AsciiArtProps = PropsWithClassName<PropsWithStyle<{
   /** Horizontal resolution of the character grid: more columns, more detail, more elements.
    * @default 120 */
   columns?: number
+  /** Render sampled source colors with block glyphs for detailed color artwork. */
+  palette?: "duotone" | "source"
   /** Fixed number of grid rows. Use it for a changing `src` to preserve the exact footprint of
    * the art while its source is morphing. */
   rows?: number
+  /** Keep stableSrc intact outside this region while src changes. */
+  stableSrc?: string
+  morphRegion?: AsciiRegion
   /** Edge of the base footprint kept fixed when the visual width overflows it.
    * @default "right" */
   overflowAlign?: "left" | "center" | "right"

@@ -1,5 +1,6 @@
-import Image from "next/image"
 import { Tabs } from "../../../../components/action/Tabs"
+import { ResponsiveAsciiArt } from "../../../../components/general/AsciiArt"
+import { TitleSection } from "../../../../components/general/TitleSection"
 
 import { Container } from "../../../../components/layout/Container"
 import { COURSES, EXPERIENCES, PROJECTS, SECTIONS, SKILL_LEARNING_EVIDENCE, SKILLS, SKILL_TABS } from "../../../../constants/profile"
@@ -47,17 +48,20 @@ export const SkillsSection = (props: PropsWithClassName) => {
         <div className={cn("flex items-start justify-between gap-6", {
           "md:items-center": isRecruiterMode,
         })}>
-          <div>
-            <h2 className="text-3xl font-bold text-ud-neutral-950">{intl.t(SECTIONS.skills.title)}</h2>
-            <p className="mt-1 text-sm text-ud-secondary-600">{intl.t(isRecruiterMode ? "EvidenceBySkillDescription" : "SkillsIntro")}</p>
-          </div>
+          <TitleSection
+            tag={intl.t("TechnologyStack")}
+            title={intl.t(SECTIONS.skills.title)}
+            subtitle={intl.t(isRecruiterMode ? "EvidenceBySkillDescription" : "SkillsIntro")}
+          />
           {isRecruiterMode && (
-            <Image
+            <ResponsiveAsciiArt
               src="/assets/profile/skills-recruiter-artwork.png"
               alt={intl.t("RecruiterSkillsArtworkAlt")}
-              width={384}
-              height={256}
-              className="hidden h-auto w-36 shrink-0 md:block md:w-48"
+              initialWidth={144}
+              columns={104}
+              rows={42}
+              palette="source"
+              wrapperClassName="hidden w-36 shrink-0 md:block md:w-48"
             />
           )}
         </div>

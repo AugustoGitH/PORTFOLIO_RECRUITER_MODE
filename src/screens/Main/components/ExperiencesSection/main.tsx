@@ -1,4 +1,6 @@
 import { Tabs } from "../../../../components/action/Tabs"
+import { ResponsiveAsciiArt } from "../../../../components/general/AsciiArt"
+import { TitleSection } from "../../../../components/general/TitleSection"
 import { Container } from "../../../../components/layout/Container"
 import { EXPERIENCES, ExperienceKind, SECTIONS } from "../../../../constants/profile"
 import { EXPERIENCE_TABS } from "../../../../constants/profile/experiences"
@@ -25,18 +27,22 @@ export const ExperiencesSection = (props: PropsWithClassName) => {
     <Container id={SECTIONS.experiences.value} className={cn("bg-ud-neutral-100", props.className)}>
       <div>
         <div className="flex items-start justify-between gap-6 pb-3">
-          <div>
-            <Chip size="sm">{intl.t("Experiences")}</Chip>
-            <h2 className="mt-2 text-3xl font-bold text-ud-neutral-950">
-              {intl.t(isRecruiterMode ? "ProfessionalTimeline" : SECTIONS.experiences.title)}
-            </h2>
-            <p className="mt-1 text-sm text-ud-secondary-600">
-              {isRecruiterMode
-                ? intl.t("ProfessionalExperienceTotal", { duration: getDurationLabel(professionalMonths, intl.t) })
-                : intl.t("ExperiencesIntro")}
-            </p>
-          </div>
-          <Image src="/assets/profile/experiences-steps.png" alt={intl.t("ExperiencesArtworkAlt")} width={310} height={165} className="hidden h-auto w-60 shrink-0 md:block" />
+          <TitleSection
+            tag={intl.t("CareerPath")}
+            title={intl.t(isRecruiterMode ? "ProfessionalTimeline" : SECTIONS.experiences.title)}
+            subtitle={isRecruiterMode
+              ? intl.t("ProfessionalExperienceTotal", { duration: getDurationLabel(professionalMonths, intl.t) })
+              : intl.t("ExperiencesIntro")}
+          />
+          <ResponsiveAsciiArt
+            src="/assets/profile/experiences-steps.png"
+            alt={intl.t("ExperiencesArtworkAlt")}
+            initialWidth={240}
+            columns={96}
+            rows={31}
+            palette="source"
+            wrapperClassName="hidden w-60 shrink-0 md:block"
+          />
         </div>
         {isRecruiterMode ? (
           <>
@@ -55,5 +61,3 @@ export const ExperiencesSection = (props: PropsWithClassName) => {
     </Container>
   )
 }
-import Image from "next/image"
-import { Chip } from "../../../../components/action/Chip"

@@ -1,16 +1,18 @@
-import Image from "next/image"
 import { ArrowRightIcon, MessageCircleIcon } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
 import { Button } from "../../../components/action/Button"
+import { ResponsiveAsciiArt } from "../../../components/general/AsciiArt"
 import { Input } from "../../../components/input/Input"
 import { Textarea } from "../../../components/input/Textarea"
 import { cn } from "../../../utils/tailwind"
 import type { FeedbackFormProps } from "./types"
 import { useINTLContext } from "../../../providers/intl"
 import { http } from "../../../libs/http"
+import { useToast } from "../../../providers/toast"
 
 export const FeedbackForm = (props: FeedbackFormProps) => {
   const intl = useINTLContext()
+  const { showToast } = useToast()
   const submission = useMutation({
     mutationFn: async (form: HTMLFormElement) => {
       const values = new FormData(form)
@@ -20,12 +22,26 @@ export const FeedbackForm = (props: FeedbackFormProps) => {
         consent: values.get("consent") === "on",
         consentVersion: "v1",
       })
+      return form
+    },
+    onSuccess: (form) => {
+      form.reset()
+      showToast({
+        variant: "status",
+        status: "success",
+        title: intl.t("FeedbackSentToastTitle"),
+        description: intl.t("FeedbackSentToastDescription"),
+      })
+    },
+    onError: () => {
+      showToast({
+        variant: "status",
+        status: "error",
+        title: intl.t("FeedbackErrorToastTitle"),
+        description: intl.t("FeedbackSubmissionError"),
+      })
     },
   })
-
-  if (submission.isSuccess) {
-    return <div className={cn("p-3 border border-ud-neutral-300 text-sm", props.className)} role="status">{intl.t("FeedbackReceived")}</div>
-  }
 
   return (
     <form
@@ -53,19 +69,20 @@ export const FeedbackForm = (props: FeedbackFormProps) => {
         <input name="consent" type="checkbox" required className="mt-0.5 h-4 w-4 shrink-0 appearance-none rounded-sm border border-ud-neutral-950 bg-transparent checked:bg-ud-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ud-neutral-950" />
         <span>{intl.t("FeedbackConsent")}</span>
       </label>
-      {submission.isError && <p className="mt-2 text-xs text-ud-semantic-error" role="alert">{intl.t("FeedbackSubmissionError")}</p>}
       <Button type="submit" endAdornment={<ArrowRightIcon size={16} />} highlight loading={{ verb: intl.t("SubmitFeedback"), state: submission.isPending }} className={cn("mt-4", props.classNameButton)}>
         {intl.t("SubmitFeedback")}
 
       </Button>
       <div className="mt-auto flex items-end justify-between gap-2 pt-5">
         <p className="max-w-28 pb-2 text-xs leading-snug text-ud-neutral-900">{intl.t("FeedbackFormNote")}</p>
-        <Image
+        <ResponsiveAsciiArt
           src="/assets/profile/testimonials-coffee.png"
           alt={intl.t("FeedbackArtworkAlt")}
-          width={160}
-          height={128}
-          className="h-auto w-36 max-w-[55%]"
+          initialWidth={144}
+          columns={80}
+          rows={38}
+          palette="source"
+          wrapperClassName="w-36 max-w-[55%] overflow-hidden"
         />
       </div>
     </form>

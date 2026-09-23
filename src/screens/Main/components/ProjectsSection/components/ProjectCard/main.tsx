@@ -1,5 +1,6 @@
 import { ArrowRightIcon } from "lucide-react"
 import { Chip } from "../../../../../../components/action/Chip"
+import { ResponsiveAsciiArt } from "../../../../../../components/general/AsciiArt"
 import { ProjectKind } from "../../../../../../constants/profile"
 import type { Term } from "../../../../../../constants/intl"
 import { useINTLContext } from "../../../../../../providers/intl"
@@ -11,22 +12,6 @@ const PROJECT_KIND_TERM: Record<Exclude<ProjectKind, ProjectKind.All>, Term> = {
   [ProjectKind.Volunteer]: "VolunteerProjectCategory",
   [ProjectKind.Personal]: "Personal",
 }
-
-const GrowthArtwork = () => (
-  <svg
-    aria-hidden="true"
-    className="h-auto w-52 max-w-full text-ud-neutral-950"
-    viewBox="0 0 220 110"
-    fill="none"
-  >
-    <ellipse cx="110" cy="103" rx="77" ry="7" fill="#e7e1ff" />
-    <path d="M38 94H177" stroke="currentColor" strokeWidth="4" strokeLinecap="square" />
-    <path d="M51 92V75H68V92M81 92V63H98V92M111 92V48H128V92M141 92V31H158V92" stroke="currentColor" strokeWidth="4" strokeLinejoin="miter" />
-    <path d="M39 70C75 60 118 42 170 13" stroke="currentColor" strokeWidth="3" strokeDasharray="5 4" />
-    <path d="M156 12L174 10L170 28" stroke="currentColor" strokeWidth="4" strokeLinecap="square" strokeLinejoin="miter" />
-    <path d="M182 37L190 30M197 49L207 45M169 44L175 38" className="text-ud-auxiliary-purple" stroke="currentColor" strokeWidth="3" strokeLinecap="square" />
-  </svg>
-)
 
 export const ProjectCard = ({ project, featured = false, className, style }: ProjectCardProps) => {
   const intl = useINTLContext()
@@ -88,7 +73,14 @@ export const ProjectCard = ({ project, featured = false, className, style }: Pro
               <ArrowRightIcon size={15} />
             </a>
           )}
-          <GrowthArtwork />
+          <ResponsiveAsciiArt
+            src="/assets/projects/growth-chart.svg"
+            alt=""
+            initialWidth={208}
+            columns={76}
+            rows={24}
+            wrapperClassName="w-52 max-w-full shrink-0 overflow-hidden"
+          />
         </div>
       )}
     </article>

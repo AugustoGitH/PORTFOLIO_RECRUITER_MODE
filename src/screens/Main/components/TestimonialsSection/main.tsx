@@ -1,6 +1,6 @@
 import { useMemo } from "react"
-import Image from "next/image"
-import { Chip } from "../../../../components/action/Chip"
+import { ResponsiveAsciiArt } from "../../../../components/general/AsciiArt"
+import { TitleSection } from "../../../../components/general/TitleSection"
 import { Container } from "../../../../components/layout/Container"
 import { SECTIONS } from "../../../../constants/profile"
 import { FeedbackForm } from "../../../../features/feedback"
@@ -26,17 +26,20 @@ export const TestimonialsSection = (props: TestimonialsSectionProps) => {
     <Container id={SECTIONS.testimonials.value} className={cn("bg-ud-neutral-100", props.className)}>
       <div>
         <div className="grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_10rem] lg:grid-cols-[minmax(0,1fr)_12rem]">
-          <div className="min-w-0">
-            <Chip size="sm">{intl.t("TestimonialsEyebrow")}</Chip>
-            <h2 className="mt-2 text-3xl font-bold leading-tight text-ud-neutral-950 md:text-4xl">{intl.t("TestimonialsHeadline")}</h2>
-            <p className="mt-2 text-sm text-ud-secondary-600 md:text-base">{intl.t("TestimonialsIntro")}</p>
-          </div>
-          <Image
+          <TitleSection
+            className="min-w-0"
+            tag={intl.t("TestimonialsEyebrow")}
+            title={intl.t("TestimonialsHeadline")}
+            subtitle={intl.t("TestimonialsIntro")}
+          />
+          <ResponsiveAsciiArt
             src="/assets/profile/testimonials-bubbles.png"
             alt={intl.t("TestimonialsBubblesAlt")}
-            width={210}
-            height={140}
-            className="hidden h-auto w-full md:block"
+            initialWidth={160}
+            columns={90}
+            rows={32}
+            palette="source"
+            wrapperClassName="hidden md:block"
           />
         </div>
         <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
