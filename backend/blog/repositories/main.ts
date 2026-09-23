@@ -90,14 +90,17 @@ export const blogRepository = {
     if (id && ObjectId.isValid(id)) {
       const current = await this.findPost(id)
       if (!current) return null
+      const { subtitle, ...rest } = input
 
       await collection.updateOne({ _id: current._id }, {
         $set: {
-          ...input,
+          ...rest,
+          ...(subtitle ? { subtitle } : {}),
           publishedAt: input.status === "published" ? current.publishedAt ?? now : current.publishedAt,
           archivedAt: input.status === "archived" ? now : current.archivedAt,
           updatedAt: now,
         },
+        ...(!subtitle ? { $unset: { subtitle: "" } } : {}),
       })
 
       return current._id
@@ -109,6 +112,62 @@ export const blogRepository = {
       createdAt: now,
       updatedAt: now,
     } as BlogPost)).insertedId
+  },
+
+  async addPostMedia(id: string, mediaId: ObjectId, updatedBy: ObjectId) {
+    if (!ObjectId.isValid(id)) return false
+
+    const result = await getBlogPostsCollection(await getMongoDb()).updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $addToSet: { mediaIds: mediaId },
+        $set: { updatedAt: new Date(), updatedBy },
+      },
+    )
+
+    return result.matchedCount === 1
+  },
+
+  async replaceCoverMedia(id: string, mediaId: ObjectId, updatedBy: ObjectId) {
+    if (!ObjectId.isValid(id)) return null
+
+    const previous = await getBlogPostsCollection(await getMongoDb()).findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          coverMediaId: mediaId,
+          updatedAt: new Date(),
+          updatedBy,
+        },
+      },
+      { returnDocument: "before" },
+    )
+
+    return previous
+      ? { previousCoverMediaId: previous.coverMediaId }
+      : null
+  },
+
+  async detachMedia(id: string, mediaId: ObjectId, updatedBy: ObjectId, removeCover: boolean) {
+    if (!ObjectId.isValid(id)) return false
+
+    const result = await getBlogPostsCollection(await getMongoDb()).updateOne(
+      removeCover
+        ? { _id: new ObjectId(id), coverMediaId: mediaId }
+        : { _id: new ObjectId(id) },
+      removeCover
+        ? {
+            $pull: { mediaIds: mediaId },
+            $unset: { coverMediaId: "" },
+            $set: { updatedAt: new Date(), updatedBy },
+          }
+        : {
+            $pull: { mediaIds: mediaId },
+            $set: { updatedAt: new Date(), updatedBy },
+          },
+    )
+
+    return result.matchedCount === 1
   },
 
   async deletePost(id: string) {
@@ -123,6 +182,14 @@ export const blogRepository = {
 
   async findMedia(id: ObjectId) {
     return getMediaAssetsCollection(await getMongoDb()).findOne({ _id: id, deletedAt: { $exists: false } })
+  },
+
+  async findMediaByIds(ids: ObjectId[]) {
+    if (!ids.length) return []
+
+    return getMediaAssetsCollection(await getMongoDb())
+      .find({ _id: { $in: ids }, deletedAt: { $exists: false } })
+      .toArray()
   },
 
   async markMediaDeleted(id: ObjectId) {

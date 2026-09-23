@@ -6,10 +6,10 @@ import { Header } from "@/components/layout/Header"
 import { PopoverProvider } from "@/components/general/Popover/providers/popover"
 import { RecruiterModeProvider } from "@/providers/recruiterMode"
 
-export const BlogChrome = ({ children }: PropsWithChildren) => (
+export const BlogChrome = ({ children, hasAdminSession }: PropsWithChildren<{ hasAdminSession: boolean }>) => (
   <PopoverProvider>
     <RecruiterModeProvider>
-      <Header />
+      <Header hasAdminSession={hasAdminSession} variant="blog" />
       {children}
       <Footer />
     </RecruiterModeProvider>

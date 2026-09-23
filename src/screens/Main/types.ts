@@ -6,4 +6,5 @@ export type MainProps = {
   metrics: Metrics
   recommendations: Recommendation[]
   feedbacks: Feedback[]
+  hasAdminSession: boolean
 }

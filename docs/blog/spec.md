@@ -47,6 +47,7 @@ type BlogPost = {
   slug: string                 // único, minúsculo e estável
   status: "draft" | "published" | "archived"
   title: string
+  subtitle?: string            // complemento editorial exibido sob o título
   excerpt: string              // resumo editorial, texto simples
   markdown: string             // fonte canônica; nunca HTML compilado
   categoryId: ObjectId
@@ -89,6 +90,7 @@ Campos administrativos são validados com Zod e payload estrito:
 
 - `slug`: `^[a-z0-9-]+$`, único;
 - `title`: 1–160 caracteres;
+- `subtitle`: opcional, 1–220 caracteres quando informado;
 - `excerpt`: 1–320 caracteres, texto simples;
 - `markdown`: 1–50.000 caracteres;
 - categoria existente e explícita;
@@ -148,7 +150,7 @@ Criar `/admin/blog` como página protegida, com link no painel principal. Ela us
 4. ações de publicar, arquivar e remover usam `useMutation` do TanStack Query e o componente `Button` com estado de loading;
 5. invalidar `['admin-blog-posts']` e `['admin-blog-categories']` após toda mutação.
 
-O formulário possui título, slug, resumo, seletor de categoria, editor, preview, capa opcional e ações editoriais. Alterações de texto ficam locais até **Salvar alterações**; não há autosave na primeira fase. A prévia mostra exatamente o componente público, sem contadores falsos nem dados administrativos.
+O formulário possui título, subtítulo opcional, slug, resumo, seletor de categoria, editor, preview, capa opcional e ações editoriais. O subtítulo complementa o título nos cards e na página individual; o resumo permanece como descrição editorial curta do post. Alterações de texto ficam locais até **Salvar alterações**; não há autosave na primeira fase. A prévia mostra exatamente o componente público, sem contadores falsos nem dados administrativos.
 
 ## Renderização e cache públicos
 

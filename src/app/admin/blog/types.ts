@@ -10,13 +10,26 @@ export type BlogPost = {
   slug: string
   status: "draft" | "published" | "archived"
   title: string
+  subtitle?: string
   excerpt: string
   markdown: string
   categoryId: string
-  media?: Array<{
-    id: string
-    publicUrl: string
-  }>
+  cover?: BlogMedia
+  media?: BlogMedia[]
+}
+
+export type BlogMedia = {
+  id: string
+  publicUrl: string
+  width?: number
+  height?: number
+}
+
+export type BlogImageUpload = {
+  mediaId: string
+  publicUrl: string
+  width: number
+  height: number
 }
 
 export type BlogAdminData = {

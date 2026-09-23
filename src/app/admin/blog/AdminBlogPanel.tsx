@@ -7,17 +7,20 @@ import { Button } from "@/components/action/Button"
 import { Input } from "@/components/input/Input"
 import { Textarea } from "@/components/input/Textarea"
 import { http } from "@/libs/http"
+import { useAdminMutationToast } from "../hooks"
 import { AdminListItem } from "../components/AdminListItem"
 import { MarkdownEditor } from "./components/MarkdownEditor"
 import type {
   BlogAdminData,
   BlogCategory,
+  BlogImageUpload,
   BlogPost,
 } from "./types"
 import { getPostBody } from "./utils"
 
 export const AdminBlogPanel = () => {
   const queryClient = useQueryClient()
+  const adminToast = useAdminMutationToast()
   const [editing, setEditing] = useState<BlogPost | undefined>()
   const [editingCategory, setEditingCategory] = useState<BlogCategory | undefined>()
   const [markdown, setMarkdown] = useState("")
@@ -32,14 +35,21 @@ export const AdminBlogPanel = () => {
   const savePost = useMutation({
     mutationFn: ({ id, body }: { id?: string; body: unknown }) =>
       id
-        ? http.patch(`api/admin/blog/${id}`, body)
-        : http.post("api/admin/blog", body),
-    onSuccess: async (_result, variables) => {
+        ? http.patch<{ id: string }>(`api/admin/blog/${id}`, body)
+        : http.post<{ id: string }>("api/admin/blog", body),
+    onSuccess: async ({ data }, variables) => {
       if (!variables.id) postFormRef.current?.reset()
-      setEditing(undefined)
-      setMarkdown("")
       await queryClient.invalidateQueries({ queryKey: ["admin-blog"] })
+      const refreshed = queryClient.getQueryData<BlogAdminData>(["admin-blog"])
+      const saved = refreshed?.posts.find((post) => post._id === data.id)
+
+      if (saved) {
+        setEditing(saved)
+        setMarkdown(saved.markdown)
+      }
+      adminToast.success("AdminSaveSuccess")
     },
+    onError: () => adminToast.error("AdminSaveError"),
   })
 
   const saveCategory = useMutation({
@@ -51,7 +61,9 @@ export const AdminBlogPanel = () => {
       if (!variables.id) categoryFormRef.current?.reset()
       setEditingCategory(undefined)
       await queryClient.refetchQueries({ queryKey: ["admin-blog"] })
+      adminToast.success("AdminSaveSuccess")
     },
+    onError: () => adminToast.error("AdminSaveError"),
   })
 
   const removePost = useMutation({
@@ -60,30 +72,53 @@ export const AdminBlogPanel = () => {
       setEditing(undefined)
       setMarkdown("")
       await queryClient.invalidateQueries({ queryKey: ["admin-blog"] })
+      adminToast.success("AdminRemoveSuccess")
     },
+    onError: () => adminToast.error("AdminRemoveError"),
   })
 
   const removeCategory = useMutation({
     mutationFn: (id: string) => http.delete(`api/admin/blog/categories/${id}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-blog"] }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-blog"] })
+      adminToast.success("AdminRemoveSuccess")
+    },
+    onError: () => adminToast.error("AdminRemoveError"),
   })
 
   const uploadImage = useMutation({
-    mutationFn: ({ id, file }: { id: string; file: File }) => {
+    mutationFn: ({ id, file, purpose }: { id: string; file: File; purpose: "content" | "cover" }) => {
       const form = new FormData()
       form.set("postId", id)
       form.set("image", file)
+      form.set("purpose", purpose)
 
-      return http.post<{ publicUrl: string }>("api/admin/media/blog-image", form, {
+      return http.post<BlogImageUpload>("api/admin/media/blog-image", form, {
         headers: { "Content-Type": undefined },
       })
     },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-blog"] })
+      adminToast.success("AdminUploadSuccess")
+    },
+    onError: () => adminToast.error("AdminUploadError"),
   })
 
   const removeImage = useMutation({
     mutationFn: ({ postId, mediaId }: { postId: string; mediaId: string }) =>
       http.delete(`api/admin/blog/${postId}/images/${mediaId}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-blog"] }),
+    onSuccess: async (_result, variables) => {
+      setEditing((current) => current?._id === variables.postId
+        ? {
+            ...current,
+            cover: current.cover?.id === variables.mediaId ? undefined : current.cover,
+            media: current.media?.filter((media) => media.id !== variables.mediaId),
+          }
+        : current)
+      await queryClient.invalidateQueries({ queryKey: ["admin-blog"] })
+      adminToast.success("AdminRemoveSuccess")
+    },
+    onError: () => adminToast.error("AdminRemoveError"),
   })
 
   const categories = query.data?.categories ?? []
@@ -136,6 +171,14 @@ export const AdminBlogPanel = () => {
         >
           <div className="grid gap-4 md:grid-cols-2">
             <Input name="title" label="Título" defaultValue={editing?.title} className="md:col-span-2" required />
+            <Input
+              name="subtitle"
+              label="Subtítulo (opcional)"
+              defaultValue={editing?.subtitle}
+              description="Complementa o título na página do artigo. O resumo continua sendo usado nos cards."
+              className="md:col-span-2"
+              maxLength={220}
+            />
             <Input name="slug" label="Slug" defaultValue={editing?.slug} required />
             <label className="block text-sm font-bold text-ud-neutral-950">
               Categoria <span aria-hidden="true">*</span>
@@ -159,53 +202,139 @@ export const AdminBlogPanel = () => {
           </div>
 
           {editing ? (
-            <div className="rounded border border-ud-neutral-300 bg-ud-neutral-100 p-3">
-              <div className="flex flex-wrap items-end gap-2">
-                <Input
-                  name="image"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  label="Anexar imagem"
-                  description="JPEG, PNG ou WebP. A imagem será inserida no final do Markdown."
-                  className="min-w-64 flex-1"
-                  inputClassName="cursor-pointer bg-ud-neutral-0"
-                />
-                <Button
-                  type="button"
-                  startAdornment={<ImagePlusIcon size={15} />}
-                  loading={{ verb: "Enviando", state: uploadImage.isPending }}
-                  onClick={(event) => {
-                    const form = event.currentTarget.closest("form")
-                    const file = form ? new FormData(form).get("image") : null
+            <div className="grid gap-4">
+              <div className="rounded border border-ud-neutral-300 bg-ud-neutral-100 p-3">
+                <div className="flex flex-wrap items-end gap-3">
+                  {editing.cover ? (
+                    <img
+                      src={editing.cover.publicUrl}
+                      alt={`Capa atual de ${editing.title}`}
+                      className="h-24 w-40 rounded object-cover"
+                    />
+                  ) : null}
+                  <Input
+                    name="coverImage"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    label={editing.cover ? "Substituir imagem de capa" : "Imagem de capa"}
+                    description="JPEG, PNG ou WebP de até 5 MB."
+                    className="min-w-64 flex-1"
+                    inputClassName="cursor-pointer bg-ud-neutral-0"
+                  />
+                  <Button
+                    type="button"
+                    className="mb-5 shrink-0"
+                    startAdornment={<ImagePlusIcon size={15} />}
+                    loading={{
+                      verb: "Enviando",
+                      state: uploadImage.isPending && uploadImage.variables?.purpose === "cover",
+                    }}
+                    onClick={(event) => {
+                      const form = event.currentTarget.closest("form")
+                      const file = form ? new FormData(form).get("coverImage") : null
 
-                    if (file instanceof File && file.size) {
-                      uploadImage.mutate({ id: editing._id, file }, {
-                        onSuccess: ({ data }) => setMarkdown((current) => `${current}\n\n![Imagem do post](${data.publicUrl})\n`),
-                      })
-                    }
-                  }}
-                >
-                  Inserir imagem
-                </Button>
+                      if (file instanceof File && file.size) {
+                        uploadImage.mutate({ id: editing._id, file, purpose: "cover" }, {
+                          onSuccess: ({ data }) => setEditing((current) => current
+                            ? {
+                                ...current,
+                                cover: {
+                                  id: data.mediaId,
+                                  publicUrl: data.publicUrl,
+                                  width: data.width,
+                                  height: data.height,
+                                },
+                              }
+                            : current),
+                        })
+                      }
+                    }}
+                  >
+                    {editing.cover ? "Substituir capa" : "Definir capa"}
+                  </Button>
+                  {editing.cover ? (
+                    <Button
+                      type="button"
+                      className="mb-5 shrink-0"
+                      startAdornment={<Trash2Icon size={14} />}
+                      loading={{
+                        verb: "Removendo",
+                        state: removeImage.isPending && removeImage.variables?.mediaId === editing.cover.id,
+                      }}
+                      onClick={() => removeImage.mutate({
+                        postId: editing._id,
+                        mediaId: editing.cover!.id,
+                      })}
+                    >
+                      Remover capa
+                    </Button>
+                  ) : null}
+                </div>
               </div>
 
-              {editing.media?.length ? (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {editing.media.map((media) => (
-                    <div key={media.id} className="flex items-center gap-2 rounded border border-ud-neutral-300 bg-ud-neutral-0 p-2">
-                      <img src={media.publicUrl} alt="Imagem anexada" className="h-10 w-10 rounded object-cover" />
-                      <Button
-                        type="button"
-                        startAdornment={<Trash2Icon size={14} />}
-                        loading={{ verb: "Removendo", state: removeImage.isPending && removeImage.variables?.mediaId === media.id }}
-                        onClick={() => removeImage.mutate({ postId: editing._id, mediaId: media.id })}
-                      >
-                        Remover
-                      </Button>
-                    </div>
-                  ))}
+              <div className="rounded border border-ud-neutral-300 bg-ud-neutral-100 p-3">
+                <div className="flex flex-wrap items-end gap-2">
+                  <Input
+                    name="image"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    label="Anexar imagem"
+                    description="JPEG, PNG ou WebP. A imagem será inserida no final do Markdown."
+                    className="min-w-64 flex-1"
+                    inputClassName="cursor-pointer bg-ud-neutral-0"
+                  />
+                  <Button
+                    type="button"
+                    className="mb-5 shrink-0"
+                    startAdornment={<ImagePlusIcon size={15} />}
+                    loading={{
+                      verb: "Enviando",
+                      state: uploadImage.isPending && uploadImage.variables?.purpose === "content",
+                    }}
+                    onClick={(event) => {
+                      const form = event.currentTarget.closest("form")
+                      const file = form ? new FormData(form).get("image") : null
+
+                      if (file instanceof File && file.size) {
+                        uploadImage.mutate({ id: editing._id, file, purpose: "content" }, {
+                          onSuccess: ({ data }) => {
+                            setMarkdown((current) => `${current}\n\n![Imagem do post](${data.publicUrl})\n`)
+                            setEditing((current) => current
+                              ? {
+                                  ...current,
+                                  media: [
+                                    ...(current.media ?? []),
+                                    { id: data.mediaId, publicUrl: data.publicUrl },
+                                  ],
+                                }
+                              : current)
+                          },
+                        })
+                      }
+                    }}
+                  >
+                    Inserir imagem
+                  </Button>
                 </div>
-              ) : null}
+
+                {editing.media?.length ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {editing.media.map((media) => (
+                      <div key={media.id} className="flex items-center gap-2 rounded border border-ud-neutral-300 bg-ud-neutral-0 p-2">
+                        <img src={media.publicUrl} alt="Imagem anexada" className="h-10 w-10 rounded object-cover" />
+                        <Button
+                          type="button"
+                          startAdornment={<Trash2Icon size={14} />}
+                          loading={{ verb: "Removendo", state: removeImage.isPending && removeImage.variables?.mediaId === media.id }}
+                          onClick={() => removeImage.mutate({ postId: editing._id, mediaId: media.id })}
+                        >
+                          Remover
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             </div>
           ) : (
             <p className="rounded border border-dashed border-ud-neutral-300 bg-ud-neutral-100 p-3 text-xs text-ud-secondary-600">
@@ -219,7 +348,6 @@ export const AdminBlogPanel = () => {
             onChange={(event) => setMarkdown(event.currentTarget.value)}
           />
 
-          {savePost.isError && <p className="text-xs text-ud-semantic-error" role="alert">Não foi possível salvar o post.</p>}
           <div className="flex flex-wrap gap-2 border-t border-ud-neutral-300 pt-4">
             <Button type="submit" highlight loading={{ verb: "Salvando", state: savePost.isPending }}>
               {editing ? "Salvar alterações" : "Criar rascunho"}
@@ -277,7 +405,6 @@ export const AdminBlogPanel = () => {
           <Input name="name" label="Categoria" defaultValue={editingCategory?.name} required />
           <Input name="slug" label="Slug" defaultValue={editingCategory?.slug} required />
           <Input name="description" label="Descrição (opcional)" defaultValue={editingCategory?.description} className="md:col-span-2" />
-          {saveCategory.isError && <p className="text-xs text-ud-semantic-error md:col-span-2">Não foi possível salvar a categoria.</p>}
           <div className="flex gap-2 md:col-span-2">
             <Button type="submit" highlight loading={{ verb: editingCategory ? "Salvando" : "Criando", state: saveCategory.isPending }}>
               {editingCategory ? "Salvar categoria" : "Criar categoria"}

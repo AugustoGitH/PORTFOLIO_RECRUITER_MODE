@@ -1,31 +1,85 @@
-import Link from "next/link"
 import { notFound } from "next/navigation"
 import { blogService } from "@backend/blog"
 import { BlogChrome } from "@/components/blog/BlogChrome"
-import { MarkdownContent } from "@/components/blog/MarkdownContent"
-import { BlogPostMetrics } from "./BlogPostMetrics"
+import { BlogPostDetail, type BlogPostHeading } from "@/components/blog/BlogPostDetail"
+import { toSlug } from "@/utils/string"
+import { getVerifiedAdminSession } from "@backend/admin/authorization"
 
 export const dynamic = "force-dynamic"
 
+const estimateReadingMinutes = (markdown: string) => {
+  const words = markdown.replace(/[^\p{L}\p{N}\s]/gu, " ").trim().split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.ceil(words / 220))
+}
+
+const getHeadings = (markdown: string): BlogPostHeading[] => {
+  const occurrences = new Map<string, number>()
+
+  return markdown
+    .split("\n")
+    .flatMap((line) => {
+      const match = /^(##|###)\s+(.+?)\s*#*$/.exec(line.trim())
+      if (!match) return []
+
+      const label = match[2]
+        .replace(/\[([^\]]+)]\([^)]*\)/g, "$1")
+        .replace(/[*_`~]/g, "")
+        .trim()
+      const baseId = toSlug(label) || "secao"
+      const occurrence = (occurrences.get(baseId) ?? 0) + 1
+      occurrences.set(baseId, occurrence)
+
+      return [{
+        id: occurrence === 1 ? baseId : `${baseId}-${occurrence}`,
+        label,
+        level: match[1].length as 2 | 3,
+      }]
+    })
+}
+
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = await blogService.publishedPost(slug)
+  const [post, posts, categories, adminSession] = await Promise.all([
+    blogService.publishedPost(slug),
+    blogService.publishedPosts(),
+    blogService.categories().catch(() => []),
+    getVerifiedAdminSession(),
+  ])
   if (!post) notFound()
+
+  const categoryNames = new Map(categories.map((category) => [String(category._id), category.name]))
+  const category = categoryNames.get(post.categoryId) ?? "Artigo"
+  const recommendations = posts
+    .filter((candidate) => candidate.slug !== post.slug)
+    .sort((first, second) => {
+      const firstMatchesCategory = first.categoryId === post.categoryId ? 1 : 0
+      const secondMatchesCategory = second.categoryId === post.categoryId ? 1 : 0
+      return secondMatchesCategory - firstMatchesCategory
+    })
+    .slice(0, 2)
+    .map((candidate) => ({
+      slug: candidate.slug,
+      title: candidate.title,
+      subtitle: candidate.subtitle,
+      category: categoryNames.get(candidate.categoryId) ?? "Artigo",
+      minutes: estimateReadingMinutes(candidate.markdown),
+      cover: candidate.cover,
+    }))
+
   return (
-    <BlogChrome>
-      <main className="min-h-screen bg-ud-neutral-100 px-4 py-10">
-        <div className="mx-auto w-full max-w-3xl">
-          <Link href="/blog" className="text-sm font-medium text-ud-auxiliary-purple hover:underline">← Voltar ao blog</Link>
-          <article className="mt-7 rounded-md border border-ud-neutral-300 bg-white p-6 sm:p-10">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-ud-auxiliary-purple">Blog</p>
-            <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-ud-neutral-999 sm:text-4xl">{post.title}</h1>
-            <p className="mt-4 text-base leading-relaxed text-ud-secondary-600">{post.excerpt}</p>
-            <BlogPostMetrics slug={slug} initialLikes={post.likes} initialViews={post.views} />
-            <div className="mt-8 border-t border-ud-neutral-300 pt-6"><MarkdownContent markdown={post.markdown} /></div>
-          </article>
-          <Link href="/" className="mt-10 inline-block text-sm font-medium text-ud-auxiliary-purple hover:underline">Conhecer o portfólio</Link>
-        </div>
-      </main>
+    <BlogChrome hasAdminSession={Boolean(adminSession)}>
+      <BlogPostDetail
+        post={{
+          ...post,
+          category,
+          minutes: estimateReadingMinutes(post.markdown),
+          publishedAt: post.publishedAt
+            ? new Date(post.publishedAt).toISOString()
+            : undefined,
+        }}
+        headings={getHeadings(post.markdown)}
+        recommendations={recommendations}
+      />
     </BlogChrome>
   )
 }

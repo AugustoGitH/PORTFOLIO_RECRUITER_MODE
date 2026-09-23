@@ -1,1 +1,4 @@
-export * from "./main"
+export type HeaderProps = {
+  hasAdminSession?: boolean
+  variant?: "portfolio" | "blog"
+}

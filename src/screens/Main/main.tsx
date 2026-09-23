@@ -25,7 +25,7 @@ const MainInner = (props: MainProps) => {
   const sectionOrder = SECTION_ORDER[isRecruiterMode ? "recruiter" : "default"]
 
   return (
-    <PageLayout>
+    <PageLayout hasAdminSession={props.hasAdminSession}>
       {sectionOrder.map((section) => (
         <Fragment key={section}>
           {sections[section]}

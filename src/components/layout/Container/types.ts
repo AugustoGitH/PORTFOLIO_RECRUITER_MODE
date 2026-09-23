@@ -1,6 +1,5 @@
-import type { PropsWithChildren } from "react"
+import type { ComponentPropsWithoutRef, PropsWithChildren } from "react"
 
-export type ContainerProps = PropsWithChildren<{
-  className?: string
-  id?: string
+export type ContainerProps = PropsWithChildren<Omit<ComponentPropsWithoutRef<"section">, "children"> & {
+  contentClassName?: string
 }>

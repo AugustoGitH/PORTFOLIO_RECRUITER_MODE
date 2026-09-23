@@ -1,11 +1,11 @@
-import { cn } from "../../../utils/tailwind";
-import type { ContainerProps } from "./types";
+import { cn } from "../../../utils/tailwind"
+import type { ContainerProps } from "./types"
 
-export const Container = (props: ContainerProps) => {
+export const Container = ({ children, className, contentClassName, ...sectionProps }: ContainerProps) => {
   return (
-    <section id={props.id} className={cn("w-full flex justify-center px-4 py-10", props.className)}>
-      <div className="w-full max-w-[calc(64rem-2rem)]">
-        {props.children}
+    <section {...sectionProps} className={cn("flex w-full justify-center px-4 py-10", className)}>
+      <div className={cn("w-full max-w-[calc(64rem-2rem)]", contentClassName)}>
+        {children}
       </div>
     </section>
   )

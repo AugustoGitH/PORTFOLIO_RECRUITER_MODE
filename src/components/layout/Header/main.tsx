@@ -5,13 +5,13 @@ import { RecruiterModeButton } from "../../../features/recruiter"
 import { NavItems } from "../NavItems"
 import { useRecruiterModeContext } from "../../../providers/recruiterMode"
 import { Button } from "../../action/Button"
-import { NotebookPenIcon } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { BriefcaseBusinessIcon, LayoutDashboardIcon, NotebookPenIcon } from "lucide-react"
+import type { HeaderProps } from "./types"
 
-export const Header = () => {
+export const Header = ({ hasAdminSession = false, variant = "portfolio" }: HeaderProps) => {
   const intl = useINTLContext()
   const { isRecruiterMode } = useRecruiterModeContext()
-  const pathname = usePathname()
+  const isBlog = variant === "blog"
 
   return (
     <div className="sticky left-0 top-0 z-50 w-full bg-ud-neutral-100 px-2 pt-2">
@@ -23,14 +23,34 @@ export const Header = () => {
             <span className="block text-xs">{intl.t(ABOUT.role[0])}</span>
           </div>
         </div>
-        <nav className="hidden items-center gap-6 2xl:flex">
-          <NavItems links={GROUP_SECTION_LINKS[isRecruiterMode ? "recruiter" : "main"]} variant="header" />
-        </nav>
+        {!isBlog && (
+          <nav className="hidden items-center gap-6 2xl:flex">
+            <NavItems links={GROUP_SECTION_LINKS[isRecruiterMode ? "recruiter" : "main"]} variant="header" />
+          </nav>
+        )}
         <div className="flex items-center gap-2 sm:gap-4">
-          <Button href="/blog" className={pathname.startsWith("/blog") ? "bg-ud-auxiliary-purple/10 text-ud-auxiliary-purple hover:border-auxiliary-purple  border-auxiliary-purple/10 hover:text-ud-auxiliary-purple" : undefined} startAdornment={<NotebookPenIcon size={15} />}>{intl.t("Blog")}</Button>
-          <span className="hidden sm:block"><RecruiterModeButton /></span>
+          {hasAdminSession && (
+            <Button
+              href="/admin"
+              className="px-2 sm:px-5"
+              startAdornment={<LayoutDashboardIcon size={15} aria-hidden="true" />}
+              title={intl.t("AdminPanel")}
+            >
+              <span className="hidden xl:inline">{intl.t("AdminPanel")}</span>
+              <span className="sr-only xl:hidden">{intl.t("AdminPanel")}</span>
+            </Button>
+          )}
+          <Button
+            href={isBlog ? "/" : "/blog"}
+            startAdornment={isBlog
+              ? <BriefcaseBusinessIcon size={15} aria-hidden="true" />
+              : <NotebookPenIcon size={15} aria-hidden="true" />}
+          >
+            {intl.t(isBlog ? "Portfolio" : "Blog")}
+          </Button>
+          {!isBlog && <span className="hidden sm:block"><RecruiterModeButton /></span>}
           <span className="hidden sm:block"><LanguageSelect /></span>
-          <VerticalMenuButton />
+          {!isBlog && <VerticalMenuButton />}
         </div>
       </div>
     </div>

@@ -14,9 +14,11 @@ export type BlogPost = MongoDocument & {
   slug: string
   status: BlogPostStatus
   title: string
+  subtitle?: string
   excerpt: string
   markdown: string
   categoryId: ObjectId
+  coverMediaId?: ObjectId
   mediaIds?: ObjectId[]
   publishedAt?: Date
   archivedAt?: Date
@@ -35,7 +37,7 @@ export type BlogAudit = MongoDocument & {
   postId?: ObjectId
   categoryId?: ObjectId
   actorId: ObjectId
-  action: "created" | "updated" | "published" | "archived" | "removed" | "image_attached"
+  action: "created" | "updated" | "published" | "archived" | "removed" | "image_attached" | "cover_updated" | "cover_removed"
   at: Date
 }
 
