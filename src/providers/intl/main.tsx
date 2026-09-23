@@ -1,8 +1,9 @@
+"use client"
+
 import { createContext, useCallback, useContext, useEffect, useState } from "react"
 import { INTL_TERMS, type Term } from "../../constants/intl"
 import type { INTLContextValue, INTLProviderProps, INTLTranslateFunction, Language } from "./types"
-import { STORAGE_KEY } from "./constants"
-import { getInitialLanguage } from "./utils"
+import { getLegacyLanguage, persistLanguage } from "./utils"
 import { template } from "../../utils/string"
 import type { CreateTypeFromString, Primitive } from "../../utils/types"
 
@@ -11,16 +12,21 @@ const INTLContext = createContext({} as INTLContextValue)
 export const useINTLContext = () => useContext(INTLContext)
 
 export const INTLProvider = (props: INTLProviderProps) => {
-  const [language, setLanguageState] = useState<Language>("ptbr")
+  const [language, setLanguageState] = useState<Language>(props.initialLanguage)
 
   useEffect(() => {
-    // The read must happen after hydration because localStorage is a browser API.
+    if (props.hasLanguageCookie) return
+
+    const legacyLanguage = getLegacyLanguage()
+    if (!legacyLanguage) return
+
+    persistLanguage(legacyLanguage)
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLanguageState(getInitialLanguage())
-  }, [])
+    setLanguageState(legacyLanguage)
+  }, [props.hasLanguageCookie])
 
   const setLanguage = (next: Language) => {
-    localStorage.setItem(STORAGE_KEY, next)
+    persistLanguage(next)
     setLanguageState(next)
   }
 

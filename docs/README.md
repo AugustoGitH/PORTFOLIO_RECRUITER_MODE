@@ -88,7 +88,7 @@ npm run test:watch
 
 Os modelos de cada domínio ficam junto do módulo: métricas usam `backend/metrics/models/`. Use `getLikesCollection(await getMongoDb())` e `getViewsCollection(await getMongoDb())` dentro de código server-side. `View` agora aponta para a coleção `views`, corrigindo o helper antigo que, por engano, apontava views para `likes`.
 
-O idioma inicial é `ptbr` no servidor para manter a hidratação determinística. Depois da hidratação, `INTLProvider` restaura a preferência salva em `localStorage`.
+O layout lê o cookie `intl.language` e fornece o idioma inicial ao `INTLProvider`, mantendo o HTML e a hidratação no mesmo idioma. Sem cookie, usa `Accept-Language` para escolher entre inglês e português, com português como padrão. A troca de idioma atualiza o cookie e o atributo `lang` do documento. Uma preferência antiga em `localStorage` é migrada para o cookie após a hidratação.
 
 ## Metadata e publicação
 

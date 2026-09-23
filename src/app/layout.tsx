@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { QueryProvider } from "../providers/query"
+import { INTLProvider } from "../providers/intl"
+import { getRequestLanguage } from "../providers/intl/server"
 
 import "./globals.css"
 
@@ -39,10 +41,16 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const { language, hasLanguageCookie } = await getRequestLanguage()
+
   return (
-    <html lang="pt-BR" className={inter.variable}>
-      <body><QueryProvider>{children}</QueryProvider></body>
+    <html lang={language === "en" ? "en" : "pt-BR"} className={inter.variable}>
+      <body>
+        <INTLProvider initialLanguage={language} hasLanguageCookie={hasLanguageCookie}>
+          <QueryProvider>{children}</QueryProvider>
+        </INTLProvider>
+      </body>
     </html>
   )
 }

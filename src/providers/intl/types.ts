@@ -22,4 +22,7 @@ export type INTLContextValue = {
   t: INTLTranslateFunction
 }
 
-export type INTLProviderProps = PropsWithChildren
+export type INTLProviderProps = PropsWithChildren<{
+  initialLanguage: Language
+  hasLanguageCookie: boolean
+}>
