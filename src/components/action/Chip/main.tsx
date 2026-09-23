@@ -3,9 +3,9 @@ import type { ChipProps } from "./types"
 
 export const Chip = ({ children, className, size = "md", tone = "accent" }: ChipProps) => {
   return (
-    <span
+    <div
       className={cn(
-        "inline-flex rounded-md font-bold uppercase",
+        "inline-flex rounded-md font-bold items-center gap-2 uppercase",
         {
           "bg-ud-auxiliary-purple/10 text-ud-auxiliary-purple": tone === "accent",
           "bg-ud-neutral-200 text-ud-neutral-999": tone === "neutral",
@@ -16,6 +16,6 @@ export const Chip = ({ children, className, size = "md", tone = "accent" }: Chip
       )}
     >
       {children}
-    </span>
+    </div>
   )
 }

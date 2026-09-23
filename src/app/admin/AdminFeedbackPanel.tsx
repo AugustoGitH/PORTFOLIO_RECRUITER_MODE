@@ -7,6 +7,7 @@ import { Button } from "../../components/action/Button"
 import { Input } from "../../components/input/Input"
 import { Textarea } from "../../components/input/Textarea"
 import { http } from "../../libs/http"
+import { useAdminMutationToast } from "./hooks"
 import { AdminListItem } from "./components/AdminListItem"
 
 export type ModerationFeedback = {
@@ -33,6 +34,7 @@ const hasMedia = (status: FeedbackStatus) => ["approved", "published", "archived
 
 export const AdminFeedbackPanel = ({ initialFeedbacks, canModerate }: AdminFeedbackPanelProps) => {
   const queryClient = useQueryClient()
+  const adminToast = useAdminMutationToast()
   const [selectedId, setSelectedId] = useState<string | undefined>(initialFeedbacks[0]?.id)
   const feedbackQuery = useQuery({
     queryKey: ["admin-feedbacks"],
@@ -45,7 +47,11 @@ export const AdminFeedbackPanel = ({ initialFeedbacks, canModerate }: AdminFeedb
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["admin-feedbacks"] })
   const mutation = useMutation({
     mutationFn: async ({ id, body }: { id: string; body: unknown }) => (await http.patch(`api/admin/feedbacks/${id}`, body)).data,
-    onSuccess: invalidate,
+    onSuccess: async () => {
+      await invalidate()
+      adminToast.success("AdminSaveSuccess")
+    },
+    onError: () => adminToast.error("AdminSaveError"),
   })
   const uploadMutation = useMutation({
     mutationFn: async ({ id, file, kind }: { id: string; file: File; kind: FileKind }) => {
@@ -56,7 +62,11 @@ export const AdminFeedbackPanel = ({ initialFeedbacks, canModerate }: AdminFeedb
 
       return (await http.post("api/admin/media/feedback-avatar", form, { headers: { "Content-Type": undefined } })).data
     },
-    onSuccess: invalidate,
+    onSuccess: async () => {
+      await invalidate()
+      adminToast.success("AdminUploadSuccess")
+    },
+    onError: () => adminToast.error("AdminUploadError"),
   })
   const saveMutation = useMutation({
     mutationFn: async ({ id, status, editorial, profileFile, companyFile }: {
@@ -77,19 +87,29 @@ export const AdminFeedbackPanel = ({ initialFeedbacks, canModerate }: AdminFeedb
         await http.post("api/admin/media/feedback-avatar", media, { headers: { "Content-Type": undefined } })
       }
     },
-    onSuccess: invalidate,
+    onSuccess: async () => {
+      await invalidate()
+      adminToast.success("AdminSaveSuccess")
+    },
+    onError: () => adminToast.error("AdminSaveError"),
   })
   const removeAvatarMutation = useMutation({
     mutationFn: async ({ id, kind }: { id: string; kind: FileKind }) =>
       http.delete("api/admin/media/feedback-avatar", { data: { feedbackId: id, kind } }),
-    onSuccess: invalidate,
+    onSuccess: async () => {
+      await invalidate()
+      adminToast.success("AdminRemoveSuccess")
+    },
+    onError: () => adminToast.error("AdminRemoveError"),
   })
   const removeFeedbackMutation = useMutation({
     mutationFn: async (id: string) => http.delete(`api/admin/feedbacks/${id}`),
     onSuccess: async () => {
       setSelectedId(undefined)
       await invalidate()
+      adminToast.success("AdminRemoveSuccess")
     },
+    onError: () => adminToast.error("AdminRemoveError"),
   })
 
   const getEditorial = (form: HTMLFormElement) => {
@@ -198,7 +218,6 @@ export const AdminFeedbackPanel = ({ initialFeedbacks, canModerate }: AdminFeedb
             {selected.companyImageUrl && <div className="flex items-center gap-2"><img src={selected.companyImageUrl} alt="Logo da empresa" className="h-10 w-10 rounded object-cover" /><Button type="button" onClick={() => removeAvatarMutation.mutate({ id: selected.id, kind: "company" })}>Remover imagem</Button></div>}
           </div>}
 
-          {mutation.isError && <p className="mt-2 text-xs text-ud-semantic-error" role="alert">Não foi possível salvar a moderação.</p>}
           <div className="mt-4 flex flex-wrap gap-2">
             {editable(selected.status) && <Button type="button" startAdornment={<SaveIcon size={15} />} loading={{ verb: "Salvando", state: saveMutation.isPending && saveMutation.variables?.id === selected.id }} onClick={(event) => { const form = event.currentTarget.closest("form"); if (form) submit(form, undefined, true) }}>Salvar alterações</Button>}
             {selected.status === "pending" && <Button type="submit" startAdornment={<CheckIcon size={15} />} loading={{ verb: "Aprovando", state: mutation.isPending && mutation.variables?.id === selected.id && (mutation.variables.body as { status: string }).status === "approved" }}>Aprovar</Button>}

@@ -7,17 +7,21 @@ import { LockKeyholeIcon, MailIcon } from "lucide-react"
 import { Button } from "../../../components/action/Button"
 import { Input } from "../../../components/input/Input"
 import { http } from "../../../libs/http"
+import { useAdminMutationToast } from "../hooks"
 
 type AdminLoginPayload = { email: string; password: string }
 
 export const AdminLoginForm = () => {
   const router = useRouter()
+  const adminToast = useAdminMutationToast()
   const loginMutation = useMutation({
     mutationFn: async (payload: AdminLoginPayload) => (await http.post("api/admin/auth/login", payload)).data,
     onSuccess: () => {
+      adminToast.success("AdminLoginSuccess")
       router.replace("/admin")
       router.refresh()
     },
+    onError: () => adminToast.error("AdminLoginError"),
   })
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -34,7 +38,7 @@ export const AdminLoginForm = () => {
         </div>
         <div className="mt-6 space-y-4">
           <Input required name="email" type="email" label="E-mail" autoComplete="username" placeholder="voce@exemplo.com" />
-          <Input required name="password" type="password" label="Senha" autoComplete="current-password" error={loginMutation.isError ? "E-mail ou senha inválidos." : undefined} />
+          <Input required name="password" type="password" label="Senha" autoComplete="current-password" />
         </div>
         <Button type="submit" highlight className="mt-6 w-full justify-center" loading={{ verb: "Entrando", state: loginMutation.isPending }} startAdornment={<MailIcon size={16} />}>Entrar</Button>
       </form>

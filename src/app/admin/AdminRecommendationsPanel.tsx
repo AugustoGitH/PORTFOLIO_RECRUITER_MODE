@@ -7,6 +7,7 @@ import { Button } from "../../components/action/Button"
 import { Input } from "../../components/input/Input"
 import { Textarea } from "../../components/input/Textarea"
 import { http } from "../../libs/http"
+import { useAdminMutationToast } from "./hooks"
 import { AdminListItem } from "./components/AdminListItem"
 
 type Recommendation = {
@@ -52,6 +53,7 @@ const formValues = (form: HTMLFormElement, editing?: Recommendation) => {
 
 export const AdminRecommendationsPanel = () => {
   const queryClient = useQueryClient()
+  const adminToast = useAdminMutationToast()
   const [editing, setEditing] = useState<Recommendation | undefined>()
   const query = useQuery({
     queryKey: ["admin-recommendations"],
@@ -63,7 +65,9 @@ export const AdminRecommendationsPanel = () => {
     onSuccess: () => {
       setEditing(undefined)
       queryClient.invalidateQueries({ queryKey: ["admin-recommendations"] })
+      adminToast.success("AdminSaveSuccess")
     },
+    onError: () => adminToast.error("AdminSaveError"),
   })
   const uploadAvatar = useMutation({
     mutationFn: async ({ id, file }: { id: string; file: File }) => {
@@ -76,14 +80,18 @@ export const AdminRecommendationsPanel = () => {
     onSuccess: (response) => {
       setEditing((current) => current ? { ...current, avatarUrl: response.data.publicUrl } : current)
       queryClient.invalidateQueries({ queryKey: ["admin-recommendations"] })
+      adminToast.success("AdminUploadSuccess")
     },
+    onError: () => adminToast.error("AdminUploadError"),
   })
   const removeAvatar = useMutation({
     mutationFn: async (id: string) => http.delete("api/admin/media/recommendation-avatar", { data: { recommendationId: id } }),
     onSuccess: () => {
       setEditing((current) => current ? { ...current, avatarUrl: undefined } : current)
       queryClient.invalidateQueries({ queryKey: ["admin-recommendations"] })
+      adminToast.success("AdminRemoveSuccess")
     },
+    onError: () => adminToast.error("AdminRemoveError"),
   })
 
   return (

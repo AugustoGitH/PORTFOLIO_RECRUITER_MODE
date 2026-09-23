@@ -85,6 +85,10 @@ export const INTL_TERMS = {
     ptbr: "Habilidades",
     en: "Skills"
   },
+  TechnologyStack: {
+    ptbr: "Stack tecnológica",
+    en: "Technology stack"
+  },
   SkillsIntro: {
     ptbr: "Tecnologias que uso para transformar ideias em produtos.",
     en: "Technologies I use to turn ideas into products."
@@ -153,6 +157,10 @@ export const INTL_TERMS = {
     ptbr: "Projetos",
     en: "Projects"
   },
+  SelectedWork: {
+    ptbr: "Trabalho selecionado",
+    en: "Selected work"
+  },
   ProjectsIntro: {
     ptbr: "Soluções reais, desafios diferentes e aprendizados que ficaram.",
     en: "Real solutions, different challenges, and lessons that stayed with me."
@@ -172,6 +180,10 @@ export const INTL_TERMS = {
   ExperiencesIntro: {
     ptbr: "Uma trajetória construída entre produto, código e colaboração.",
     en: "A path built across product, code, and collaboration."
+  },
+  CareerPath: {
+    ptbr: "Trajetória",
+    en: "Career path"
   },
   ExperiencesArtworkAlt: {
     ptbr: "Ilustração em pixel art de uma pessoa subindo degraus",
@@ -338,6 +350,54 @@ export const INTL_TERMS = {
   FeedbackSubmissionError: {
     ptbr: "Não foi possível enviar seu feedback. Tente novamente.",
     en: "Your feedback could not be sent. Please try again."
+  },
+  FeedbackSentToastTitle: {
+    ptbr: "Feedback enviado",
+    en: "Feedback sent"
+  },
+  FeedbackSentToastDescription: {
+    ptbr: "Obrigado por compartilhar sua opinião.",
+    en: "Thank you for sharing your opinion."
+  },
+  FeedbackErrorToastTitle: {
+    ptbr: "Erro ao enviar",
+    en: "Could not send"
+  },
+  LikeErrorToastTitle: {
+    ptbr: "Erro ao curtir",
+    en: "Could not like"
+  },
+  LikeSubmissionError: {
+    ptbr: "Não foi possível registrar sua curtida. Tente novamente.",
+    en: "Your like could not be registered. Please try again."
+  },
+  PortfolioLikedToastTitle: {
+    ptbr: "Portfólio curtido",
+    en: "Portfolio liked"
+  },
+  PortfolioLikedToastDescription: {
+    ptbr: "Sua curtida foi registrada.",
+    en: "Your like was registered."
+  },
+  MessageReceivedToastTitle: {
+    ptbr: "Mensagem recebida!",
+    en: "Message received!"
+  },
+  MessageReceivedToastDescription: {
+    ptbr: "Valeu por ajudar a melhorar o portfólio.",
+    en: "Thanks for helping improve the portfolio."
+  },
+  Undo: {
+    ptbr: "Desfazer",
+    en: "Undo"
+  },
+  ViewFeedback: {
+    ptbr: "Ver feedback",
+    en: "View feedback"
+  },
+  CloseNotification: {
+    ptbr: "Fechar notificação",
+    en: "Close notification"
   },
   Logout: {
     ptbr: "Sair",
@@ -527,9 +587,121 @@ export const INTL_TERMS = {
     ptbr: "Outros perfis para considerar",
     en: "Other profiles to consider"
   },
+  RecommendationHonestBadge: {
+    ptbr: "Recomendação honesta",
+    en: "Honest recommendation"
+  },
+  RecommendationHonestTitle: {
+    ptbr: "Talvez outro perfil combine melhor",
+    en: "Another profile may be a better fit"
+  },
+  RecommendationHonestDescription: {
+    ptbr: "Meu perfil não cobre totalmente os critérios selecionados. Para não limitar sua busca, separei outros profissionais que podem fazer sentido para a vaga.",
+    en: "My profile does not fully cover the selected criteria. To avoid limiting your search, I selected other professionals who may be relevant to the role."
+  },
+  RecommendationConditionalNote: {
+    ptbr: "Esta seção aparece somente quando não há correspondência completa.",
+    en: "This section only appears when there is no complete match."
+  },
+  RecommendedProfiles: {
+    ptbr: "Perfis recomendados",
+    en: "Recommended profiles"
+  },
+  RecommendationCount: {
+    ptbr: "{current} de {total}",
+    en: "{current} of {total}"
+  },
+  RecommendationTechnologies: {
+    ptbr: "Tecnologias",
+    en: "Technologies"
+  },
+  PreviousRecommendation: {
+    ptbr: "Perfil anterior",
+    en: "Previous profile"
+  },
+  NextRecommendation: {
+    ptbr: "Próximo perfil",
+    en: "Next profile"
+  },
+  ViewAllRecommendations: {
+    ptbr: "Ver todos",
+    en: "View all"
+  },
+  ViewRecommendationCarousel: {
+    ptbr: "Ver carrossel",
+    en: "View carousel"
+  },
+  RecommendationNavigation: {
+    ptbr: "Navegação entre perfis",
+    en: "Profile navigation"
+  },
+  GoToRecommendation: {
+    ptbr: "Ir para o perfil {position}",
+    en: "Go to profile {position}"
+  },
+  RecommendationCarouselHelp: {
+    ptbr: "Use as setas ou selecione um marcador para conhecer outros perfis.",
+    en: "Use the arrows or select a marker to browse other profiles."
+  },
+  RecommendationDisclosure: {
+    ptbr: "Perfis apresentados com base nas informações fornecidas pelos profissionais.",
+    en: "Profiles shown based on information provided by the professionals."
+  },
   Blog: {
     ptbr: "Blog",
     en: "Blog"
+  },
+  AdminPanel: {
+    ptbr: "Painel administrativo",
+    en: "Admin panel"
+  },
+  AdminOperationSuccessTitle: {
+    ptbr: "Alteração concluída",
+    en: "Change completed"
+  },
+  AdminOperationErrorTitle: {
+    ptbr: "Não foi possível concluir",
+    en: "Unable to complete"
+  },
+  AdminSaveSuccess: {
+    ptbr: "As informações foram salvas.",
+    en: "The information was saved."
+  },
+  AdminSaveError: {
+    ptbr: "Não foi possível salvar as informações. Tente novamente.",
+    en: "The information could not be saved. Please try again."
+  },
+  AdminRemoveSuccess: {
+    ptbr: "O item foi removido.",
+    en: "The item was removed."
+  },
+  AdminRemoveError: {
+    ptbr: "Não foi possível remover o item. Tente novamente.",
+    en: "The item could not be removed. Please try again."
+  },
+  AdminUploadSuccess: {
+    ptbr: "O arquivo foi enviado.",
+    en: "The file was uploaded."
+  },
+  AdminUploadError: {
+    ptbr: "Não foi possível enviar o arquivo. Tente novamente.",
+    en: "The file could not be uploaded. Please try again."
+  },
+  AdminLoginSuccess: {
+    ptbr: "Acesso ao painel autorizado.",
+    en: "Admin access authorized."
+  },
+  AdminLoginError: {
+    ptbr: "E-mail ou senha inválidos.",
+    en: "Invalid email or password."
+  },
+  AdminLogoutSuccess: {
+    ptbr: "Você saiu do painel administrativo.",
+    en: "You signed out of the admin panel."
+  },
+  AdminLogoutError: {
+    ptbr: "Não foi possível sair do painel. Tente novamente.",
+    en: "Unable to sign out of the admin panel. Please try again."
   },
   ViewOtherProfiles: {
     ptbr: "Ver outros perfis",
@@ -643,9 +815,25 @@ export const INTL_TERMS = {
     ptbr: "Vamos conversar",
     en: "Let's talk"
   },
+  Contact: {
+    ptbr: "Contato",
+    en: "Contact"
+  },
   RecruiterContactDescription: {
     ptbr: "Encontrou evidências relevantes? Estou disponível para conversar sobre contexto, desafios e próximos passos.",
     en: "Found relevant evidence? I'm available to discuss context, challenges, and next steps."
+  },
+  ChooseContactChannel: {
+    ptbr: "Escolha o melhor canal",
+    en: "Choose the best channel"
+  },
+  ConversationStart: {
+    ptbr: "Uma boa conversa pode ser o começo de um grande projeto.",
+    en: "A good conversation can be the start of a great project."
+  },
+  FeedbackClosing: {
+    ptbr: "Sua opinião ajuda a tornar este portfólio melhor.",
+    en: "Your thoughts help make this portfolio better."
   },
   Greeting: {
     ptbr: "Olá, eu sou",
@@ -789,9 +977,73 @@ export const INTL_TERMS = {
     ptbr: "Uma seleção de ideias, ferramentas e boas práticas.",
     en: "A selection of ideas, tools, and good practices."
   },
+  Home: {
+    ptbr: "Início",
+    en: "Home"
+  },
+  BlogBreadcrumbLabel: {
+    ptbr: "Caminho da página",
+    en: "Page path"
+  },
+  BlogSave: {
+    ptbr: "Salvar",
+    en: "Save"
+  },
+  BlogSaved: {
+    ptbr: "Salvo",
+    en: "Saved"
+  },
+  BlogShare: {
+    ptbr: "Compartilhar",
+    en: "Share"
+  },
+  BlogLinkCopied: {
+    ptbr: "Link copiado",
+    en: "Link copied"
+  },
+  BlogTableOfContents: {
+    ptbr: "Sumário do artigo",
+    en: "Article contents"
+  },
+  BlogInThisArticle: {
+    ptbr: "Neste artigo",
+    en: "In this article"
+  },
+  BlogWasThisClear: {
+    ptbr: "Ficou claro?",
+    en: "Was this clear?"
+  },
+  BlogViews: {
+    ptbr: "{views} visualizações",
+    en: "{views} views"
+  },
+  BlogLiking: {
+    ptbr: "Curtindo",
+    en: "Liking"
+  },
+  BlogLiked: {
+    ptbr: "Curtido",
+    en: "Liked"
+  },
+  BlogYesClear: {
+    ptbr: "Sim!",
+    en: "Yes!"
+  },
+  BlogStillHaveQuestion: {
+    ptbr: "Ainda tenho dúvida",
+    en: "I still have a question"
+  },
+  BlogMoreReading: {
+    ptbr: "Mais uma gota?",
+    en: "One more idea?"
+  },
   NavigationMenu: {
     ptbr: "Menu de navegação",
     en: "Navigation menu"
+  },
+  Menu: {
+    ptbr: "Menu",
+    en: "Menu"
   },
   Portfolio: {
     ptbr: "Portfólio",

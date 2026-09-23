@@ -100,6 +100,7 @@
   --animate-scale-in: ud-scale-in 300ms ease-out backwards;
   --animate-fade-in: ud-fade-in 120ms ease-out backwards;
   --animate-glyph-pop: ud-glyph-pop 220ms ease-out;
+  --animate-toast-progress: ud-toast-progress var(--toast-duration, 5000ms) linear forwards;
 
   /* -- Colors --------------------------------------------------------------- */
   --color-ud-primary-100: #f7fcff;
@@ -211,6 +212,33 @@
   0% { transform: scale(1) translateY(0); opacity: 0.5; }
   40% { transform: scale(1.4) translateY(-0.1em); opacity: 1; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes ud-toast-in {
+  0% { opacity: 0; transform: translateX(calc(100% + 1.5rem)); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes ud-toast-out {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(calc(100% + 1.5rem)); }
+}
+@keyframes ud-toast-progress {
+  0% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+.ud-toast-enter {
+  animation: ud-toast-in 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ud-toast-exit {
+  animation: ud-toast-out 200ms ease-in forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ud-toast-enter,
+  .ud-toast-exit {
+    animation: none;
+  }
 }
 
 /* ============================================================================
