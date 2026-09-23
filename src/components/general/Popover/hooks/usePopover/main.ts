@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 
 import { usePopoverContext } from '../../providers/popover'
 import { useModal } from '../../../../../hooks/modal'
@@ -73,21 +73,28 @@ export const usePopover = <A extends HTMLElement = HTMLElement>(
   props: PopoverProps<A>
 ) => {
   // #region Context
-  const { registerPopover, unregisterPopover } = usePopoverContext()
+  const { activatePopover, deactivatePopover, registerPopover, unregisterPopover } = usePopoverContext()
 
   // #endregion
 
   // #region States
   const [popoverId, setPopoverId] = useState<string | null>(null)
   const [popoverZIndex, setPopoverZIndex] = useState(10000)
+  const popoverInstanceId = useId()
+  const onClose = props.onClose
 
   // #endregion
+
+  const handleClose = useCallback(() => {
+    deactivatePopover(popoverInstanceId)
+    onClose?.()
+  }, [deactivatePopover, onClose, popoverInstanceId])
 
   // #region Custom Hooks
   const modal = useModal<A, HTMLDivElement>({
     show: props.show,
     onShow: props.onShow,
-    onClose: props.onClose,
+    onClose: handleClose,
     anchorRef: props.anchor.ref,
     origin: props.origin,
     fullWidth: props.fullWidth,
@@ -103,6 +110,7 @@ export const usePopover = <A extends HTMLElement = HTMLElement>(
     smartPositioning: props.smartPositioning,
     positionStrategy: getPositionStrategy(props.direction),
   })
+  const { closeModal, showModal, toggleShowModal } = modal.action
 
   // #endregion
 
@@ -112,20 +120,30 @@ export const usePopover = <A extends HTMLElement = HTMLElement>(
       if (typeof element !== 'function') return element
 
       const stableState = {
-        onShow: modal.action.showModal,
-        onClose: modal.action.closeModal,
+        onShow: (event?: React.MouseEvent<A>) => {
+          activatePopover(popoverInstanceId, closeModal)
+          showModal(event)
+        },
+        onClose: closeModal,
         show: modal.status.isShowModal,
-        onToggleShow: modal.action.toggleShowModal,
+        onToggleShow: (event?: React.MouseEvent<A>) => {
+          if (!modal.status.isShowModal) {
+            activatePopover(popoverInstanceId, closeModal)
+          }
+          toggleShowModal(event)
+        },
       }
 
       return element(stableState)
     },
     // Stable dependencies, without including the complete state object
     [
-      modal.action.toggleShowModal,
+      toggleShowModal,
       modal.status.isShowModal,
-      modal.action.closeModal,
-      modal.action.showModal,
+      closeModal,
+      showModal,
+      activatePopover,
+      popoverInstanceId,
     ]
   )
 

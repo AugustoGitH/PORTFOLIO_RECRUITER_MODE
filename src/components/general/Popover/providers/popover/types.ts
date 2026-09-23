@@ -9,6 +9,8 @@ export type PopoverContextValue = {
   currentZIndex: number
   registerPopover: () => PopoverRegistration
   unregisterPopover: (popoverId: string) => void
+  activatePopover: (popoverId: string, onClose: () => void) => void
+  deactivatePopover: (popoverId: string) => void
   activePopoversCount: number
 }
 

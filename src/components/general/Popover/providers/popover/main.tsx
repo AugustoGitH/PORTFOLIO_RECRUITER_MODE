@@ -9,6 +9,7 @@ export const usePopoverContext = () => useContext(PopoverContext)
 export const PopoverProvider = (props: PopoverProviderProps) => {
   const [activePopovers, setActivePopovers] = useState<Set<string>>(new Set())
   const popoverIdCounter = useRef(0)
+  const activePopover = useRef<{ id: string; onClose: () => void } | null>(null)
 
   const registerPopover = useCallback(() => {
     const popoverId = `popover-${++popoverIdCounter.current}`
@@ -27,6 +28,20 @@ export const PopoverProvider = (props: PopoverProviderProps) => {
     })
   }, [])
 
+  const activatePopover = useCallback((popoverId: string, onClose: () => void) => {
+    if (activePopover.current?.id === popoverId) return
+
+    const previousPopover = activePopover.current
+    activePopover.current = { id: popoverId, onClose }
+    previousPopover?.onClose()
+  }, [])
+
+  const deactivatePopover = useCallback((popoverId: string) => {
+    if (activePopover.current?.id === popoverId) {
+      activePopover.current = null
+    }
+  }, [])
+
   const getTopZIndex = useCallback(() => {
     return BASE_Z_INDEX + activePopovers.size * Z_INDEX_INCREMENT
   }, [activePopovers.size])
@@ -35,6 +50,8 @@ export const PopoverProvider = (props: PopoverProviderProps) => {
     currentZIndex: getTopZIndex(),
     registerPopover,
     unregisterPopover,
+    activatePopover,
+    deactivatePopover,
     activePopoversCount: activePopovers.size,
   }
 
