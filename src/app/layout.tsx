@@ -5,6 +5,9 @@ import { INTLProvider } from "../providers/intl"
 import { getRequestLanguage } from "../providers/intl/server"
 
 import "./globals.css"
+import { ToastProvider } from "@/providers/toast"
+import { PopoverProvider } from "@/components/general/Popover/providers/popover"
+import { RecruiterModeProvider } from "@/providers/recruiterMode"
 
 const inter = Inter({
   variable: "--font-inter",
@@ -48,7 +51,13 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang={language === "en" ? "en" : "pt-BR"} className={inter.variable}>
       <body>
         <INTLProvider initialLanguage={language} hasLanguageCookie={hasLanguageCookie}>
-          <QueryProvider>{children}</QueryProvider>
+          <ToastProvider>
+            <RecruiterModeProvider>
+              <PopoverProvider>
+                <QueryProvider>{children}</QueryProvider>
+              </PopoverProvider>
+            </RecruiterModeProvider>
+          </ToastProvider>
         </INTLProvider>
       </body>
     </html>

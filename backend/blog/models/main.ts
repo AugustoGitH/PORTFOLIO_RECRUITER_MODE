@@ -26,6 +26,25 @@ export type BlogPost = MongoDocument & {
   updatedBy: ObjectId
 }
 
+export type PublicBlogPostCover = {
+  url: string
+  width: number
+  height: number
+}
+
+export type PublicBlogPost = {
+  slug: string
+  title: string
+  subtitle?: string
+  excerpt: string
+  markdown: string
+  publishedAt?: Date
+  categoryId: string
+  cover?: PublicBlogPostCover
+  views: number
+  likes: number
+}
+
 export type BlogMetric = MongoDocument & {
   postId: ObjectId
   visitorId: string

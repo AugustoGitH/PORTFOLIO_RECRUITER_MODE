@@ -5,7 +5,7 @@ import type { PageLayoutProps } from "./types";
 export const PageLayout = (props: PageLayoutProps) => {
   return (
     <>
-      <Header hasAdminSession={props.hasAdminSession} />
+      <Header hasAdminSession={props.hasAdminSession} variant={props.headerVariant} />
       {props.children}
       <Footer />
     </>

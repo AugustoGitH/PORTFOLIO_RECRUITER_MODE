@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from "react"
 import { useAsciiArt, useAsciiReveal } from "../../../hooks/media"
 import { useOnceInView } from "../../../hooks/observer"

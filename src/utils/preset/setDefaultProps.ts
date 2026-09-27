@@ -68,14 +68,22 @@ export const setDefaultProps = <
       ? Exclude<Defaults[K], undefined> // Use exact type but remove undefined
       : Exclude<Props[K], undefined>; // Remove undefined from original type
 } => {
+  type Result = Omit<Props, keyof Defaults> & {
+    [K in keyof Defaults & keyof Props]-?: Defaults[K] extends undefined
+      ? Props[K]
+      : Defaults[K] extends Props[K]
+        ? Exclude<Defaults[K], undefined>
+        : Exclude<Props[K], undefined>
+  }
+
   // Early return for null or undefined inputs
   if (!props || !defaultProps) {
-    return (props || defaultProps || {}) as any;
+    return (props || defaultProps || {}) as Result;
   }
 
   // Prevent infinite recursion with circular references
   if (visited.has(props) || visited.has(defaultProps)) {
-    return props as any;
+    return props as Result;
   }
 
   // Track visited objects
@@ -90,7 +98,7 @@ export const setDefaultProps = <
   );
 
   // Create the merged object
-  const result: Record<string, any> = { ...defaultProps };
+  const result: Record<string, unknown> = { ...defaultProps };
 
   // Add filtered props
   for (const key in filtered) {
@@ -113,14 +121,14 @@ export const setDefaultProps = <
       ) {
         // Pass the visited set to the recursive call
         // Use type assertion to handle nested objects safely
-        result[key] = setDefaultProps(
-          propsValue as Record<string, any>,
-          defaultValue as Record<string, any>,
+        result[key] = setDefaultProps<Record<string, unknown>, Record<string, unknown>>(
+          propsValue,
+          defaultValue,
           visited
         );
       }
     }
   }
 
-  return result as any;
+  return result as Result;
 };

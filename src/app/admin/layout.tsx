@@ -1,6 +1,5 @@
 import type { PropsWithChildren } from "react"
-import { AdminProviders } from "./AdminProviders"
 
-export default function AdminRootLayout({ children }: PropsWithChildren) {
-  return <AdminProviders>{children}</AdminProviders>
+export default function AdminLayout(props: PropsWithChildren) {
+  return props.children
 }

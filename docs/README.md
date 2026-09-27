@@ -10,15 +10,17 @@ npm run build
 npm run lint
 ```
 
-O ponto de entrada do App Router é `src/app/`: `layout.tsx` define o documento e metadata, `page.tsx` monta a aplicação e `globals.css` carrega os estilos existentes. A composição de providers está em `src/App.tsx`; a página atual é `src/screens/Main/main.tsx`.
+O ponto de entrada do App Router é `src/app/`: `layout.tsx` define o documento, metadata e providers globais; cada `page.tsx` adapta a rota e delega a apresentação para o módulo correspondente em `src/screens/`.
 
-`layout.tsx` e `page.tsx` são Server Components. `App.tsx` é a fronteira client-side temporária, pois a SPA atual compartilha idioma, tabs, popovers, navegação por hash e arte ASCII. Não adicione `"use client"` a `app/` sem necessidade; extraia uma seção dessa fronteira somente quando seu conteúdo e tradução puderem ser fornecidos pelo servidor sem mudar a interação.
+`layout.tsx` e os arquivos de rota `page.tsx` são Server Components. Não adicione `"use client"` a `app/` sem necessidade; declare a fronteira cliente no menor componente interativo possível dentro de `src/screens/`, providers ou componentes compartilhados.
 
 ## Estrutura
 
 | Área | Onde procurar | Regra prática |
 | --- | --- | --- |
-| Página e composição | `src/app/` e `src/screens/` | `app/page.tsx` monta a rota `/`; `screens/Main` define a ordem das seções. |
+| Rotas | `src/app/` | `page.tsx` adapta o contrato do App Router e delega dados e apresentação; não concentra consultas ou transformação de DTOs. |
+| Páginas e composição | `src/screens/` | Cada página concentra sua composição e seus componentes exclusivos, como `Portfolio`, `Blog` e `BlogPost`. |
+| Dados de página | `src/server/` | Leitura de request, autenticação, acesso a serviços, fallbacks e adaptação para props serializáveis. |
 | Seções de conteúdo | `src/sections/` | Cada seção rende uma parte do portfólio (`About`, `Skills`, `Projects`, `Experiences`, `Testimonials` e `Congratulations`). |
 | Componentes reutilizáveis | `src/components/` | `action` contém controles, `general` primitivas, `layout` estrutura, `text` tipografia e `wrapper` comportamento visual. |
 | Features | `src/features/` | Fluxos de produto como métricas, feedback e recruiter mode. |
@@ -49,6 +51,11 @@ flowchart TD
 ## Convenções de código
 
 - Pastas de componentes, hooks e módulos usam `main.tsx` ou `main.ts` para implementação, `types.ts` para contrato e `index.ts` para exportação pública. Em subáreas, há barrels adicionais para agrupamento.
+- `src/components/` contém apenas peças compartilhadas entre páginas ou features. Um componente usado por uma única página fica em `src/screens/<Página>/components/`; tamanho ou complexidade, isoladamente, não justificam torná-lo genérico.
+- O `main.tsx` de cada page é o mapa legível da página: ele compõe diretamente cabeçalho, seções e painéis de primeiro nível. Evite wrappers como `*Detail` que encapsulam a página inteira e apenas deslocam sua composição para outro arquivo. Componentes extraídos devem corresponder a uma responsabilidade visual ou comportamental concreta.
+- Se um componente é uma seção de primeiro nível da página, seu nome termina obrigatoriamente em `Section`. Cada `*Section` usa `Container` como raiz e declara no próprio `Container` seu background e seus paddings. O `main.tsx` da page somente ordena essas seções; não centraliza background, largura ou espaçamento vertical delas em um wrapper externo.
+- Páginas em `src/app/**/page.tsx` devem permanecer finas: recebem `params`/`searchParams`, chamam um módulo de `src/server/<domínio>/`, tratam controles próprios do roteador como `notFound()` e renderizam a tela. Consultas, autorização, acesso a headers/cookies, fallbacks, ordenação e mapeamento de dados não pertencem ao arquivo da rota.
+- A camada de apresentação não depende da infraestrutura: módulos em `src/screens/` nunca importam de `src/server/` ou `src/app/`. Componentes são nomeados pelo domínio, sem o sufixo `Screen`.
 - Use `@/` para módulos em `src/` e `@backend/` para módulos server-only em `backend/`; não atravesse a fronteira com imports relativos longos.
 - `PropsWithClassName` e tipos comuns ficam em `src/utils/types/`; classes condicionais devem usar `cn` de `src/utils/tailwind`.
 - Tailwind v4 é carregado por `@tailwindcss/postcss`. `src/app/globals.css` importa `src/index.css`, onde vivem os tokens `ud-*`, incluindo cores, espaçamento, sombras, z-index e animações. Reutilize tokens antes de criar valores arbitrários.
@@ -106,7 +113,7 @@ Há mudanças locais não commitadas para converter imagens de perfil em arte de
 
 | Necessidade | Local inicial |
 | --- | --- |
-| Nova seção no portfólio | `src/sections/`, depois `screens/Main/main.tsx`, links de `constants/profile/page.ts` e termos. |
+| Nova seção no portfólio | `src/screens/Portfolio/components/`, depois `screens/Portfolio/main.tsx`, links de `constants/profile/page.ts` e termos. |
 | Novo componente visual | `src/components/` na categoria adequada; só crie uma feature se houver fluxo de produto próprio. |
 | Novo texto | `src/constants/intl/terms.ts`. |
 | Novo dado de perfil | `src/constants/profile/`, mantendo tipo explícito. |

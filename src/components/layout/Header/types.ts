@@ -1,4 +1,6 @@
+export type HeaderVariant = "portfolio" | "blog"
+
 export type HeaderProps = {
   hasAdminSession?: boolean
-  variant?: "portfolio" | "blog"
+  variant?: HeaderVariant
 }

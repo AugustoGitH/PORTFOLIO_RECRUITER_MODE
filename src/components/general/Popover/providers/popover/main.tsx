@@ -1,3 +1,5 @@
+"use client"
+
 import { createContext, useCallback, useContext, useRef, useState } from "react"
 import type { PopoverContextValue, PopoverProviderProps } from "./types"
 import { BASE_Z_INDEX, Z_INDEX_INCREMENT } from "./constants"

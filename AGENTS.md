@@ -11,6 +11,12 @@ Regras que refletem o código atual:
 
 - O conteúdo público do perfil pertence a `src/constants/profile/`; textos visíveis pertencem ao registro `constants/intl/terms.ts` e devem passar por `intl.t(...)`.
 - Componentes, hooks e módulos normalmente têm `main.tsx`/`main.ts`, `types.ts` e `index.ts` como barrel público. Preserve esse formato ao estender uma área já estruturada assim.
+- Componentes usados por uma única página pertencem a `src/screens/<Página>/components/`, mesmo quando são grandes. `src/components/` é reservado a componentes realmente compartilhados por mais de uma página ou feature; não promova antecipadamente componentes específicos de página para essa pasta.
+- O `main.tsx` de uma page deve tornar a composição da página explícita, montando diretamente suas seções principais. Não crie um componente intermediário que represente a página inteira (`*Detail`, `*Content` ou equivalente) apenas para esconder essa composição; extraia componentes por responsabilidade visual ou comportamental real.
+- Todo componente de primeiro nível que representa uma seção da página deve usar obrigatoriamente o sufixo `Section` e renderizar seu próprio `Container`. Cada `*Section` define localmente seu background e seus paddings; a page apenas ordena as seções e não cria um wrapper visual compartilhado para esconder essas decisões.
+- Arquivos `src/app/**/page.tsx` são adaptadores finos do App Router: resolvem apenas contratos do framework, delegam carregamento e transformação server-side para `src/server/<domínio>/` e entregam os dados a um componente de `src/screens/`. Não coloque consultas, autenticação, composição de DTOs ou regras de seleção diretamente na rota.
+- `src/screens/` não deve importar de `src/server/` nem de `src/app/`. A direção permitida é `app → server` e `app → screens`; `server` pode produzir os contratos serializáveis consumidos pela página.
+- O nome do componente segue o domínio (`Portfolio`, `BlogPage`, `BlogPostPage`) e não recebe o sufixo `Screen`. `screens` é somente o nome da camada/pasta.
 - A API expõe recursos sob `/api` por Route Handlers em `src/app/api/`.
 - Não presuma que as métricas já estão prontas: a estrutura Fastify era composta de stubs e foi removida sem ser publicada.
 - Há trabalho local em andamento ligado a arte ASCII. Preserve mudanças não relacionadas e leia `ACII.spec.md` quando a tarefa envolver esse recurso.

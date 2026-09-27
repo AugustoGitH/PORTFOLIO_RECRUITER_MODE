@@ -1,15 +1,10 @@
-import { requireAdminPermission } from "@backend/admin/authorization"
-import { AdminRecommendationsPanel } from "../AdminRecommendationsPanel"
-import { AdminLayout } from "../components/AdminLayout"
+import { AdminRecommendationsPage } from "@/screens/AdminRecommendations"
+import { requireAdminRecommendationsPageAccess } from "@/server/admin"
 
-export default async function AdminRecommendationsPage() {
-  await requireAdminPermission("recommendation.read")
+async function Page() {
+  await requireAdminRecommendationsPageAccess()
 
-  return (
-    <AdminLayout>
-      <div className="mx-auto w-full max-w-5xl p-8">
-        <AdminRecommendationsPanel />
-      </div>
-    </AdminLayout>
-  )
+  return <AdminRecommendationsPage />
 }
+
+export default Page

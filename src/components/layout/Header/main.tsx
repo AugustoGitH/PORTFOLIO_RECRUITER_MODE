@@ -1,3 +1,5 @@
+"use client"
+
 import { ABOUT, GROUP_SECTION_LINKS } from "../../../constants/profile"
 import { useINTLContext } from "../../../providers/intl"
 import { LanguageSelect, VerticalMenuButton } from "./components"

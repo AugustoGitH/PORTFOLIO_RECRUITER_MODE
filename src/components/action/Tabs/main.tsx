@@ -1,3 +1,5 @@
+"use client"
+
 import { useLayoutEffect, useRef, useState } from "react"
 import { slug } from "../../../utils/string"
 import { TabsProvider, useTabsContext } from "./providers"

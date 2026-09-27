@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps, react-hooks/immutability, react-hooks/refs, react-hooks/set-state-in-effect -- this imperative positioning hook intentionally synchronizes DOM measurements, external visibility and mutable observer state. */
 import {
   useCallback,
   useEffect,

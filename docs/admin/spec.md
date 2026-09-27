@@ -51,6 +51,8 @@ de tela, URL ou role. O catálogo inicial é pequeno, mas já cobre a evolução
 export const ADMIN_PERMISSIONS = [
   "admin.access",
   "admin.dashboard.read",
+  "admin.login-attempts.manage",
+  "rate-limits.manage",
   "metrics.read",
   "feedback.read",
   "feedback.moderate",
@@ -148,6 +150,17 @@ type AdminSession = {
 - TTL em `expiresAt`, com a verificação de expiração feita também pela aplicação;
 - `ipHash` e `userAgentHash` são apenas indicadores de auditoria, nunca bloqueios frágeis nem
   valores brutos.
+
+### `rate_limits`
+
+Mantém os buckets ativos do rate limit de login por IP e por e-mail normalizado. Cada documento
+armazena `scope`, `dimension`, `identifier`, `count`, início/última tentativa e `expiresAt`; o incremento é
+atômico, há índice único em `scope + dimension + identifier` e TTL em `expiresAt`. A mesma coleção
+armazena os buckets das rotas públicas em escopos separados. O IP fica em texto somente
+durante a janela curta necessária para o bloqueio e para o reset operacional no dashboard; não é
+copiado para o histórico de auditoria. A leitura e o reset dos buckets de IP exigem
+`admin.login-attempts.manage`; buckets de e-mail não são expostos à interface. Um login válido
+remove os buckets correspondentes de IP e e-mail.
 
 ### `admin_audit_events`
 

@@ -1,7 +1,7 @@
 import "server-only"
 
 export const ADMIN_PERMISSIONS = [
-  "admin.access", "admin.dashboard.read", "metrics.read", "feedback.read", "feedback.moderate",
+  "admin.access", "admin.dashboard.read", "admin.login-attempts.manage", "rate-limits.manage", "metrics.read", "feedback.read", "feedback.moderate",
   "recommendation.read", "recommendation.manage",
   "blog.read", "blog.manage",
   "resume.catalog.read", "resume.catalog.manage", "admin.users.read", "admin.users.manage", "audit.read",

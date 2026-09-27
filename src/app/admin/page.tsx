@@ -1,15 +1,14 @@
-import { requireAdminPermission } from "@backend/admin/authorization"
-import { AdminLayout } from "./components/AdminLayout"
+import { AdminPage } from "@/screens/Admin"
+import {
+  getAdminDashboardPageData,
+  requireAdminDashboardPageAccess,
+} from "@/server/admin"
 
-export default async function AdminPage() {
-  await requireAdminPermission("admin.dashboard.read")
+async function Page() {
+  const access = await requireAdminDashboardPageAccess()
+  const data = getAdminDashboardPageData(access)
 
-  return (
-    <AdminLayout>
-      <div className="mx-auto w-full max-w-5xl p-8">
-        <h1 className="text-2xl font-bold text-ud-neutral-950">Administração</h1>
-        <p className="mt-2 text-sm text-ud-secondary-600">Use a navegação lateral para acessar cada área administrativa.</p>
-      </div>
-    </AdminLayout>
-  )
+  return <AdminPage {...data} />
 }
+
+export default Page

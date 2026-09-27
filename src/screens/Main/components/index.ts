@@ -1,6 +1,0 @@
-export * from "./AboutSection"
-export * from "./SkillsSection"
-export * from "./ProjectsSection"
-export * from "./ExperiencesSection"
-export * from "./TestimonialsSection"
-export * from "./CongratulationsSection"

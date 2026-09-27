@@ -29,7 +29,9 @@ export const shouldTriggerOutsideClick = (
     options.anchorElement && options.anchorElement.contains(options.node)
 
   const modalNode = options.modalElement?.getAttribute('node-menu')
-  const clickedNodeEl = (options.node as any).closest(`[node-menu]`)
+  const clickedNodeEl = options.node instanceof Element
+    ? options.node.closest('[node-menu]')
+    : null
   const clickedNode = clickedNodeEl?.getAttribute('node-menu')
 
   if (isInAnchor) {

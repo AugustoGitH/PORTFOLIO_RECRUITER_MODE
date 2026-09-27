@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect -- registration state is synchronized with the external popover stack. */
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 
 import { usePopoverContext } from '../../providers/popover'
@@ -232,7 +233,7 @@ export const usePopover = <A extends HTMLElement = HTMLElement>(
         anchorElement.removeEventListener('mouseleave', handleMouseLeave)
       }
     }
-  }, [props.hovering, props.anchor.ref, modal.controller.anchor])
+  }, [props.hovering, props.anchor.ref, modal.controller])
   // #endregion
 
   // Determine effective direction based on side fallback

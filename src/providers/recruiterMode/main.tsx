@@ -1,3 +1,5 @@
+"use client"
+
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import type { PortfolioAudience, RecruiterModeContextValue, RecruiterModeProviderProps, RecruiterRole, RecruiterSeniority } from "./types"

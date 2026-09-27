@@ -3,7 +3,7 @@ import { stdin, stdout } from "node:process"
 import * as argon2 from "argon2"
 import { MongoClient } from "mongodb"
 
-const permissions = ["admin.access", "admin.dashboard.read", "metrics.read", "feedback.read", "feedback.moderate", "recommendation.read", "recommendation.manage", "blog.read", "blog.manage", "resume.catalog.read", "resume.catalog.manage", "admin.users.read", "admin.users.manage", "audit.read"]
+const permissions = ["admin.access", "admin.dashboard.read", "admin.login-attempts.manage", "rate-limits.manage", "metrics.read", "feedback.read", "feedback.moderate", "recommendation.read", "recommendation.manage", "blog.read", "blog.manage", "resume.catalog.read", "resume.catalog.manage", "admin.users.read", "admin.users.manage", "audit.read"]
 const prompt = createInterface({ input: stdin, output: stdout })
 const email = (await prompt.question("E-mail do superadmin: ")).trim().toLowerCase()
 prompt.close()

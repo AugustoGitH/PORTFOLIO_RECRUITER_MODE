@@ -5,7 +5,12 @@ import sharp from "sharp"
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache"
 import { blogRepository } from "@backend/blog/repositories"
 import { deletePublicObject, putPublicWebp } from "@backend/media/storage"
-import type { BlogPost, BlogPostStatus } from "@backend/blog/models"
+import type {
+  BlogPost,
+  BlogPostStatus,
+  PublicBlogPost,
+  PublicBlogPostCover,
+} from "@backend/blog/models"
 
 const publishedTag = "blog:published"
 type CachedPublishedPost = Omit<BlogPost, "_id" | "categoryId" | "coverMediaId" | "mediaIds" | "createdBy" | "updatedBy"> & {
@@ -15,12 +20,6 @@ type CachedPublishedPost = Omit<BlogPost, "_id" | "categoryId" | "coverMediaId" 
   mediaIds?: string[]
   createdBy: string
   updatedBy: string
-}
-
-type PublicCover = {
-  url: string
-  width: number
-  height: number
 }
 
 const toCachedPublishedPost = (post: BlogPost): CachedPublishedPost => ({
@@ -44,8 +43,8 @@ const toPublicPost = (
     categoryId: string | BlogPost["categoryId"]
   },
   totals: { views: number; likes: number } = { views: 0, likes: 0 },
-  cover?: PublicCover,
-) => ({
+  cover?: PublicBlogPostCover,
+): PublicBlogPost => ({
   slug: post.slug,
   title: post.title,
   subtitle: post.subtitle,
@@ -57,7 +56,9 @@ const toPublicPost = (
   ...totals,
 })
 
-const toPublicCover = (media: Awaited<ReturnType<typeof blogRepository.findMedia>>): PublicCover | undefined =>
+const toPublicCover = (
+  media: Awaited<ReturnType<typeof blogRepository.findMedia>>,
+): PublicBlogPostCover | undefined =>
   media
     ? { url: media.publicUrl, width: media.width, height: media.height }
     : undefined
@@ -134,7 +135,7 @@ export const blogService = {
 
   deleteCategory: (id: string) => blogRepository.deleteCategory(id),
 
-  async publishedPosts() {
+  async publishedPosts(): Promise<PublicBlogPost[]> {
     try {
       return await rankedPublished()
     } catch {
@@ -142,7 +143,7 @@ export const blogService = {
     }
   },
 
-  async publishedPost(slug: string) {
+  async publishedPost(slug: string): Promise<PublicBlogPost | null> {
     const post = (await published()).find((item) => item.slug === slug)
     if (!post) return null
 

@@ -1,8 +1,10 @@
-import { redirect } from "next/navigation"
-import { getVerifiedAdminSession } from "@backend/admin/authorization"
-import { AdminLoginForm } from "./AdminLoginForm"
+import { AdminLoginPage } from "@/screens/AdminLogin"
+import { requireAdminLoginPageAccess } from "@/server/admin"
 
-export default async function AdminLoginPage() {
-  if (await getVerifiedAdminSession()) redirect("/admin")
-  return <AdminLoginForm />
+async function Page() {
+  await requireAdminLoginPageAccess()
+
+  return <AdminLoginPage />
 }
+
+export default Page

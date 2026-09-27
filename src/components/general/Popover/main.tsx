@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs -- usePopover exposes a structured controller that contains refs; JSX only forwards them to React. */
 import { createPortal } from 'react-dom'
 
 import { setDefaultProps } from '../../../utils/preset'

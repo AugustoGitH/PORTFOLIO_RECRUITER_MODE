@@ -1,5 +1,4 @@
 import type { Image } from "../../utils/types"
-import type { Term } from "../intl"
 import { ENTERPRISE } from "./experiences"
 
 

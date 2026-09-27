@@ -1,7 +1,12 @@
 import "server-only"
 import { ObjectId } from "mongodb"
 import { getMongoDb } from "@backend/libs/db/mongo"
-import { getAdminRolesCollection, getAdminSessionsCollection, getAdminUsersCollection, type AdminSession } from "@backend/admin/models"
+import {
+  getAdminRolesCollection,
+  getAdminSessionsCollection,
+  getAdminUsersCollection,
+  type AdminSession,
+} from "@backend/admin/models"
 
 export const adminRepository = {
   async findUserByEmail(email: string) { return getAdminUsersCollection(await getMongoDb()).findOne({ email }) },

@@ -1,4 +1,15 @@
 import "server-only"
+import { combineRateLimits, consumeRateLimit } from "./rate-limit"
+import type { RateLimitResult } from "./rate-limit"
+
+const applyRateLimitHeaders = (
+  headers: Headers,
+  rateLimit: RateLimitResult,
+) => {
+  headers.set("RateLimit-Limit", String(rateLimit.limit))
+  headers.set("RateLimit-Remaining", String(rateLimit.remaining))
+  headers.set("RateLimit-Reset", String(rateLimit.retryAfterSeconds))
+}
 
 /** Returns a 403 response for cross-origin writes, or null when allowed. */
 export const requireSameOrigin = (request: Request): Response | null => {
@@ -21,32 +32,53 @@ export const withPublicControllerSecurity = (
   return handler(request)
 }
 
-const attempts = new Map<string, { startedAt: number; count: number }>()
 const idempotencyKeys = new Map<string, number>()
-
-const exceedsRateLimit = (key: string, limit: number, windowMs = 60_000) => {
-  const now = Date.now()
-  const current = attempts.get(key)
-  if (!current || now - current.startedAt >= windowMs) {
-    attempts.set(key, { startedAt: now, count: 1 })
-    return false
-  }
-  current.count += 1
-  return current.count > limit
-}
 
 export const withRateLimit = <Context>(
   handler: (request: Request, context: Context) => Response | Promise<Response>,
   limits: { visitor: number; ip: number },
-  scope = "public",
+  scope: string,
   windowMs = 60_000,
 ) => async (request: Request, context: Context) => {
-  const visitor = request.headers.get("cookie")?.match(/(?:^|;\s*)visitor_id=([^;]+)/)?.[1] ?? "anonymous"
+  const visitor = request.headers.get("cookie")?.match(/(?:^|;\s*)visitor_id=([^;]+)/)?.[1]
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
-  if (exceedsRateLimit(`${scope}:visitor:${visitor}`, limits.visitor, windowMs) || exceedsRateLimit(`${scope}:ip:${ip}`, limits.ip, windowMs)) {
-    return Response.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(Math.ceil(windowMs / 1000)) } })
+  const rateLimits = await Promise.all([
+    consumeRateLimit({
+      scope,
+      dimension: "ip",
+      identifier: ip,
+      limit: limits.ip,
+      windowMs,
+    }),
+    ...(visitor ? [consumeRateLimit({
+      scope,
+      dimension: "visitor" as const,
+      identifier: visitor,
+      limit: limits.visitor,
+      windowMs,
+    })] : []),
+  ])
+  const rateLimit = combineRateLimits(...rateLimits)
+
+  if (rateLimit.isLimited) {
+    const response = Response.json(
+      { error: "Too many requests" },
+      {
+        status: 429,
+        headers: {
+          "Cache-Control": "no-store",
+          "Retry-After": String(rateLimit.retryAfterSeconds),
+        },
+      },
+    )
+
+    applyRateLimitHeaders(response.headers, rateLimit)
+    return response
   }
-  return handler(request, context)
+
+  const response = await handler(request, context)
+  applyRateLimitHeaders(response.headers, rateLimit)
+  return response
 }
 
 /** Prevents replay of a public write inside a bounded local development window. */

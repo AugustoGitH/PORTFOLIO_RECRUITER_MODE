@@ -7,4 +7,5 @@ export const dynamic = "force-dynamic"
 export const POST = withRateLimit(
   (request) => withPublicControllerSecurity(metricsController.toggleLike)(request),
   { visitor: 10, ip: 30 },
+  "portfolio-like",
 )

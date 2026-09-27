@@ -22,8 +22,23 @@ const published = unstable_cache(
 )
 
 const editableRecommendation = (recommendation: DeveloperRecommendation) => {
-  const { _id, createdAt, updatedAt, ...input } = recommendation
-  return input
+  return {
+    displayName: recommendation.displayName,
+    headline: recommendation.headline,
+    seniority: recommendation.seniority,
+    skills: recommendation.skills,
+    roleKinds: recommendation.roleKinds,
+    summary: recommendation.summary,
+    availability: recommendation.availability,
+    contact: recommendation.contact,
+    avatarMediaId: recommendation.avatarMediaId,
+    status: recommendation.status,
+    slug: recommendation.slug,
+    editorialPriority: recommendation.editorialPriority,
+    consent: recommendation.consent,
+    publishedAt: recommendation.publishedAt,
+    archivedAt: recommendation.archivedAt,
+  }
 }
 
 const toPublicRecommendation = async (

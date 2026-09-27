@@ -1,5 +1,5 @@
-import type { MainProps } from "@/screens/Main/types"
+import type { PortfolioProps } from "@/screens/Portfolio/types"
 
 export type RecommendationsPanelProps = {
-  recommendations: MainProps["recommendations"]
+  recommendations: PortfolioProps["recommendations"]
 }

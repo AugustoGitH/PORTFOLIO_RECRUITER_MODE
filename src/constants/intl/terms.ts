@@ -651,6 +651,34 @@ export const INTL_TERMS = {
     ptbr: "Blog",
     en: "Blog"
   },
+  PortfolioBlogEyebrow: {
+    ptbr: "Do código para o café",
+    en: "From code to coffee"
+  },
+  PortfolioBlogTitle: {
+    ptbr: "Em alta no blog",
+    en: "Trending on the blog"
+  },
+  PortfolioBlogDescription: {
+    ptbr: "O conteúdo que mais chamou atenção por aqui.",
+    en: "The story that caught the most attention around here."
+  },
+  PortfolioBlogExplore: {
+    ptbr: "Explorar o blog",
+    en: "Explore the blog"
+  },
+  PortfolioBlogPopular: {
+    ptbr: "Em alta",
+    en: "Trending"
+  },
+  PortfolioBlogLikes: {
+    ptbr: "{likes} curtidas",
+    en: "{likes} likes"
+  },
+  PortfolioBlogPublished: {
+    ptbr: "Publicado em {date}",
+    en: "Published on {date}"
+  },
   AdminPanel: {
     ptbr: "Painel administrativo",
     en: "Admin panel"
@@ -694,6 +722,38 @@ export const INTL_TERMS = {
   AdminLoginError: {
     ptbr: "E-mail ou senha inválidos.",
     en: "Invalid email or password."
+  },
+  AdminLoginAttemptsRemaining: {
+    ptbr: "{count} tentativas disponíveis.",
+    en: "{count} attempts available."
+  },
+  AdminLoginAttemptRemaining: {
+    ptbr: "1 tentativa disponível.",
+    en: "1 attempt available."
+  },
+  AdminLoginRateLimited: {
+    ptbr: "Limite de tentativas atingido. Tente novamente em {time}.",
+    en: "Attempt limit reached. Try again in {time}."
+  },
+  AdminLoginDescription: {
+    ptbr: "Acesso restrito ao portfólio.",
+    en: "Restricted portfolio access."
+  },
+  Email: {
+    ptbr: "E-mail",
+    en: "Email"
+  },
+  Password: {
+    ptbr: "Senha",
+    en: "Password"
+  },
+  SignIn: {
+    ptbr: "Entrar",
+    en: "Sign in"
+  },
+  SigningIn: {
+    ptbr: "Entrando",
+    en: "Signing in"
   },
   AdminLogoutSuccess: {
     ptbr: "Você saiu do painel administrativo.",
@@ -1040,6 +1100,134 @@ export const INTL_TERMS = {
   NavigationMenu: {
     ptbr: "Menu de navegação",
     en: "Navigation menu"
+  },
+  AdminTitle: {
+    ptbr: "Administração",
+    en: "Administration"
+  },
+  AdminDashboardDescription: {
+    ptbr: "Use a navegação lateral para acessar cada área administrativa.",
+    en: "Use the side navigation to access each administrative area."
+  },
+  AdminLoginAttemptsTitle: {
+    ptbr: "Acessos de login",
+    en: "Login access"
+  },
+  AdminLoginAttemptsDescription: {
+    ptbr: "Acompanhe as janelas ativas de tentativas por IP e libere um endereço quando necessário.",
+    en: "Monitor active attempt windows by IP and release an address when needed."
+  },
+  AdminLoginAttemptsLoading: {
+    ptbr: "Carregando tentativas de login...",
+    en: "Loading login attempts..."
+  },
+  AdminLoginAttemptsLoadError: {
+    ptbr: "Não foi possível carregar as tentativas de login.",
+    en: "Unable to load login attempts."
+  },
+  AdminLoginAttemptsEmpty: {
+    ptbr: "Não há janelas de tentativas ativas.",
+    en: "There are no active attempt windows."
+  },
+  AdminLoginAttemptsBlocked: {
+    ptbr: "Bloqueado",
+    en: "Blocked"
+  },
+  AdminLoginAttemptsActive: {
+    ptbr: "Ativo",
+    en: "Active"
+  },
+  AdminLoginAttemptsCount: {
+    ptbr: "{count} de {limit} tentativas utilizadas",
+    en: "{count} of {limit} attempts used"
+  },
+  AdminLoginAttemptsLastAttempt: {
+    ptbr: "Última tentativa: {date}",
+    en: "Last attempt: {date}"
+  },
+  AdminLoginAttemptsExpiresAt: {
+    ptbr: "Reset automático: {date}",
+    en: "Automatic reset: {date}"
+  },
+  AdminLoginAttemptsReset: {
+    ptbr: "Resetar tentativas",
+    en: "Reset attempts"
+  },
+  AdminLoginAttemptsResetting: {
+    ptbr: "Resetando",
+    en: "Resetting"
+  },
+  AdminLoginAttemptsResetSuccess: {
+    ptbr: "As tentativas do IP foram resetadas.",
+    en: "The IP attempts were reset."
+  },
+  AdminLoginAttemptsResetError: {
+    ptbr: "Não foi possível resetar as tentativas do IP.",
+    en: "Unable to reset the IP attempts."
+  },
+  AdminPublicRateLimitsTitle: {
+    ptbr: "Limites das rotas públicas",
+    en: "Public route limits"
+  },
+  AdminPublicRateLimitsDescription: {
+    ptbr: "Acompanhe e resete os buckets ativos por endpoint, IP ou visitante.",
+    en: "Monitor and reset active buckets by endpoint, IP, or visitor."
+  },
+  AdminPublicRateLimitsLoading: {
+    ptbr: "Carregando limites das rotas públicas...",
+    en: "Loading public route limits..."
+  },
+  AdminPublicRateLimitsLoadError: {
+    ptbr: "Não foi possível carregar os limites das rotas públicas.",
+    en: "Unable to load public route limits."
+  },
+  AdminPublicRateLimitsEmpty: {
+    ptbr: "Não há buckets públicos ativos.",
+    en: "There are no active public buckets."
+  },
+  AdminPublicRateLimitsIp: {
+    ptbr: "IP",
+    en: "IP"
+  },
+  AdminPublicRateLimitsVisitor: {
+    ptbr: "Visitante",
+    en: "Visitor"
+  },
+  AdminPublicRateLimitsResetSuccess: {
+    ptbr: "O limite selecionado foi resetado.",
+    en: "The selected limit was reset."
+  },
+  AdminPublicRateLimitsResetError: {
+    ptbr: "Não foi possível resetar o limite selecionado.",
+    en: "Unable to reset the selected limit."
+  },
+  AdminProfessionalFeedbacksTitle: {
+    ptbr: "Feedbacks profissionais",
+    en: "Professional feedback"
+  },
+  AdminProfessionalFeedbacksDescription: {
+    ptbr: "Modere os relatos que podem aparecer publicamente no portfólio.",
+    en: "Moderate the testimonials that may appear publicly in the portfolio."
+  },
+  AdminPortfolioFeedbacksTitle: {
+    ptbr: "Feedbacks do portfólio",
+    en: "Portfolio feedback"
+  },
+  AdminPortfolioFeedbacksDescription: {
+    ptbr: "Mensagens privadas enviadas por visitantes. A retenção é de 90 dias.",
+    en: "Private messages sent by visitors. Retention is 90 days."
+  },
+  AdminPortfolioFeedbacksEmpty: {
+    ptbr: "Não há feedbacks do portfólio no período de retenção.",
+    en: "There is no portfolio feedback within the retention period."
+  },
+  AdminVisitorLabel: {
+    ptbr: "Visitante",
+    en: "Visitor"
+  },
+  AdminLoadMore: {
+    ptbr: "Carregar mais",
+    en: "Load more"
   },
   Menu: {
     ptbr: "Menu",

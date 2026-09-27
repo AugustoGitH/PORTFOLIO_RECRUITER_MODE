@@ -1,3 +1,3 @@
-export type PresetComponent<P extends object = Record<string, any>> = P & {
+export type PresetComponent<P extends object = Record<string, unknown>> = P & {
   name: string
 }

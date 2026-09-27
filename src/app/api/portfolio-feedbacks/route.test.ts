@@ -1,9 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 const submit = vi.fn()
+const consumeRateLimit = vi.fn().mockResolvedValue({
+  isLimited: false,
+  limit: 3,
+  remaining: 2,
+  retryAfterSeconds: 900,
+})
 
 vi.mock("@backend/portfolio-feedbacks/services", () => ({
   portfolioFeedbackService: { submit },
+}))
+vi.mock("@backend/security/rate-limit", async (importOriginal) => ({
+  ...await importOriginal<typeof import("@backend/security/rate-limit")>(),
+  consumeRateLimit,
 }))
 
 const { POST } = await import("./route")

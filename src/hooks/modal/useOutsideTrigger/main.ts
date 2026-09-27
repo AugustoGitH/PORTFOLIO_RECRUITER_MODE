@@ -71,7 +71,7 @@ export const useOutsideTrigger = <Element extends HTMLElement = HTMLDivElement>(
     return () => {
       document.removeEventListener('mousedown', handleEvent)
     }
-  }, [])
+  }, [optionsRef])
 
   return [elementRef]
 }

@@ -4,6 +4,14 @@ import { randomUUID } from "crypto"
 import { adminRepository } from "@backend/admin/repositories"
 import { encryptAdminSession, type AdminClaims } from "@backend/admin/session"
 import type { AdminPermission } from "@backend/admin/authorization/permissions"
+import {
+  consumeRateLimit,
+  listRateLimitBuckets,
+  resetRateLimit,
+  type RateLimitResult,
+} from "@backend/security/rate-limit"
+
+export type AdminLoginRateLimitResult = RateLimitResult
 
 export const adminAuthService = {
   async login(emailInput: string, password: string) {
@@ -27,4 +35,40 @@ export const adminAuthService = {
   },
   async logout(sessionId: string) { await adminRepository.revokeSession(sessionId) },
   hasPermission(session: { permissions: AdminPermission[] }, permission: AdminPermission) { return session.permissions.includes(permission) },
+  async consumeLoginAttempt(
+    scope: "ip" | "email",
+    identifier: string,
+    limit: number,
+    windowMs: number,
+  ) {
+    return consumeRateLimit({
+      scope: "admin-login",
+      dimension: scope,
+      identifier,
+      limit,
+      windowMs,
+    })
+  },
+  async listLoginIpRateLimits(limit: number) {
+    const rateLimits = await listRateLimitBuckets("admin-login", "ip")
+
+    return rateLimits.map((rateLimit) => ({
+      ip: rateLimit.identifier,
+      count: rateLimit.count,
+      attemptsRemaining: Math.max(0, limit - rateLimit.count),
+      isBlocked: rateLimit.count >= limit,
+      windowStartedAt: rateLimit.windowStartedAt,
+      lastAttemptAt: rateLimit.lastAttemptAt,
+      expiresAt: rateLimit.expiresAt,
+    }))
+  },
+  async resetLoginIpRateLimit(ip: string) {
+    await resetRateLimit("admin-login", "ip", ip)
+  },
+  async resetSuccessfulLoginRateLimits(ip: string, email: string) {
+    await Promise.all([
+      resetRateLimit("admin-login", "ip", ip),
+      resetRateLimit("admin-login", "email", email),
+    ])
+  },
 }

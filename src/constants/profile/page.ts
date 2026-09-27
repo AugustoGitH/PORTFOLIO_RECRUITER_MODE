@@ -1,4 +1,4 @@
-import { BriefcaseBusinessIcon, FolderIcon, GridIcon, MegaphoneIcon, StarIcon, UserIcon } from "lucide-react"
+import { BriefcaseBusinessIcon, FolderIcon, GridIcon, MegaphoneIcon, NotebookPenIcon, StarIcon, UserIcon } from "lucide-react"
 import type { Term } from "../intl"
 
 export type Section = {
@@ -31,6 +31,12 @@ export const SECTIONS: Record<string, Section> = {
     title: "Projects",
     icon: FolderIcon
   },
+  blog: {
+    href: "#blog-highlight",
+    value: "blog-highlight",
+    title: "Blog",
+    icon: NotebookPenIcon
+  },
   experiences: {
     href: "#experiences",
     value: "experiences",
@@ -53,6 +59,6 @@ export const SECTIONS: Record<string, Section> = {
 }
 
 export const GROUP_SECTION_LINKS = {
-  main: [SECTIONS.about, SECTIONS.skills, SECTIONS.projects, SECTIONS.experiences, SECTIONS.testimonials, SECTIONS.feedback],
-  recruiter: [SECTIONS.about, SECTIONS.experiences, SECTIONS.projects, SECTIONS.skills, SECTIONS.testimonials, SECTIONS.feedback],
+  main: [SECTIONS.about, SECTIONS.skills, SECTIONS.blog, SECTIONS.projects, SECTIONS.experiences, SECTIONS.testimonials, SECTIONS.feedback],
+  recruiter: [SECTIONS.about, SECTIONS.experiences, SECTIONS.projects, SECTIONS.blog, SECTIONS.skills, SECTIONS.testimonials, SECTIONS.feedback],
 }

@@ -1,3 +1,5 @@
+export type RecommendationContact = { label: string; url: string }
+
 export type Recommendation = {
   id: string;
   displayName: string;
@@ -8,5 +10,5 @@ export type Recommendation = {
   avatarUrl?: string;
   summary?: string;
   availability?: string;
-  contact: { label: string; url: string }
+  contact: RecommendationContact
 }

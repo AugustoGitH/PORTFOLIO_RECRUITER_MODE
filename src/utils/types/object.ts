@@ -1,3 +1,3 @@
-export type PropsWithClassName<P = {}> = P & { className?: string }
-export type PropsWithTabIndex<P = {}> = P & { tabIndex?: number }
-export type PropsWithStyle<P = {}> = P & { style?: React.CSSProperties }
+export type PropsWithClassName<P = object> = P & { className?: string }
+export type PropsWithTabIndex<P = object> = P & { tabIndex?: number }
+export type PropsWithStyle<P = object> = P & { style?: React.CSSProperties }

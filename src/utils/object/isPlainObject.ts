@@ -1,2 +1,2 @@
-export const isPlainObject = (value: any): value is Record<string, any> =>
+export const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   Object.prototype.toString.call(value) === "[object Object]";

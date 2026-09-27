@@ -1,8 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 const submit = vi.fn()
+const consumeRateLimit = vi.fn().mockResolvedValue({
+  isLimited: false,
+  limit: 5,
+  remaining: 4,
+  retryAfterSeconds: 60,
+})
 vi.mock("@backend/feedback/services", () => ({ feedbackService: { submit }, FeedbackError: class FeedbackError extends Error {} }))
 vi.mock("@backend/admin/authorization", () => ({ getVerifiedAdminSession: vi.fn() }))
+vi.mock("@backend/security/rate-limit", async (importOriginal) => ({
+  ...await importOriginal<typeof import("@backend/security/rate-limit")>(),
+  consumeRateLimit,
+}))
 
 const { POST } = await import("./route")
 

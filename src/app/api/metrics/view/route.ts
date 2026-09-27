@@ -11,4 +11,5 @@ export async function GET() {
 export const POST = withRateLimit(
   (request) => withPublicControllerSecurity(metricsController.registerPortfolioView)(request),
   { visitor: 5, ip: 30 },
+  "portfolio-view",
 )

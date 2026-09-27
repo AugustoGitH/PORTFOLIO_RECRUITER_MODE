@@ -1,14 +1,10 @@
-import { requireAdminPermission } from "@backend/admin/authorization"
-import { AdminLayout } from "../components/AdminLayout"
-import { AdminBlogPanel } from "./AdminBlogPanel"
+import { AdminBlogPage } from "@/screens/AdminBlog"
+import { requireAdminBlogPageAccess } from "@/server/admin"
 
-export default async function AdminBlogPage() {
-  await requireAdminPermission("blog.read")
-  return (
-    <AdminLayout>
-      <div className="mx-auto w-full max-w-6xl p-8">
-        <AdminBlogPanel />
-      </div>
-    </AdminLayout>
-  )
+async function Page() {
+  await requireAdminBlogPageAccess()
+
+  return <AdminBlogPage />
 }
+
+export default Page

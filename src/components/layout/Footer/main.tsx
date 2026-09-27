@@ -1,3 +1,5 @@
+"use client"
+
 import { ABOUT, GROUP_LINKS, GROUP_SECTION_LINKS, PAGE } from "../../../constants/profile"
 import { useINTLContext } from "../../../providers/intl"
 import { slug } from "../../../utils/string"

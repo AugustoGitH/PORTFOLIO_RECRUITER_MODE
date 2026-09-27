@@ -45,7 +45,7 @@ export const filterObject = <T extends object, K extends keyof T = keyof T>(
         // Only recursive if the recursive parameter is true
         result[field] = filterObject<typeof value>(
           value,
-          ([k, v]) => predicate([k as any, v]),
+          ([k, v]) => predicate([k as K, v as T[K]]),
           recursive,
           visited
         )

@@ -49,4 +49,8 @@ async function download(request: Request, context: { params: Promise<{ slug: str
   }
 }
 
-export const GET = withRateLimit(download, { visitor: 3, ip: 10 })
+export const GET = withRateLimit(
+  download,
+  { visitor: 3, ip: 10 },
+  "resume-download",
+)
