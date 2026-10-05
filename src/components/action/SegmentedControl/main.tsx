@@ -55,9 +55,13 @@ export const SegmentedControl = <Value extends string>(props: SegmentedControlPr
             type="button"
             data-segmented-value={option.value}
             aria-pressed={isSelected}
-            className={cn("relative z-10 min-h-11 rounded-lg px-2 text-sm font-medium text-ud-secondary-600 transition-colors hover:text-ud-auxiliary-purple", {
-              "text-ud-neutral-0 hover:bg-transparent hover:text-ud-neutral-0": isSelected,
-            })}
+            className={cn(
+              "relative z-10 min-h-11 rounded-lg px-2 text-sm font-medium text-ud-secondary-600 transition-colors hover:text-ud-auxiliary-purple",
+              {
+                "text-ud-neutral-0 hover:bg-transparent hover:text-ud-neutral-0": isSelected,
+              },
+              props.optionClassName,
+            )}
             onClick={() => props.onChange(isSelected ? null : option.value)}
           >
             {option.label}

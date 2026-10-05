@@ -1,7 +1,9 @@
-import { ArrowRightIcon, ChevronRightIcon, MenuIcon, MessageCircleIcon, NotebookPenIcon } from "lucide-react"
+import { ArrowRightIcon, ChevronRightIcon, LanguagesIcon, MessageCircleIcon, NotebookPenIcon, UserRoundSearchIcon } from "lucide-react"
 import { usePathname } from "next/navigation"
-import { useMemo, useRef } from "react"
-import { Popover } from "@/components/general/Popover"
+import { useMemo } from "react"
+import { Button } from "@/components/action/Button"
+import { SegmentedControl } from "@/components/action/SegmentedControl"
+import { NavigationMenuPopover } from "@/components/layout/NavigationMenuPopover"
 import { GROUP_SECTION_LINKS } from "@/constants/profile"
 import { useHashNavigation } from "@/hooks/navigation"
 import { useINTLContext } from "@/providers/intl"
@@ -12,40 +14,17 @@ export const VerticalMenuButton = () => {
   const intl = useINTLContext()
   const pathname = usePathname()
   const { isRecruiterMode } = useRecruiterModeContext()
-  const anchorRef = useRef<HTMLButtonElement>(null)
   const links = GROUP_SECTION_LINKS[isRecruiterMode ? "recruiter" : "main"]
   const sectionHrefs = useMemo(() => links.map((link) => link.href), [links])
   const navigation = useHashNavigation(sectionHrefs)
   const isHome = pathname === "/"
 
   return (
-    <Popover<HTMLButtonElement>
+    <NavigationMenuPopover
       name="vertical-navigation-menu"
-      origin="right"
-      paperProps={{
-        className: "w-[min(22rem,calc(100vw-1.5rem))] rounded-lg bg-ud-neutral-100 p-2 shadow-modal",
-      }}
-      anchor={{
-        ref: anchorRef,
-        element: (state) => (
-          <button
-            ref={anchorRef}
-            type="button"
-            onClick={state.onToggleShow}
-            aria-expanded={state.show}
-            aria-haspopup="menu"
-            className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-sm border border-ud-neutral-300 transition-colors hover:border-ud-auxiliary-purple hover:text-ud-auxiliary-purple",
-              state.show && "border-ud-auxiliary-purple text-ud-auxiliary-purple",
-            )}
-          >
-            <MenuIcon size={20} aria-hidden="true" />
-            <span className="sr-only">{intl.t("NavigationMenu")}</span>
-          </button>
-        ),
-      }}
+      label={intl.t("NavigationMenu")}
     >
-      {(state) => (
+      {(onClose) => (
         <nav aria-label={intl.t("NavigationMenu")} className="flex flex-col" role="menu">
           <div className="mb-2 px-2 py-1">
             <span className="text-xs font-bold uppercase tracking-wide text-ud-secondary-600">
@@ -65,7 +44,7 @@ export const VerticalMenuButton = () => {
                   role="menuitem"
                   onClick={(event) => {
                     if (isHome) navigation.handleAnchorClick(link.href)(event)
-                    state.onClose()
+                    onClose()
                   }}
                   className={cn(
                     "relative flex min-h-12 items-center gap-4 rounded-md px-4 text-base font-medium text-ud-neutral-999 transition-colors hover:bg-ud-auxiliary-purple-light hover:text-ud-auxiliary-purple",
@@ -84,7 +63,7 @@ export const VerticalMenuButton = () => {
             <a
               href="/blog"
               role="menuitem"
-              onClick={state.onClose}
+              onClick={onClose}
               className={cn(
                 "flex min-h-12 items-center gap-4 rounded-md px-4 text-base font-medium text-ud-neutral-999 transition-colors hover:bg-ud-auxiliary-purple-light hover:text-ud-auxiliary-purple",
                 pathname.startsWith("/blog") && "bg-ud-auxiliary-purple-light text-ud-auxiliary-purple",
@@ -102,7 +81,7 @@ export const VerticalMenuButton = () => {
               role="menuitem"
               onClick={(event) => {
                 if (isHome) navigation.handleAnchorClick("#feedback")(event)
-                state.onClose()
+                onClose()
               }}
               className="relative flex min-h-14 items-center gap-4 overflow-hidden rounded-md bg-ud-auxiliary-purple-light px-4 text-base font-bold text-ud-auxiliary-purple transition-colors hover:bg-ud-auxiliary-purple/15"
             >
@@ -112,17 +91,39 @@ export const VerticalMenuButton = () => {
             </a>
           </div>
 
-          <div className="mt-2 flex items-center justify-between border-t border-ud-neutral-300 px-4 pt-2 sm:hidden">
-            <a href="/?audience=recruiter#about" onClick={state.onClose} className="text-sm font-bold text-ud-neutral-999 hover:text-ud-auxiliary-purple">
+          <div className="mt-2 flex flex-col gap-3 border-t border-ud-neutral-300 p-2 pt-3 sm:hidden">
+            <Button
+              href="/?audience=recruiter#about"
+              highlight
+              startAdornment={<UserRoundSearchIcon size={18} aria-hidden="true" />}
+              className="w-full justify-center"
+              onClick={onClose}
+            >
               {intl.t("Recruiter")}
-            </a>
-            <div className="flex gap-3">
-              <button type="button" onClick={() => intl.setLanguage("ptbr")} className={intl.language === "ptbr" ? "font-bold text-ud-auxiliary-purple" : "text-ud-secondary-600"}>PT</button>
-              <button type="button" onClick={() => intl.setLanguage("en")} className={intl.language === "en" ? "font-bold text-ud-auxiliary-purple" : "text-ud-secondary-600"}>EN</button>
+            </Button>
+
+            <div>
+              <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-ud-secondary-600">
+                <LanguagesIcon size={16} aria-hidden="true" />
+                {intl.t("Language")}
+              </span>
+              <SegmentedControl
+                className="mt-2 w-full grid-cols-2"
+                optionClassName="h-[38px] min-h-0"
+                ariaLabel={intl.t("Language")}
+                options={[
+                  { value: "ptbr", label: "Português" },
+                  { value: "en", label: "English" },
+                ]}
+                value={intl.language}
+                onChange={(language) => {
+                  if (language) intl.setLanguage(language)
+                }}
+              />
             </div>
           </div>
         </nav>
       )}
-    </Popover>
+    </NavigationMenuPopover>
   )
 }

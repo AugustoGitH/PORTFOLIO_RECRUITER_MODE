@@ -6,6 +6,7 @@ import { Container } from "@/components/layout/Container"
 import { useINTLContext } from "@/providers/intl"
 import { BlogPostMetrics } from "../BlogPostMetrics"
 import type { BlogPostContentSectionProps } from "./types"
+import { getActiveHeadingId } from "./utils"
 
 export const BlogPostContentSection = ({ post, headings }: BlogPostContentSectionProps) => {
   const intl = useINTLContext()
@@ -13,22 +14,40 @@ export const BlogPostContentSection = ({ post, headings }: BlogPostContentSectio
 
   useEffect(() => {
     if (headings.length === 0) return
-    let animationFrame = 0
+    let animationFrame: number | null = null
 
     const updateActiveHeading = () => {
-      window.cancelAnimationFrame(animationFrame)
+      if (animationFrame !== null) return
+
       animationFrame = window.requestAnimationFrame(() => {
-        const headingElements = headings
+        animationFrame = null
+
+        const renderedHeadings = headings
           .map((heading) => document.getElementById(heading.id))
           .filter((element): element is HTMLElement => element !== null)
-        if (headingElements.length === 0) return
+          .map((element) => ({
+            id: element.id,
+            top: element.getBoundingClientRect().top,
+          }))
+        const scrollOffset = Number.parseFloat(
+          window
+            .getComputedStyle(document.documentElement)
+            .getPropertyValue("--scroll-offset"),
+        ) || 0
+        const focusLine = scrollOffset
+          + Math.max(window.innerHeight - scrollOffset, 0) / 2
+        const nextActiveHeadingId = getActiveHeadingId({
+          focusLine,
+          headings: renderedHeadings,
+          isAtPageEnd:
+            window.scrollY + window.innerHeight
+            >= document.documentElement.scrollHeight - 1,
+        })
 
-        let currentHeading = headingElements[0].id
-        for (const headingElement of headingElements) {
-          if (headingElement.getBoundingClientRect().top > 112) break
-          currentHeading = headingElement.id
-        }
-        setActiveHeadingId((current) => current === currentHeading ? current : currentHeading)
+        if (nextActiveHeadingId === null) return
+        setActiveHeadingId((current) =>
+          current === nextActiveHeadingId ? current : nextActiveHeadingId,
+        )
       })
     }
 
@@ -37,7 +56,9 @@ export const BlogPostContentSection = ({ post, headings }: BlogPostContentSectio
     window.addEventListener("resize", updateActiveHeading)
 
     return () => {
-      window.cancelAnimationFrame(animationFrame)
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame)
+      }
       window.removeEventListener("scroll", updateActiveHeading)
       window.removeEventListener("resize", updateActiveHeading)
     }

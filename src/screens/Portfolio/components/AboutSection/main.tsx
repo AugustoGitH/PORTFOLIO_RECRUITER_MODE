@@ -28,23 +28,26 @@ export const AboutSection = (props: AboutSectionProps) => {
     states: [
       {
         active: hasDownloadedResume,
-        art: { src: "/assets/profile/augusto_main_profile.png", alt: "Main profile image", width: 360, rows: 78 }
+        art: { src: "/assets/profile/augusto_main_profile.png", alt: "Main profile image", width: 300, rows: 78 }
       },
       {
         active: isRecruiterMode,
-        art: { src: "/assets/profile/augusto_main_profile-recruiter.png", alt: "Recruiter profile image", width: 360, rows: 78 }
+        art: { src: "/assets/profile/augusto_main_profile-recruiter.png", alt: "Recruiter profile image", width: 300, rows: 78 }
       }
     ],
     baseRows: 78,
-    baseWidth: 360,
+    baseWidth: 300,
     columns: 110,
   })
 
   return (
-    <Container id={SECTIONS.about.value} className={cn("portfolio-hero bg-ud-neutral-100", props.className)}>
+    <Container
+      id={SECTIONS.about.value}
+      className={cn("portfolio-hero min-h-[calc(100dvh-4.25rem)] bg-ud-neutral-100 lg:min-h-0", props.className)}
+    >
       <div className="w-full">
-        <div className="flex flex-col items-center justify-between gap-5 lg:flex-row lg:items-end">
-          <div className="min-w-0 flex-1">
+        <div className="grid grid-cols-1 items-end lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-5">
+          <div className="order-3 mt-5 w-full min-w-0 lg:order-1 lg:mt-0">
             <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-ud-auxiliary-purple">{intl.t("Portfolio")}</p>
             {isRecruiterMode ? (
               <>
@@ -108,9 +111,11 @@ export const AboutSection = (props: AboutSectionProps) => {
               </Button>
             </div>
           </div>
-          <AsciiArt {...asciiProps} />
+          <div className="order-1 justify-self-center lg:order-2">
+            <AsciiArt {...asciiProps} />
+          </div>
+          <MetricsHeader className="order-2 lg:order-3 lg:col-span-2 lg:mt-9" metrics={props.metrics} />
         </div>
-        <MetricsHeader className="mt-9" metrics={props.metrics} />
       </div>
     </Container>
   )

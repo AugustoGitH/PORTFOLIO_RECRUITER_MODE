@@ -285,9 +285,17 @@ export const INTL_TERMS = {
     ptbr: "Feedback(s) profissional(is)",
     en: "Professional Feedback(s)"
   },
+  Feedbacks: {
+    ptbr: "Feedback(s)",
+    en: "Feedback(s)"
+  },
   ResumeViews: {
     ptbr: "Visualização(ões) de currículo",
     en: "Resume View(s)"
+  },
+  ResumeDownloads: {
+    ptbr: "Currículo(s) baixado(s)",
+    en: "Downloaded Resume(s)"
   },
   LeaveYourFeedback: {
     ptbr: "Deixe seu feedback",
@@ -456,6 +464,10 @@ export const INTL_TERMS = {
   Recruiter: {
     ptbr: "Sou Recrutador(a)",
     en: "I am a Recruiter"
+  },
+  Language: {
+    ptbr: "Idioma",
+    en: "Language"
   },
   Month: {
     ptbr: "mês(es)",
@@ -1101,9 +1113,29 @@ export const INTL_TERMS = {
     ptbr: "Menu de navegação",
     en: "Navigation menu"
   },
+  SocialMedia: {
+    ptbr: "Redes sociais",
+    en: "Social media"
+  },
+  FooterCopyright: {
+    ptbr: "© {year} {name}. Todos os direitos reservados.",
+    en: "© {year} {name}. All rights reserved."
+  },
   AdminTitle: {
     ptbr: "Administração",
     en: "Administration"
+  },
+  AdminNavigation: {
+    ptbr: "Navegação administrativa",
+    en: "Administration navigation"
+  },
+  AdminDashboardNav: {
+    ptbr: "Painel",
+    en: "Dashboard"
+  },
+  AdminRecommendationsNav: {
+    ptbr: "Indicações",
+    en: "Recommendations"
   },
   AdminDashboardDescription: {
     ptbr: "Use a navegação lateral para acessar cada área administrativa.",

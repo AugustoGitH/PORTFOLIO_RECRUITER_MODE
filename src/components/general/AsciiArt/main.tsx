@@ -8,7 +8,7 @@ import type { ArtLayout, AsciiArtProps } from "./types"
 import { CHAR_ASPECT } from "@/constants/ascii"
 import { ACCENT, DEFAULT_COLUMNS, DEFAULT_VARIANT, PULSE, TRANSITION } from "./constants"
 import { AsciiRows } from "./components"
-import { getHorizontalPosition } from "./utils"
+import { getAsciiRunKey, getHorizontalPosition } from "./utils"
 import { setDefaultProps } from "@/utils/preset"
 
 
@@ -139,7 +139,7 @@ export const AsciiArt = (_props: AsciiArtProps) => {
           >
             {row.map((run, runIndex) => (
               <span
-                key={run.pulseId ?? runIndex}
+                key={getAsciiRunKey(runIndex, run.pulseId)}
                 className={cn(run.tone === "accent" ? ACCENT : undefined, run.pulseId && PULSE)}
                 style={run.color ? { color: run.color } : undefined}
               >

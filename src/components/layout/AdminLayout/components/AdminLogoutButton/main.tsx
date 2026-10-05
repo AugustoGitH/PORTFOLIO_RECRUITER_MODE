@@ -6,8 +6,10 @@ import { LogOutIcon } from "lucide-react"
 import { Button } from "@/components/action/Button"
 import { http } from "@/libs/http"
 import { useAdminMutationToast } from "@/hooks/admin"
+import { useINTLContext } from "@/providers/intl"
 
 export const AdminLogoutButton = () => {
+  const intl = useINTLContext()
   const router = useRouter()
   const adminToast = useAdminMutationToast()
   const logoutMutation = useMutation({
@@ -24,10 +26,11 @@ export const AdminLogoutButton = () => {
     <Button
       type="button"
       onClick={() => logoutMutation.mutate()}
-      loading={{ verb: "Saindo", state: logoutMutation.isPending }}
+      loading={{ verb: intl.t("Logout"), state: logoutMutation.isPending }}
       startAdornment={<LogOutIcon size={15} />}
+      className="w-full justify-center"
     >
-      Sair
+      {intl.t("Logout")}
     </Button>
   )
 }

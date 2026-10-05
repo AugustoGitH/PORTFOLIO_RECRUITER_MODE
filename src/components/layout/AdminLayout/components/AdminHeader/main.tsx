@@ -4,6 +4,7 @@ import { Button } from "@/components/action/Button"
 import { useINTLContext } from "@/providers/intl"
 import { ABOUT } from "@/constants/profile"
 import { HouseIcon, NotebookPenIcon } from "lucide-react"
+import { AdminMobileMenu } from "../AdminMobileMenu"
 
 export const AdminHeader = () => {
   const intl = useINTLContext()
@@ -15,18 +16,21 @@ export const AdminHeader = () => {
         <div className="flex items-center gap-2">
           <Button
             href="/"
-            className="px-3"
+            className="h-10 w-10 justify-center gap-0 px-0 py-0 sm:w-auto sm:gap-2 sm:px-3"
             startAdornment={<HouseIcon size={15} aria-hidden="true" />}
           >
-            {intl.t("Portfolio")}
+            <span className="sr-only sm:not-sr-only">{intl.t("Portfolio")}</span>
           </Button>
           <Button
             href="/blog"
-            className="px-3"
+            className="h-10 w-10 justify-center gap-0 px-0 py-0 sm:w-auto sm:gap-2 sm:px-3"
             startAdornment={<NotebookPenIcon size={15} aria-hidden="true" />}
           >
-            {intl.t("Blog")}
+            <span className="sr-only sm:not-sr-only">{intl.t("Blog")}</span>
           </Button>
+          <span className="md:hidden">
+            <AdminMobileMenu />
+          </span>
         </div>
       </div>
     </header>

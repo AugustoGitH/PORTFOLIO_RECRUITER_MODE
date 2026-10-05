@@ -1,4 +1,4 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, PropsWithChildren, ReactNode } from "react";
+import type { ComponentPropsWithRef, ReactNode } from "react";
 import { PropsWithClassName } from "../../../utils/types";
 
 export type ButtonBaseProps = {
@@ -15,12 +15,12 @@ export type ButtonBaseProps = {
   }
 }
 
-export type NativeButtonProps = PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement> & {
+export type NativeButtonProps = ComponentPropsWithRef<"button"> & {
   href?: never
-}> & ButtonBaseProps
+} & ButtonBaseProps
 
-export type LinkButtonProps = PropsWithChildren<AnchorHTMLAttributes<HTMLAnchorElement> & {
+export type LinkButtonProps = ComponentPropsWithRef<"a"> & {
   href: string
-}> & ButtonBaseProps
+} & ButtonBaseProps
 
 export type ButtonProps = PropsWithClassName<NativeButtonProps | LinkButtonProps>

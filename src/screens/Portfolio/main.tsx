@@ -14,7 +14,7 @@ const PortfolioInner = (props: PortfolioProps) => {
   const { isRecruiterMode } = useRecruiterModeContext()
 
   const sections = {
-    about: <AboutSection className="pt-28" metrics={props.metrics} />,
+    about: <AboutSection className="pt-4 lg:pt-28" metrics={props.metrics} />,
     refinement: <><RecruiterContextPanel /><RecommendationsPanel recommendations={props.recommendations} /></>,
     skills: <SkillsSection />,
     blog: <BlogHighlightSection post={props.featuredBlogPost} />,

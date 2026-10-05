@@ -41,7 +41,9 @@ export const withRateLimit = <Context>(
   windowMs = 60_000,
 ) => async (request: Request, context: Context) => {
   const visitor = request.headers.get("cookie")?.match(/(?:^|;\s*)visitor_id=([^;]+)/)?.[1]
+
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+
   const rateLimits = await Promise.all([
     consumeRateLimit({
       scope,
@@ -58,6 +60,7 @@ export const withRateLimit = <Context>(
       windowMs,
     })] : []),
   ])
+
   const rateLimit = combineRateLimits(...rateLimits)
 
   if (rateLimit.isLimited) {

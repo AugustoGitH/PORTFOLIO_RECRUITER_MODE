@@ -8,6 +8,7 @@ export type SegmentedControlOption<Value extends string> = {
 
 export type SegmentedControlProps<Value extends string> = PropsWithClassName<{
   ariaLabel: string
+  optionClassName?: string
   options: readonly SegmentedControlOption<Value>[]
   value: Value | null
   onChange: (value: Value | null) => void

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { ABOUT, GROUP_SECTION_LINKS } from "../../../constants/profile"
 import { useINTLContext } from "../../../providers/intl"
 import { LanguageSelect, VerticalMenuButton } from "./components"
@@ -20,10 +21,10 @@ export const Header = ({ hasAdminSession = false, variant = "portfolio" }: Heade
       <div className="flex h-15 w-full items-center justify-between gap-3 rounded border border-ud-neutral-300 bg-ud-neutral-100 px-4 py-1">
         <div className="flex items-center gap-2">
           {/* <img src="/src/assets/profile/augusto_main_profile.png" width={60} className="w-12" /> */}
-          <div>
+          <Link href="/" className="cursor-pointer">
             <span className="block font-bold text-sm">{ABOUT.name}</span>
             <span className="block text-xs">{intl.t(ABOUT.role[0])}</span>
-          </div>
+          </Link>
         </div>
         {!isBlog && (
           <nav className="hidden items-center gap-6 2xl:flex">
