@@ -2,6 +2,7 @@ import { createInterface } from "node:readline/promises"
 import { stdin, stdout } from "node:process"
 import * as argon2 from "argon2"
 import { MongoClient } from "mongodb"
+import { getMongoUrl } from "./lib/mongo-env.mjs"
 
 const permissions = ["admin.access", "admin.dashboard.read", "admin.login-attempts.manage", "rate-limits.manage", "metrics.read", "feedback.read", "feedback.moderate", "recommendation.read", "recommendation.manage", "blog.read", "blog.manage", "resume.catalog.read", "resume.catalog.manage", "admin.users.read", "admin.users.manage", "audit.read"]
 const prompt = createInterface({ input: stdin, output: stdout })
@@ -24,8 +25,7 @@ const password = await new Promise((resolve, reject) => {
   stdin.on("data", onData)
 })
 if (!/^\S+@\S+\.\S+$/.test(email) || !password) throw new Error("E-mail ou senha inválidos")
-if (!process.env.MONGO_URL) throw new Error("MONGO_URL is required")
-const client = new MongoClient(process.env.MONGO_URL)
+const client = new MongoClient(getMongoUrl())
 await client.connect()
 try {
   const db = client.db()

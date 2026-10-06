@@ -33,7 +33,7 @@ Para executar a aplicação:
 npm run dev
 ```
 
-A aplicação roda em `http://localhost:5173`. Copie `.env.example` para `.env.local` para configurar a URL pública e o MongoDB. Para MongoDB local, há um serviço em `docker-compose.yml`.
+A aplicação roda em `http://localhost:5173`. Copie `.env.example` para `.env.local` para configurar a URL pública e o MongoDB. Use `MONGO_URL_DEV` para o banco local e `MONGO_URL` no ambiente de produção. Para MongoDB local, há um serviço em `docker-compose.yml`.
 
 `GET /api/health` é um Route Handler do Next. Modelos e conexão MongoDB são exclusivos do servidor em `backend/`.
 

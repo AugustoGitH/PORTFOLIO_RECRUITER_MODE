@@ -1,7 +1,7 @@
 import { ArrowRightIcon, HeartIcon, MessageCircleIcon, SparklesIcon } from "lucide-react"
 import { useState } from "react"
 import { Button } from "../../../../components/action/Button"
-import { AsciiArt } from "../../../../components/general/AsciiArt"
+import { ResponsiveAsciiArt } from "../../../../components/general/AsciiArt"
 import { Container } from "../../../../components/layout/Container"
 import { ABOUT, SECTIONS } from "../../../../constants/profile"
 import { PortfolioFeedbackForm } from "../../../../features/portfolio-feedback"
@@ -165,7 +165,11 @@ export const CongratulationsSection = (props: CongratulationsSectionProps) => {
         </div>
 
         <div className="flex min-h-[400px] items-center justify-center overflow-hidden border-t border-ud-auxiliary-purple/20 bg-ud-auxiliary-purple-light/35 lg:min-h-0 lg:border-l lg:border-t-0">
-          <AsciiArt {...asciiArtProps} />
+          <ResponsiveAsciiArt
+            {...asciiArtProps}
+            initialWidth={asciiArtProps.width}
+            wrapperClassName="max-w-[380px]"
+          />
         </div>
       </div>
     </Container>

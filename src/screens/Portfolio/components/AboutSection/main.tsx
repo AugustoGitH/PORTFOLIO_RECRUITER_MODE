@@ -7,7 +7,7 @@ import { ABOUT, getSkillByValue, GROUP_LINKS, RECRUITER_PROFILE, SECTIONS } from
 import { BriefcaseBusinessIcon } from "lucide-react"
 import { MetricsHeader } from "../../../../features/metrics/MetricsHeader"
 import { useINTLContext } from "../../../../providers/intl"
-import { AsciiArt } from "../../../../components/general/AsciiArt"
+import { ResponsiveAsciiArt } from "../../../../components/general/AsciiArt"
 import { useRecruiterModeContext } from "../../../../providers/recruiterMode"
 import { getElapsedYears } from "../../../../utils/date"
 import { AboutSectionProps } from "./types"
@@ -111,8 +111,12 @@ export const AboutSection = (props: AboutSectionProps) => {
               </Button>
             </div>
           </div>
-          <div className="order-1 justify-self-center lg:order-2">
-            <AsciiArt {...asciiProps} />
+          <div className="order-1 flex w-full justify-center lg:order-2 lg:w-[300px]">
+            <ResponsiveAsciiArt
+              {...asciiProps}
+              initialWidth={asciiProps.width}
+              wrapperClassName="max-w-[300px]"
+            />
           </div>
           <MetricsHeader className="order-2 lg:order-3 lg:col-span-2 lg:mt-9" metrics={props.metrics} />
         </div>

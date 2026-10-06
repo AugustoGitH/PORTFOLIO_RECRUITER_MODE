@@ -41,6 +41,7 @@ export const useAsciiArt = (input: AsciiArtInput): AsciiArtOutput => {
       if (cached) return cached
 
       const image = new Image()
+      image.crossOrigin = "anonymous"
       image.src = imageSrc
       // The canvas must sample a decoded bitmap, especially on the first hover.
       await image.decode()

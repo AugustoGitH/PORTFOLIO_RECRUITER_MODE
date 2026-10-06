@@ -1,6 +1,5 @@
 import { MongoClient } from "mongodb"
-
-if (!process.env.MONGO_URL) throw new Error("MONGO_URL is required")
+import { getMongoUrl } from "./lib/mongo-env.mjs"
 
 const testimonials = [
   { key: "leonardo", displayName: "Leonardo", role: "CEO da Tech Legion", company: "Tech Legion", publicMessage: "É uma honra ter cruzado o caminho do Augusto Westphal e um orgulho estar ao seu lado, onde tive a oportunidade de conhecer um excelente profissional e uma pessoa incrível. Parabéns pelo projeto, meu nobre 👏." },
@@ -10,7 +9,7 @@ const testimonials = [
   { key: "warllei", displayName: "Warllei", role: "Desenvolvedor Web Frontend", company: "DRT Sistemas", publicMessage: "É com prazer que recomendo Augusto Westphal como um desenvolvedor Full-Stack altamente competente. Durante nosso tempo juntos na DRT Sistemas, demonstrou domínio em Node.js, React.js e Next.js, entregando projetos de alta qualidade." },
 ]
 
-const client = new MongoClient(process.env.MONGO_URL)
+const client = new MongoClient(getMongoUrl())
 await client.connect()
 
 try {

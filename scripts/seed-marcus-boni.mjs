@@ -1,6 +1,7 @@
 import { MongoClient } from "mongodb"
-if (!process.env.MONGO_URL) throw new Error("MONGO_URL is required")
-const client = new MongoClient(process.env.MONGO_URL)
+import { getMongoUrl } from "./lib/mongo-env.mjs"
+
+const client = new MongoClient(getMongoUrl())
 await client.connect()
 try {
   const now = new Date()

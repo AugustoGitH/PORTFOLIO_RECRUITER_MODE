@@ -1,7 +1,7 @@
-import Image from "next/image"
 import { ArrowRight, Clock3, Coffee, Eye, Heart } from "lucide-react"
 import { Button } from "@/components/action/Button"
 import { Chip } from "@/components/action/Chip"
+import { ResponsiveAsciiArt } from "@/components/general/AsciiArt"
 import { TitleSection } from "@/components/general/TitleSection"
 import { Container } from "@/components/layout/Container"
 import { SECTIONS } from "@/constants/profile"
@@ -11,8 +11,6 @@ import type { BlogHighlightSectionProps } from "./types"
 
 const fallbackArtwork = {
   src: "/assets/blog/hero-developer.png",
-  width: 420,
-  height: 420,
 } as const
 
 export const BlogHighlightSection = ({ post, className }: BlogHighlightSectionProps) => {
@@ -94,12 +92,12 @@ export const BlogHighlightSection = ({ post, className }: BlogHighlightSectionPr
                   </div>
                 </>
               ) : (
-                <div className="flex h-full flex-col justify-center">
+                <div className="flex h-full flex-col items-start justify-center">
                   <Chip>{intl.t("BlogEditorial")}</Chip>
                   <h3 className="mt-4 text-2xl font-extrabold text-ud-neutral-950 sm:text-3xl">
                     {intl.t("BlogEmptyTitle")}
                   </h3>
-                  <p className="mt-3 max-w-xl text-sm leading-relaxed text-ud-secondary-600 sm:text-base">
+                  <p className="mt-3  text-sm leading-relaxed text-ud-secondary-600 sm:text-base">
                     {intl.t("BlogEmptyDescription")}
                   </p>
                   <div className="mt-6">
@@ -115,14 +113,14 @@ export const BlogHighlightSection = ({ post, className }: BlogHighlightSectionPr
               )}
             </div>
 
-            <div className="relative min-h-64 overflow-hidden border-t border-ud-auxiliary-purple/20 lg:min-h-full  lg:border-t-0">
-              <Image
+            <div className="flex min-h-64 items-center justify-center overflow-hidden border-t border-ud-auxiliary-purple/20 p-6 lg:min-h-80 lg:border-t-0">
+              <ResponsiveAsciiArt
                 src={post?.cover?.url ?? fallbackArtwork.src}
                 alt={post?.cover ? post.title : intl.t("BlogHeroArtAlt")}
-                width={post?.cover?.width ?? fallbackArtwork.width}
-                height={post?.cover?.height ?? fallbackArtwork.height}
-                sizes="(min-width: 1024px) 36rem, 100vw"
-                className="relative h-full min-h-64 w-full object-contain p-6 lg:min-h-80"
+                initialWidth={420}
+                columns={112}
+                rows={45}
+                wrapperClassName="max-w-[420px]"
               />
             </div>
           </div>

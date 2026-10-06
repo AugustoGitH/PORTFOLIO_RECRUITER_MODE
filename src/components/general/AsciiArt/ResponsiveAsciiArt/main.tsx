@@ -24,7 +24,7 @@ export const ResponsiveAsciiArt = ({ initialWidth, wrapperClassName, ...props }:
   }, [])
 
   return (
-    <div ref={wrapperRef} className={cn("w-full", wrapperClassName)}>
+    <div ref={wrapperRef} className={cn("w-full min-w-0 overflow-hidden", wrapperClassName)}>
       <AsciiArt {...props} width={width} baseWidth={width} />
     </div>
   )
