@@ -91,7 +91,7 @@ npm run test:watch
 
 `GET /api/health` está em `src/app/api/health/route.ts` e não é uma dependência de renderização da página principal. Não há API ou servidor separado fora do Next.
 
-`backend/libs/db/mongo` exporta `getMongoClient()` e `getMongoDb()` para Route Handlers e Server Components. O módulo importa `server-only`, reutiliza a conexão durante o hot reload e só exige uma URL quando alguma rota realmente acessa o banco. Em desenvolvimento, usa `MONGO_URL_DEV` com fallback para `MONGO_URL`; em produção, exige `MONGO_URL`. Os scripts administrativos seguem a mesma seleção. Copie `.env.example` para `.env.local` e não use o prefixo `NEXT_PUBLIC_` nessas variáveis.
+`backend/libs/db/mongo` exporta `getMongoClient()` e `getMongoDb()` para Route Handlers e Server Components. O módulo importa `server-only`, reutiliza a conexão durante o hot reload e só exige uma URL quando alguma rota realmente acessa o banco. `ENVIRONMENT` é a fonte canônica do ambiente: `development` usa `MONGO_URL_DEV` com fallback para `MONGO_URL`; qualquer ambiente implantado no Railway, incluindo `production` e `staging`, usa a `MONGO_URL` injetada naquele ambiente. Sem a variável do Railway, `NODE_ENV` serve como fallback. Os scripts administrativos carregam arquivos `.env*` locais quando disponíveis e usam diretamente as variáveis injetadas quando executados no Railway.
 
 Os modelos de cada domínio ficam junto do módulo: métricas usam `backend/metrics/models/`. Use `getLikesCollection(await getMongoDb())` e `getViewsCollection(await getMongoDb())` dentro de código server-side. `View` agora aponta para a coleção `views`, corrigindo o helper antigo que, por engano, apontava views para `likes`.
 

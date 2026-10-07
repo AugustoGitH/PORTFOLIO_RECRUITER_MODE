@@ -33,7 +33,9 @@ Para executar a aplicação:
 npm run dev
 ```
 
-A aplicação roda em `http://localhost:5173`. Copie `.env.example` para `.env.local` para configurar a URL pública e o MongoDB. Use `MONGO_URL_DEV` para o banco local e `MONGO_URL` no ambiente de produção. Para MongoDB local, há um serviço em `docker-compose.yml`.
+A aplicação roda em `http://localhost:5173`. Copie `.env.example` para `.env.local` para configurar a URL pública e o MongoDB. Use `ENVIRONMENT=development` e `MONGO_URL_DEV` localmente; o Railway fornece `ENVIRONMENT=production` e a aplicação usa `MONGO_URL` no deploy. Para MongoDB local, há um serviço em `docker-compose.yml`.
+
+Os scripts administrativos carregam `.env.local` quando o arquivo existe, mas não dependem dele. No Railway, execute `npm run admin:bootstrap` com as variáveis configuradas no serviço; elas são injetadas diretamente no processo.
 
 `GET /api/health` é um Route Handler do Next. Modelos e conexão MongoDB são exclusivos do servidor em `backend/`.
 

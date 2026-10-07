@@ -9,7 +9,10 @@ declare global {
 let clientPromise: Promise<MongoClient> | undefined
 
 const getMongoUrl = () => {
-  const isDevelopment = process.env.NODE_ENV === "development"
+  const railwayEnvironment = process.env.ENVIRONMENT?.trim().toLowerCase()
+  const isDevelopment = railwayEnvironment
+    ? railwayEnvironment === "development"
+    : process.env.NODE_ENV === "development"
   const uri = isDevelopment
     ? process.env.MONGO_URL_DEV || process.env.MONGO_URL
     : process.env.MONGO_URL

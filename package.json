@@ -10,9 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "start": "next start -p 5173",
-    "admin:bootstrap": "node --env-file=.env.local scripts/bootstrap-admin.mjs",
-    "feedback:seed-static": "node --env-file=.env.local scripts/seed-static-feedbacks.mjs",
-    "recommendation:seed-marcus": "node --env-file=.env.local scripts/seed-marcus-boni.mjs",
+    "admin:bootstrap": "node scripts/bootstrap-admin.mjs",
+    "feedback:seed-static": "node scripts/seed-static-feedbacks.mjs",
+    "recommendation:seed-marcus": "node scripts/seed-marcus-boni.mjs",
     "install:all": "npm install"
   },
   "dependencies": {
