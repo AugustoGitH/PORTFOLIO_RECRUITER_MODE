@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { ArrowRight, Clock3, Coffee, Eye, Heart } from "lucide-react"
 import { Button } from "@/components/action/Button"
 import { Chip } from "@/components/action/Chip"
@@ -114,14 +115,26 @@ export const BlogHighlightSection = ({ post, className }: BlogHighlightSectionPr
             </div>
 
             <div className="flex min-h-64 items-center justify-center overflow-hidden border-t border-ud-auxiliary-purple/20 p-6 lg:min-h-80 lg:border-t-0">
-              <ResponsiveAsciiArt
-                src={post?.cover?.url ?? fallbackArtwork.src}
-                alt={post?.cover ? post.title : intl.t("BlogHeroArtAlt")}
-                initialWidth={420}
-                columns={112}
-                rows={45}
-                wrapperClassName="max-w-[420px]"
-              />
+              {post?.cover ? (
+                <div className="relative aspect-[4/3] w-full max-w-[420px]">
+                  <Image
+                    src={post.cover.url}
+                    alt={post.title}
+                    fill
+                    sizes="(min-width: 1024px) 420px, 100vw"
+                    className="object-contain"
+                  />
+                </div>
+              ) : (
+                <ResponsiveAsciiArt
+                  src={fallbackArtwork.src}
+                  alt={intl.t("BlogHeroArtAlt")}
+                  initialWidth={420}
+                  columns={112}
+                  rows={45}
+                  wrapperClassName="max-w-[420px]"
+                />
+              )}
             </div>
           </div>
         </article>
