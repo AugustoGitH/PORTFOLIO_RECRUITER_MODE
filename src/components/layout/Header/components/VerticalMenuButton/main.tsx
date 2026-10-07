@@ -13,7 +13,7 @@ import { cn } from "@/utils/tailwind"
 export const VerticalMenuButton = () => {
   const intl = useINTLContext()
   const pathname = usePathname()
-  const { isRecruiterMode } = useRecruiterModeContext()
+  const { isRecruiterMode, toggleRecruiterMode } = useRecruiterModeContext()
   const links = GROUP_SECTION_LINKS[isRecruiterMode ? "recruiter" : "main"]
   const sectionHrefs = useMemo(() => links.map((link) => link.href), [links])
   const navigation = useHashNavigation(sectionHrefs)
@@ -93,13 +93,16 @@ export const VerticalMenuButton = () => {
 
           <div className="mt-2 flex flex-col gap-3 border-t border-ud-neutral-300 p-2 pt-3 sm:hidden">
             <Button
-              href="/?audience=recruiter#about"
-              highlight
+              href={isHome ? undefined : "/?audience=recruiter#about"}
+              highlight={!isRecruiterMode || !isHome}
               startAdornment={<UserRoundSearchIcon size={18} aria-hidden="true" />}
               className="w-full justify-center"
-              onClick={onClose}
+              onClick={() => {
+                if (isHome) toggleRecruiterMode()
+                onClose()
+              }}
             >
-              {intl.t("Recruiter")}
+              {isHome && isRecruiterMode ? intl.t("GeneralReading") : intl.t("Recruiter")}
             </Button>
 
             <div>
