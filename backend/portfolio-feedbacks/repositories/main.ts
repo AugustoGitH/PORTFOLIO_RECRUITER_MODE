@@ -11,6 +11,7 @@ const ensureIndexes = async () => {
       const collection = getPortfolioFeedbacksCollection(await getMongoDb())
       await Promise.all([
         collection.createIndex({ submittedAt: -1 }),
+        collection.createIndex({ status: 1, publishedAt: -1 }),
         collection.createIndex({ submittedAt: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 }),
         collection.createIndex({ visitorId: 1, submittedAt: -1 }),
       ])
@@ -46,5 +47,32 @@ export const portfolioFeedbackRepository = {
       .sort({ submittedAt: -1, _id: -1 })
       .limit(limit + 1)
       .toArray()
+  },
+
+  async listPublished(limit: number) {
+    await ensureIndexes()
+
+    return getPortfolioFeedbacksCollection(await getMongoDb())
+      .find({ status: "published" })
+      .sort({ publishedAt: -1, _id: -1 })
+      .limit(limit)
+      .toArray()
+  },
+
+  async findById(id: string) {
+    if (!ObjectId.isValid(id)) return null
+
+    return getPortfolioFeedbacksCollection(await getMongoDb()).findOne({
+      _id: new ObjectId(id),
+    })
+  },
+
+  async update(id: ObjectId, update: Partial<PortfolioFeedback>) {
+    await getPortfolioFeedbacksCollection(await getMongoDb()).updateOne(
+      { _id: id },
+      { $set: { ...update, updatedAt: new Date() } },
+    )
+
+    return getPortfolioFeedbacksCollection(await getMongoDb()).findOne({ _id: id })
   },
 }

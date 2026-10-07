@@ -3,4 +3,5 @@ import type { AdminPortfolioFeedback } from "./components/AdminPortfolioFeedback
 export type AdminPortfolioFeedbacksPageProps = {
   feedbacks: AdminPortfolioFeedback[]
   nextCursor?: string
+  canModerate: boolean
 }

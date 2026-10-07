@@ -1,12 +1,15 @@
 import type { NextConfig } from "next"
 
 const r2PublicBaseUrl = process.env.R2_PUBLIC_BASE_URL?.trim()
+const legacyR2PublicBaseUrl = "https://pub-0e7d4473a3bd416f9163cd308a2daed6.r2.dev"
+
+const r2ImagePatterns = [r2PublicBaseUrl, legacyR2PublicBaseUrl]
+  .filter((url): url is string => Boolean(url))
+  .map((url) => new URL(`${url.replace(/\/$/, "")}/**`))
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: r2PublicBaseUrl
-      ? [new URL(`${r2PublicBaseUrl.replace(/\/$/, "")}/**`)]
-      : [],
+    remotePatterns: r2ImagePatterns,
   },
   serverExternalPackages: ["@react-pdf/renderer"],
   experimental: {

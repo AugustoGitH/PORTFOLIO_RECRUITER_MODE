@@ -10,8 +10,8 @@ type AdminPortfolioFeedbacksRouteProps = {
 
 async function Page({ searchParams }: AdminPortfolioFeedbacksRouteProps) {
   const { cursor } = await searchParams
-  await requireAdminPortfolioFeedbacksPageAccess()
-  const pageData = await getAdminPortfolioFeedbacksPageData(cursor)
+  const access = await requireAdminPortfolioFeedbacksPageAccess()
+  const pageData = await getAdminPortfolioFeedbacksPageData(cursor, access)
 
   return <AdminPortfolioFeedbacksPage {...pageData} />
 }

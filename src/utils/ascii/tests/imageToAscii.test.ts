@@ -27,4 +27,29 @@ describe("imageToAscii source palette", () => {
       { text: " ", tone: "blank", color: undefined },
     ]])
   })
+
+  it("uses quadrant glyphs to preserve small silhouettes", () => {
+    const pixels = new Uint8ClampedArray([
+      72, 48, 240, 255,
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      72, 48, 240, 255,
+    ])
+
+    vi.stubGlobal("document", {
+      createElement: () => ({
+        getContext: () => ({
+          drawImage: () => undefined,
+          getImageData: () => ({ data: pixels }),
+        }),
+      }),
+    })
+
+    const image = { naturalWidth: 2, naturalHeight: 2 } as HTMLImageElement
+    const rows = imageToAscii(image, 1, 1, "source")
+
+    expect(rows).toEqual([[
+      { text: "▚", tone: "ink", color: "rgb(72 48 240 / 1)" },
+    ]])
+  })
 })

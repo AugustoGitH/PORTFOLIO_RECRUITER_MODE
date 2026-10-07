@@ -5,6 +5,7 @@ import { SendIcon } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
 import { Button } from "../../../components/action/Button"
 import { Textarea } from "../../../components/input/Textarea"
+import { Checkbox } from "../../../components/input/Checkbox"
 import { useINTLContext } from "../../../providers/intl"
 import type { PropsWithClassName } from "../../../utils/types"
 import { http } from "../../../libs/http"
@@ -20,8 +21,14 @@ export const PortfolioFeedbackForm = ({ title, description, className }: Portfol
   const { showToast } = useToast()
   const submission = useMutation({
     mutationFn: async (form: HTMLFormElement) => {
-      const message = new FormData(form).get("message")
-      await http.post("api/portfolio-feedbacks", { message }, { headers: { "Idempotency-Key": crypto.randomUUID() } })
+      const data = new FormData(form)
+      const message = data.get("message")
+      const allowPublication = data.get("allowPublication") === "on"
+      await http.post(
+        "api/portfolio-feedbacks",
+        { message, allowPublication },
+        { headers: { "Idempotency-Key": crypto.randomUUID() } },
+      )
       return form
     },
     onSuccess: (form) => {
@@ -71,6 +78,11 @@ export const PortfolioFeedbackForm = ({ title, description, className }: Portfol
         {intl.t("FeedbackMessage")}
         <Textarea id="portfolio-feedback-message" name="message" required minLength={1} maxLength={1000} className="mt-1" placeholder={intl.t("FeedbackMessagePlaceholder")} />
       </label>
+      <Checkbox
+        name="allowPublication"
+        label={intl.t("PortfolioFeedbackPublicationConsent")}
+        className="mt-3 leading-relaxed text-ud-secondary-600"
+      />
       <Button type="submit" startAdornment={<SendIcon size={21} />} highlight loading={{ verb: intl.t("SubmitFeedback"), state: submission.isPending }} className="mt-4">
         {intl.t("SubmitFeedback")}
       </Button>

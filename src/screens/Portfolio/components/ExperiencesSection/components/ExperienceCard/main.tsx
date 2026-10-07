@@ -19,13 +19,16 @@ export const ExperienceCard = (props: ExperienceCardProps) => {
   const [startDate, endDate] = props.experience.rangeDate
 
   return (
-    <article id={`experience-${props.experience.value}`} style={props.style} className={cn("relative grid w-full grid-cols-[6.5rem_minmax(0,1fr)] gap-3 py-1 pl-3 sm:grid-cols-[7rem_minmax(0,1fr)]", props.className)}>
-      <div className="relative pt-3 text-xs leading-tight text-ud-secondary-600 after:absolute after:top-7 after:right-0 after:h-[calc(100%+0.5rem)] after:w-px after:bg-ud-auxiliary-purple/30 last:after:hidden">
+    <article id={`experience-${props.experience.value}`} style={props.style} className={cn("relative grid w-full grid-cols-1 gap-3 py-1 sm:grid-cols-[7rem_minmax(0,1fr)] sm:pl-3", props.className)}>
+      <div className="relative hidden pt-3 text-xs sm:block leading-tight text-ud-secondary-600 after:absolute after:top-7 after:right-0 after:h-[calc(100%+0.5rem)] after:w-px after:bg-ud-auxiliary-purple/30 last:after:hidden">
         <span className="block">{formatDate(startDate)}</span>
         <span className="mt-1 block font-semibold text-ud-auxiliary-purple">{formatDate(endDate)}</span>
         <span className="absolute top-4 -right-1.25 h-2.5 w-2.5 rounded-full border-2 border-ud-auxiliary-purple bg-ud-neutral-100" />
       </div>
-      <div className="relative min-w-0 rounded-md border border-ud-neutral-300 bg-ud-neutral-100 p-3 before:absolute before:left-[-5px] before:top-4 before:h-2.5 before:w-2.5 before:rotate-45 before:border-b before:border-l before:border-ud-neutral-300 before:bg-ud-neutral-100">
+      <div className="relative min-w-0 rounded-md border border-ud-neutral-300 bg-ud-neutral-100 p-3 sm:before:absolute before:hidden sm:before:block before:left-[-5px] before:top-4 before:h-2.5 before:w-2.5 before:rotate-45 before:border-b before:border-l before:border-ud-neutral-300 before:bg-ud-neutral-100">
+        <span className="mb-2 block text-right text-xs leading-tight text-ud-secondary-600 sm:hidden">
+          {formatDate(startDate)} — <span className="font-semibold text-ud-auxiliary-purple">{formatDate(endDate)}</span>
+        </span>
         <div className="flex min-w-0 items-start gap-3">
         {
           props.experience.image && (

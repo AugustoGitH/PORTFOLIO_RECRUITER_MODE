@@ -315,6 +315,46 @@ export const INTL_TERMS = {
     en:
       "Your feedback is very important to me and helps me continuously improve."
   },
+  RecentPortfolioFeedbacks: {
+    ptbr: "O que acharam do portfólio",
+    en: "What people thought of the portfolio"
+  },
+  PortfolioCommentsCount: {
+    ptbr: "{count} comentário(s)",
+    en: "{count} comment(s)"
+  },
+  PortfolioVisitor: {
+    ptbr: "Visitante do portfólio",
+    en: "Portfolio visitor"
+  },
+  PortfolioFeedbackPublicationConsent: {
+    ptbr: "Autorizo a publicação anônima deste comentário após revisão.",
+    en: "I authorize this comment to be published anonymously after review."
+  },
+  RecentPortfolioFeedbacksEmpty: {
+    ptbr: "Os primeiros comentários publicados aparecerão aqui.",
+    en: "The first published comments will appear here."
+  },
+  PortfolioFeedbackCategoryNavigation: {
+    ptbr: "Navegação",
+    en: "Navigation"
+  },
+  PortfolioFeedbackCategoryContent: {
+    ptbr: "Conteúdo",
+    en: "Content"
+  },
+  PortfolioFeedbackCategoryRecruiter: {
+    ptbr: "Recrutador",
+    en: "Recruiter"
+  },
+  PortfolioFeedbackCategoryDesign: {
+    ptbr: "Design",
+    en: "Design"
+  },
+  PortfolioFeedbackCategoryGeneral: {
+    ptbr: "Geral",
+    en: "General"
+  },
   LeaveALike: {
     ptbr: "Deixar um like",
     en: "Leave a Like"
@@ -1246,8 +1286,40 @@ export const INTL_TERMS = {
     en: "Portfolio feedback"
   },
   AdminPortfolioFeedbacksDescription: {
-    ptbr: "Mensagens privadas enviadas por visitantes. A retenção é de 90 dias.",
-    en: "Private messages sent by visitors. Retention is 90 days."
+    ptbr: "Revise as mensagens dos visitantes e publique somente as adequadas. A retenção é de 90 dias.",
+    en: "Review visitor messages and publish only suitable ones. Retention is 90 days."
+  },
+  AdminPortfolioFeedbackCategory: {
+    ptbr: "Categoria pública",
+    en: "Public category"
+  },
+  AdminPortfolioFeedbackPublish: {
+    ptbr: "Publicar",
+    en: "Publish"
+  },
+  AdminPortfolioFeedbackHide: {
+    ptbr: "Ocultar",
+    en: "Hide"
+  },
+  AdminPortfolioFeedbackSaving: {
+    ptbr: "Salvando",
+    en: "Saving"
+  },
+  AdminPortfolioFeedbackPublished: {
+    ptbr: "Publicado",
+    en: "Published"
+  },
+  AdminPortfolioFeedbackPending: {
+    ptbr: "Privado",
+    en: "Private"
+  },
+  AdminPortfolioFeedbackAuthorized: {
+    ptbr: "Publicação autorizada",
+    en: "Publication authorized"
+  },
+  AdminPortfolioFeedbackNotAuthorized: {
+    ptbr: "Sem autorização para publicar",
+    en: "Not authorized for publication"
   },
   AdminPortfolioFeedbacksEmpty: {
     ptbr: "Não há feedbacks do portfólio no período de retenção.",

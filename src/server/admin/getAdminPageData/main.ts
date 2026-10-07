@@ -23,6 +23,7 @@ export const getAdminLoginPageData = async (): Promise<AdminLoginPageData> => ({
 
 export const getAdminPortfolioFeedbacksPageData = async (
   cursor?: string,
+  access?: AdminPageAccess,
 ): Promise<AdminPortfolioFeedbacksPageData> => {
   const page = await portfolioFeedbackService.list(cursor)
 
@@ -32,8 +33,12 @@ export const getAdminPortfolioFeedbacksPageData = async (
       message: feedback.message,
       visitorId: feedback.visitorId,
       submittedAt: feedback.submittedAt.toISOString(),
+      publicationConsent: feedback.publicationConsent ?? false,
+      status: feedback.status ?? "pending",
+      category: feedback.category ?? "general",
     })),
     nextCursor: page.nextCursor,
+    canModerate: access?.permissions.includes("feedback.moderate") ?? false,
   }
 }
 

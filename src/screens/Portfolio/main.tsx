@@ -21,7 +21,13 @@ const PortfolioInner = (props: PortfolioProps) => {
     projects: <ProjectsSection />,
     experiences: <ExperiencesSection />,
     testimonials: <TestimonialsSection feedbacks={props.feedbacks} />,
-    feedback: <CongratulationsSection className="pb-28" initialLiked={props.metrics.liked} />,
+    feedback: (
+      <CongratulationsSection
+        className="pb-28"
+        initialLiked={props.metrics.liked}
+        feedbacks={props.portfolioFeedbacks}
+      />
+    ),
   }
 
   const sectionOrder = SECTION_ORDER[isRecruiterMode ? "recruiter" : "default"]

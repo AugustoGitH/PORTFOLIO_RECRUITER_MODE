@@ -1,6 +1,6 @@
 "use client"
 
-import { AsciiArt } from "@/components/general/AsciiArt"
+import { ResponsiveAsciiArt } from "@/components/general/AsciiArt"
 import { Container } from "@/components/layout/Container"
 import { useINTLContext } from "@/providers/intl"
 import { useBlogContext } from "../../providers"
@@ -17,7 +17,7 @@ export const BlogHeroSection = () => {
       contentClassName="max-w-[72rem]"
     >
       <div className="grid min-h-72 items-center gap-7 md:grid-cols-[1fr_0.95fr]">
-        <div className="relative z-10">
+        <div className="relative z-10 order-2 md:order-1">
           <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-ud-auxiliary-purple">{intl.t("Blog")}</p>
           <h1 className="max-w-[560px] text-4xl font-extrabold leading-[1.04] tracking-[-0.045em] text-ud-neutral-999 sm:text-5xl lg:text-[3.6rem]">
             {intl.t("BlogHeroTitleFirst")}<br />{intl.t("BlogHeroTitleSecond")}
@@ -37,8 +37,15 @@ export const BlogHeroSection = () => {
             ))}
           </div>
         </div>
-        <div className="relative hidden min-h-72 items-end justify-center md:flex">
-          <AsciiArt src="/assets/blog/hero-developer.png" alt={intl.t("BlogHeroArtAlt")} width={420} columns={112} rows={45} />
+        <div className="relative order-1 flex w-full justify-center md:order-2 md:min-h-72 md:items-end">
+          <ResponsiveAsciiArt
+            src="/assets/blog/hero-developer.png"
+            alt={intl.t("BlogHeroArtAlt")}
+            initialWidth={420}
+            columns={112}
+            rows={45}
+            wrapperClassName="max-w-[420px]"
+          />
         </div>
       </div>
     </Container>

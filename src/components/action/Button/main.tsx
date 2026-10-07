@@ -8,7 +8,7 @@ export const Button = (_props: ButtonProps) => {
   const isLoading = typeof loading === "object" ? loading.state : Boolean(loading)
   const isDisabled = isLoading
   const loadingLabel = typeof loading === "object" ? loading.verb : children
-  const buttonClassName = cn("flex items-center gap-2 rounded-md border border-ud-neutral-300 px-5 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ud-auxiliary-purple", {
+  const buttonClassName = cn("h-10 flex items-center gap-2 rounded-md border border-ud-neutral-300 px-5  text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ud-auxiliary-purple", {
     "bg-ud-auxiliary-purple text-ud-neutral-0 border-ud-auxiliary-purple hover:bg-transparent hover:text-ud-auxiliary-purple": props.highlight,
     "hover:border-ud-neutral-950 hover:text-ud-neutral-950": !props.highlight,
     "pointer-events-none border-ud-neutral-300 bg-ud-neutral-300 text-ud-secondary-600 ": isDisabled,

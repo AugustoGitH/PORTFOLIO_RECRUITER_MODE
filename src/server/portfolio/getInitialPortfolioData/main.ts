@@ -4,6 +4,7 @@ import { getVerifiedAdminSession } from "@backend/admin/authorization"
 import { TESTIMONIALS } from "@/constants/profile"
 import type { Metrics } from "@/services/metric/useMetricsQuery"
 import { feedbackService } from "@backend/feedback"
+import { portfolioFeedbackService } from "@backend/portfolio-feedbacks"
 import { metricsService } from "@backend/metrics"
 import { recommendationService } from "@backend/developer-recommendations"
 import { blogService } from "@backend/blog"
@@ -57,9 +58,10 @@ const getFeaturedBlogPost = async () => {
 }
 
 export const getInitialPortfolioData = async (context: PageContext): Promise<InitialPageData> => {
-  const [metrics, feedbacks, recommendations, featuredBlogPost] = await Promise.all([
+  const [metrics, feedbacks, portfolioFeedbacks, recommendations, featuredBlogPost] = await Promise.all([
     getInitialMetrics(context.visitorId),
     feedbackService.getPublished(),
+    portfolioFeedbackService.getPublished(),
     context.audience === "recruiter"
       ? recommendationService.select({ roles: context.roles, seniority: context.seniority })
       : Promise.resolve([]),
@@ -72,6 +74,7 @@ export const getInitialPortfolioData = async (context: PageContext): Promise<Ini
       professionalFeedbacks: feedbacks.length || TESTIMONIALS.length,
     },
     feedbacks,
+    portfolioFeedbacks,
     recommendations,
     featuredBlogPost,
   }

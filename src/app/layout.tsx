@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Augusto Westphal", url: "https://github.com/AugustoGitH" }],
   keywords: ["Augusto Westphal", "desenvolvedor web", "full stack", "React", "Next.js"],
   icons: {
-    icon: "/favicon.svg",
+    icon: "/assets/profile/augusto-avatar-mark-ascii-white.png",
   },
   openGraph: {
     type: "website",

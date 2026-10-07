@@ -7,6 +7,7 @@ import type {
 } from "@backend/developer-recommendations"
 import type { PublicFeedback } from "@backend/feedback"
 import type { PortfolioFeaturedBlogPost } from "@/screens/Portfolio"
+import type { PublicPortfolioFeedback } from "@/types/service/portfolio-feedback"
 
 export type SearchParams = {
   audience?: string
@@ -24,6 +25,7 @@ export type PageContext = {
 export type InitialPageData = {
   metrics: Metrics
   feedbacks: PublicFeedback[]
+  portfolioFeedbacks: PublicPortfolioFeedback[]
   recommendations: PublicRecommendation[]
   featuredBlogPost: PortfolioFeaturedBlogPost | null
 }

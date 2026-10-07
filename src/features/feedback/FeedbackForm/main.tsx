@@ -4,6 +4,7 @@ import { Button } from "../../../components/action/Button"
 import { ResponsiveAsciiArt } from "../../../components/general/AsciiArt"
 import { Input } from "../../../components/input/Input"
 import { Textarea } from "../../../components/input/Textarea"
+import { Checkbox } from "../../../components/input/Checkbox"
 import { cn } from "../../../utils/tailwind"
 import type { FeedbackFormProps } from "./types"
 import { useINTLContext } from "../../../providers/intl"
@@ -65,10 +66,12 @@ export const FeedbackForm = (props: FeedbackFormProps) => {
         <Textarea name="message" required minLength={20} maxLength={1500} className="mt-1" placeholder={intl.t("FeedbackMessagePlaceholder")} />
       </label>
       <Input name="linkedinUrl" type="url" label={intl.t("LinkedinUrl")} maxLength={2048} className="mt-4" />
-      <label className="mt-4 flex items-start gap-2 text-xs text-ud-neutral-950">
-        <input name="consent" type="checkbox" required className="mt-0.5 h-4 w-4 shrink-0 appearance-none rounded-sm border border-ud-neutral-950 bg-transparent checked:bg-ud-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ud-neutral-950" />
-        <span>{intl.t("FeedbackConsent")}</span>
-      </label>
+      <Checkbox
+        name="consent"
+        required
+        label={intl.t("FeedbackConsent")}
+        className="mt-4"
+      />
       <Button type="submit" endAdornment={<ArrowRightIcon size={16} />} highlight loading={{ verb: intl.t("SubmitFeedback"), state: submission.isPending }} className={cn("mt-4", props.classNameButton)}>
         {intl.t("SubmitFeedback")}
 

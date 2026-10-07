@@ -34,7 +34,11 @@ describe("POST /api/portfolio-feedbacks", () => {
 
     expect(response.status).toBe(202)
     expect(await response.json()).toEqual({ status: "received" })
-    expect(submit).toHaveBeenCalledWith("O portfólio está claro e objetivo.", expect.any(String))
+    expect(submit).toHaveBeenCalledWith(
+      "O portfólio está claro e objetivo.",
+      expect.any(String),
+      false,
+    )
   })
 
   it("blocks cross-origin writes before reaching the service", async () => {

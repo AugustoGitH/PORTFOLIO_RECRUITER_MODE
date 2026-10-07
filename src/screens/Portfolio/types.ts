@@ -1,11 +1,13 @@
 import { Metrics } from "@/services/metric"
 import { Feedback } from "@/types/service/feedback"
 import { Recommendation } from "@/types/service/recommendation"
+import type { PublicPortfolioFeedback } from "@/types/service/portfolio-feedback"
 
 export type PortfolioProps = {
   metrics: Metrics
   recommendations: Recommendation[]
   feedbacks: Feedback[]
+  portfolioFeedbacks: PublicPortfolioFeedback[]
   featuredBlogPost: PortfolioFeaturedBlogPost | null
   hasAdminSession: boolean
 }
