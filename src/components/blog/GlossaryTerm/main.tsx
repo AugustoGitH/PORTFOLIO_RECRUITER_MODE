@@ -5,6 +5,7 @@ import { BookOpenIcon } from "lucide-react"
 import { Popover } from "@/components/general/Popover"
 import { GlossaryDefinitionText } from "../GlossaryDefinitionText"
 import { useINTLContext } from "@/providers/intl"
+import { cn } from "@/utils/tailwind"
 import type { GlossaryTermProps } from "./types"
 
 export const GlossaryTerm = ({ entry, referenceKey, children }: GlossaryTermProps) => {
@@ -41,7 +42,10 @@ export const GlossaryTerm = ({ entry, referenceKey, children }: GlossaryTermProp
             aria-haspopup="dialog"
             aria-expanded={state.show}
             onClick={state.onToggleShow}
-            className="inline cursor-help rounded-sm border-0 bg-transparent p-0 font-medium text-inherit decoration-ud-auxiliary-purple decoration-2 decoration-dotted underline underline-offset-4 transition-colors hover:text-ud-auxiliary-purple focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ud-auxiliary-purple"
+            className={cn(
+              "inline cursor-help rounded-sm border-0 bg-transparent p-0 font-medium text-inherit decoration-ud-auxiliary-purple decoration-2 decoration-dotted underline underline-offset-4 transition-colors hover:text-ud-auxiliary-purple focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ud-auxiliary-purple",
+              state.show && "text-ud-auxiliary-purple",
+            )}
           >
             {children}
           </button>
