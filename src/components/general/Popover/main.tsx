@@ -62,7 +62,7 @@ export const Popover = <A extends HTMLElement = HTMLElement>(
   )
 
   return (
-    <div className='relative contents'>
+    <span className='relative contents'>
       {popover.render.anchorElement}
       {popover.modal.status.isShowModal &&
         createPortal(
@@ -95,6 +95,6 @@ export const Popover = <A extends HTMLElement = HTMLElement>(
           </div>,
           document.body
         )}
-    </div>
+    </span>
   )
 }

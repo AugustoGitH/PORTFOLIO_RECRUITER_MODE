@@ -1,19 +1,15 @@
 import { CheckIcon, ChevronDown, GlobeIcon } from "lucide-react"
 import { useRef } from "react"
 import { Popover } from "../../../../general/Popover"
-import { useINTLContext, type Language } from "../../../../../providers/intl"
+import { SUPPORTED_LANGUAGES } from "../../../../../constants/intl"
+import { useINTLContext } from "../../../../../providers/intl"
 import { cn } from "../../../../../utils/tailwind"
-
-const LANGUAGES: { value: Language; label: string; short: string }[] = [
-  { value: "ptbr", label: "Português", short: "PT" },
-  { value: "en", label: "English", short: "EN" },
-]
 
 export const LanguageSelect = () => {
   const anchorRef = useRef<HTMLButtonElement>(null)
   const intl = useINTLContext()
 
-  const current = LANGUAGES.find(language => language.value === intl.language) ?? LANGUAGES[0]
+  const current = SUPPORTED_LANGUAGES.find(language => language.value === intl.language) ?? SUPPORTED_LANGUAGES[0]
 
   return (
     <Popover<HTMLButtonElement>
@@ -33,7 +29,7 @@ export const LanguageSelect = () => {
     >
       {(state) => (
         <div className="flex flex-col gap-0.5 p-1 min-w-36 ">
-          {LANGUAGES.map(language => (
+          {SUPPORTED_LANGUAGES.map(language => (
             <button
               key={language.value}
               onClick={() => {

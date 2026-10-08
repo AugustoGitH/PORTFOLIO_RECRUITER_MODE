@@ -104,6 +104,7 @@ export const usePopover = <A extends HTMLElement = HTMLElement>(
     hoverOpenDelay: props.hoverOpenDelay,
     hoverCloseDelay: props.hoverCloseDelay,
     allowModalHover: props.allowModalHover,
+    persistOnManualOpen: props.persistOnManualOpen,
     disableOutsideClick: props.disableOutsideClick,
     wrapperSelector: props.wrapperSelector,
     autoRepositionOnOverflow: props.autoRepositionOnOverflow,

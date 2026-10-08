@@ -74,15 +74,15 @@ export const TestimonialsSection = (props: TestimonialsSectionProps) => {
               className="md:col-span-2 lg:col-start-1 lg:row-start-3"
             />
           )}
+          {remainingTestimonials.map((testimonial) => (
+            <TestimonialCard key={slug("testimonial", testimonial.value)} testimonial={testimonial} />
+          ))}
           <FeedbackForm
             className="h-full rounded-md border-ud-auxiliary-purple/30 bg-ud-auxiliary-purple-light/50 md:col-span-2 lg:col-span-1 lg:col-start-3 lg:row-start-1 lg:row-span-3"
             classNameButton="w-full justify-center"
             title={intl.t("HaveYouWorkedWithMe")}
             description={intl.t("ShareYourTestimonial")}
           />
-          {remainingTestimonials.map((testimonial) => (
-            <TestimonialCard key={slug("testimonial", testimonial.value)} testimonial={testimonial} />
-          ))}
         </div>
       </div>
     </Container>

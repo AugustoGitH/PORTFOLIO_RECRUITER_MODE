@@ -74,7 +74,7 @@ export const SkillsSection = (props: PropsWithClassName) => {
         ) : (
           <Tabs className="mt-3" tabs={SKILL_TABS}>
             <div className="grid gap-5 rounded-md border border-ud-neutral-300 bg-ud-neutral-100 p-4 md:grid-cols-[minmax(0,30%)_minmax(0,1fr)] md:gap-6 md:p-5">
-              <div className="flex items-start justify-center border-b border-ud-neutral-300 pb-4 md:border-r md:border-b-0 md:pr-5 md:pb-0">
+              <div className="hidden items-start justify-center md:flex md:border-r md:border-ud-neutral-300 md:pr-5">
                 <ResponsiveAsciiArt
                   src="/assets/profile/skills-code-coffee.png"
                   alt={intl.t("SkillsArtworkAlt")}

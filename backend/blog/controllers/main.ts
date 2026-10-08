@@ -1,10 +1,11 @@
 import "server-only"
-import { ObjectId } from "mongodb"
+import { MongoServerError, ObjectId } from "mongodb"
 import { getVisitorId } from "@backend/metrics/utils"
-import { blogService } from "@backend/blog/services"
+import { blogService, InvalidGlossaryReferencesError } from "@backend/blog/services"
 import { getVerifiedAdminSession } from "@backend/admin/authorization"
 import {
   blogCategorySchema,
+  blogGlossaryEntrySchema,
   blogImagePurposeSchema,
   blogPostSchema,
 } from "./schemas"
@@ -43,6 +44,10 @@ export const blogController = {
         ...category,
         _id: String(category._id),
       })),
+      glossary: (await blogService.glossaryEntries()).map((entry) => ({
+        ...entry,
+        _id: String(entry._id),
+      })),
     })
   },
   async savePost(request: Request, id?: string) {
@@ -52,10 +57,22 @@ export const blogController = {
     const parsed = blogPostSchema.safeParse(await request.json().catch(() => null))
     if (!parsed.success) return Response.json({ error: "Invalid post" }, { status: 400 })
 
-    const saved = await blogService.savePost(id, session.userId, {
-      ...parsed.data,
-      categoryId: new ObjectId(parsed.data.categoryId),
-    })
+    let saved
+    try {
+      saved = await blogService.savePost(id, session.userId, {
+        ...parsed.data,
+        ...parsed.data.translations.ptbr,
+        categoryId: new ObjectId(parsed.data.categoryId),
+      })
+    } catch (error) {
+      if (error instanceof InvalidGlossaryReferencesError) {
+        return Response.json({
+          error: "Unknown glossary references",
+          keys: error.keys,
+        }, { status: 400 })
+      }
+      throw error
+    }
 
     return saved
       ? Response.json({ id: String(saved) })
@@ -68,7 +85,40 @@ export const blogController = {
     const parsed = blogCategorySchema.safeParse(await request.json().catch(() => null))
     if (!parsed.success) return Response.json({ error: "Invalid category" }, { status: 400 })
 
-    return Response.json({ id: String(await blogService.saveCategory(id, parsed.data)) })
+    return Response.json({ id: String(await blogService.saveCategory(id, {
+      ...parsed.data,
+      ...parsed.data.translations.ptbr,
+    })) })
+  },
+  async saveGlossaryEntry(request: Request, id?: string) {
+    const session = await admin("blog.manage")
+    if (typeof session === "number") return Response.json({ error: "Forbidden" }, { status: session })
+
+    const parsed = blogGlossaryEntrySchema.safeParse(await request.json().catch(() => null))
+    if (!parsed.success) return Response.json({ error: "Invalid glossary entry" }, { status: 400 })
+
+    try {
+      const saved = await blogService.saveGlossaryEntry(id, parsed.data)
+      return saved
+        ? Response.json({ id: String(saved) })
+        : Response.json({ error: "Not found" }, { status: 404 })
+    } catch (error) {
+      if (error instanceof MongoServerError && error.code === 11000) {
+        return Response.json({ error: "Glossary key already exists" }, { status: 409 })
+      }
+      throw error
+    }
+  },
+  async removeGlossaryEntry(id: string) {
+    const session = await admin("blog.manage")
+    if (typeof session === "number") return Response.json({ error: "Forbidden" }, { status: session })
+
+    const removed = await blogService.deleteGlossaryEntry(id)
+    return removed === null
+      ? Response.json({ error: "Glossary entry is referenced by posts" }, { status: 409 })
+      : removed
+        ? new Response(null, { status: 204 })
+        : Response.json({ error: "Not found" }, { status: 404 })
   },
   async removePost(id: string) { const session = await admin("blog.manage"); if (typeof session === "number") return Response.json({ error: "Forbidden" }, { status: session }); return (await blogService.deletePost(id, session.userId)) ? new Response(null, { status: 204 }) : Response.json({ error: "Not found" }, { status: 404 }) },
   async removeCategory(id: string) { const session = await admin("blog.manage"); if (typeof session === "number") return Response.json({ error: "Forbidden" }, { status: session }); const removed = await blogService.deleteCategory(id); return removed === null ? Response.json({ error: "Category has posts" }, { status: 409 }) : removed ? new Response(null, { status: 204 }) : Response.json({ error: "Not found" }, { status: 404 }) },

@@ -14,9 +14,10 @@ import { useToast } from "../../../providers/toast"
 type PortfolioFeedbackFormProps = PropsWithClassName<{
   title: string
   description: string
+  onMessageFocusChange?: (focused: boolean) => void
 }>
 
-export const PortfolioFeedbackForm = ({ title, description, className }: PortfolioFeedbackFormProps) => {
+export const PortfolioFeedbackForm = ({ title, description, className, onMessageFocusChange }: PortfolioFeedbackFormProps) => {
   const intl = useINTLContext()
   const { showToast } = useToast()
   const submission = useMutation({
@@ -76,14 +77,24 @@ export const PortfolioFeedbackForm = ({ title, description, className }: Portfol
       <span className="mt-1 block text-xs text-ud-secondary-600">{description}</span>
       <label className="mt-4 block text-sm font-bold text-ud-neutral-950">
         {intl.t("FeedbackMessage")}
-        <Textarea id="portfolio-feedback-message" name="message" required minLength={1} maxLength={1000} className="mt-1" placeholder={intl.t("FeedbackMessagePlaceholder")} />
+        <Textarea
+          id="portfolio-feedback-message"
+          name="message"
+          required
+          minLength={1}
+          maxLength={1000}
+          className="mt-1"
+          placeholder={intl.t("FeedbackMessagePlaceholder")}
+          onFocus={() => onMessageFocusChange?.(true)}
+          onBlur={() => onMessageFocusChange?.(false)}
+        />
       </label>
       <Checkbox
         name="allowPublication"
         label={intl.t("PortfolioFeedbackPublicationConsent")}
         className="mt-3 leading-relaxed text-ud-secondary-600"
       />
-      <Button type="submit" startAdornment={<SendIcon size={21} />} highlight loading={{ verb: intl.t("SubmitFeedback"), state: submission.isPending }} className="mt-4">
+      <Button type="submit" startAdornment={<SendIcon size={21} />} highlight loading={{ verb: intl.t("SubmitFeedback"), state: submission.isPending }} className="mt-4 w-full justify-center sm:w-auto">
         {intl.t("SubmitFeedback")}
       </Button>
     </form>

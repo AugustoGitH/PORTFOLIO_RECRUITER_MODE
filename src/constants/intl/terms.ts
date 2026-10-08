@@ -1,12 +1,22 @@
 
+import type { Language } from "./languages"
+
 export type Term = keyof typeof INTL_TERMS
 
-export type language = "ptbr" | "en"
+export type language = Language
 
 export type Terms = Record<Term, Record<language, string>>
 
 
 export const INTL_TERMS = {
+  GlossaryLabel: {
+    ptbr: "Glossário",
+    en: "Glossary",
+  },
+  GlossaryReferenceMissing: {
+    ptbr: "A referência de glossário “{key}” não existe.",
+    en: "The glossary reference “{key}” does not exist.",
+  },
   WebDeveloper: {
     ptbr: "Desenvolvedor Web",
     en: "Web Developer"
@@ -632,7 +642,7 @@ export const INTL_TERMS = {
     en: "Role: {vacancy}. Declared profile: {profile}."
   },
   MidLevel: {
-    ptbr: "Pleno (mid-level)",
+    ptbr: "Pleno",
     en: "Mid-level"
   },
   OtherProfiles: {

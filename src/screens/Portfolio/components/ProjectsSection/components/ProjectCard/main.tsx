@@ -61,7 +61,7 @@ export const ProjectCard = ({ project, featured = false, className, style }: Pro
       )}
 
       {featured && (
-        <div className="mt-auto flex min-h-28 items-end justify-between gap-2 pt-3">
+        <div className="mt-auto flex items-end justify-between gap-2 pt-3 md:min-h-28">
           {projectLink && (
             <a
               href={projectLink.href}
@@ -79,7 +79,7 @@ export const ProjectCard = ({ project, featured = false, className, style }: Pro
             initialWidth={208}
             columns={76}
             rows={24}
-            wrapperClassName="w-52 max-w-full shrink-0 overflow-hidden"
+            wrapperClassName="hidden w-52 max-w-full shrink-0 overflow-hidden md:flex"
           />
         </div>
       )}

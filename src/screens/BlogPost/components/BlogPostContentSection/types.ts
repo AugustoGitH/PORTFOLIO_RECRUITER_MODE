@@ -1,6 +1,7 @@
-import type { BlogPost, BlogPostHeading } from "../../types"
+import type { BlogPost, BlogPostPageProps } from "../../types"
 
 export type BlogPostContentSectionProps = {
   post: BlogPost
-  headings: BlogPostHeading[]
+  headings: BlogPostPageProps["headings"]
+  glossary: BlogPostPageProps["glossary"]
 }

@@ -49,13 +49,10 @@ export const Header = ({ hasAdminSession = false, variant = "portfolio" }: Heade
               href="/admin"
               aria-label={intl.t("AdminPanel")}
               title={intl.t("AdminPanel")}
+              className="h-10 w-10 justify-center gap-0 px-0 py-0 sm:w-auto sm:gap-2 sm:px-3"
+              startAdornment={<LayoutDashboardIcon size={15} aria-hidden="true" />}
             >
-              <div className="flex items-center gap-2">
-                <LayoutDashboardIcon size={15} aria-hidden="true" />
-                <span className="hidden md:block">
-                  {intl.t("AdminPanel")}
-                </span>
-              </div>
+              <span className="sr-only sm:not-sr-only">{intl.t("AdminPanel")}</span>
             </Button>
           )}
           <Button

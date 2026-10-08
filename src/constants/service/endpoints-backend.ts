@@ -6,6 +6,8 @@ export const ENDPOINTS_BACKEND = {
   adminBlogPost: (id: string) => `/api/admin/blog/${id}`,
   adminBlogCategories: () => "/api/admin/blog/categories",
   adminBlogCategory: (id: string) => `/api/admin/blog/categories/${id}`,
+  adminBlogGlossary: () => "/api/admin/blog/glossary",
+  adminBlogGlossaryEntry: (id: string) => `/api/admin/blog/glossary/${id}`,
   adminBlogImage: () => "/api/admin/media/blog-image",
   adminBlogPostImage: (postId: string, mediaId: string) =>
     `/api/admin/blog/${postId}/images/${mediaId}`,

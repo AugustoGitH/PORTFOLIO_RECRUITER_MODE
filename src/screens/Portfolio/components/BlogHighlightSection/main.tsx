@@ -8,6 +8,8 @@ import { Container } from "@/components/layout/Container"
 import { SECTIONS } from "@/constants/profile"
 import { useINTLContext } from "@/providers/intl"
 import { cn } from "@/utils/tailwind"
+import { estimateReadingMinutes } from "@/utils/date"
+import { getLocalizedValue } from "@/utils/intl"
 import type { BlogHighlightSectionProps } from "./types"
 
 const fallbackArtwork = {
@@ -16,6 +18,7 @@ const fallbackArtwork = {
 
 export const BlogHighlightSection = ({ post, className }: BlogHighlightSectionProps) => {
   const intl = useINTLContext()
+  const localizedPost = post ? getLocalizedValue(post.translations, intl.language) : null
   const publishedDate = post?.publishedAt
     ? new Intl.DateTimeFormat(intl.language === "ptbr" ? "pt-BR" : "en-US", {
       day: "2-digit",
@@ -57,18 +60,18 @@ export const BlogHighlightSection = ({ post, className }: BlogHighlightSectionPr
                       <Coffee size={14} aria-hidden="true" />
                       {intl.t("PortfolioBlogPopular")}
                     </Chip>
-                    <Chip tone="neutral">{post.category ?? intl.t("BlogArticle")}</Chip>
+                    <Chip tone="neutral">{localizedPost?.category ?? intl.t("BlogArticle")}</Chip>
                   </div>
                   <h3 className="mt-5 max-w-2xl text-2xl font-extrabold leading-tight tracking-[-0.03em] text-ud-neutral-950 sm:text-3xl">
-                    {post.title}
+                    {localizedPost?.title}
                   </h3>
                   <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ud-secondary-600 sm:text-base">
-                    {post.subtitle ?? post.excerpt}
+                    {localizedPost?.subtitle ?? localizedPost?.excerpt}
                   </p>
                   <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs text-ud-secondary-600">
                     <span className="inline-flex items-center gap-1.5">
                       <Clock3 size={16} aria-hidden="true" />
-                      {intl.t("BlogReadingMinutes", { minutes: post.minutes })}
+                      {intl.t("BlogReadingMinutes", { minutes: localizedPost ? estimateReadingMinutes(localizedPost.markdown) : post.minutes })}
                     </span>
                     <span className="inline-flex items-center gap-1.5">
                       <Eye size={16} aria-hidden="true" />
@@ -84,7 +87,7 @@ export const BlogHighlightSection = ({ post, className }: BlogHighlightSectionPr
                   </div>
                   <div className="inline-flex mt-7">
                     <Button
-                      href={`/blog/${post.slug}`}
+                      href={`/blog/${localizedPost?.slug ?? post.slug}`}
                       highlight
                       endAdornment={<ArrowRight size={17} aria-hidden="true" />}
                     >
@@ -119,7 +122,7 @@ export const BlogHighlightSection = ({ post, className }: BlogHighlightSectionPr
                 <div className="relative aspect-[4/3] w-full max-w-[420px]">
                   <Image
                     src={post.cover.url}
-                    alt={post.title}
+                    alt={localizedPost?.title ?? post.title}
                     fill
                     sizes="(min-width: 1024px) 420px, 100vw"
                     className="object-contain"

@@ -1,8 +1,9 @@
 import type { PropsWithChildren } from 'react'
 import type { INTL_TERMS, Term } from '../../constants/intl'
+import type { Language } from '../../constants/intl/languages'
 import type { CreateTypeFromString, Primitive } from '../../utils/types'
 
-export type Language = 'ptbr' | 'en'
+export type { Language } from '../../constants/intl/languages'
 
 export type TermKey = keyof typeof INTL_TERMS
 

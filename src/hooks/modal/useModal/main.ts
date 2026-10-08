@@ -504,8 +504,36 @@ export const useModal = <
         let newArrowOffset: number | undefined = undefined
 
         if (useHorizontalPosition) {
-          newAppliedSide = useLeftPosition ? 'left' : 'right'
-          const popoverTop = typeof position.top === 'number' ? position.top : 0
+          const preferredSide = useLeftPosition ? 'left' : 'right'
+          newAppliedSide = preferredSide
+
+          if (options.autoRepositionOnOverflow && modalWidth > 0) {
+            const padding = options.overflowPadding || DEFAULT_OVERFLOW_PADDING
+            const sideGap = offsetBottom
+            const preferredLeft = position.left as number
+            const preferredOverflows = preferredLeft < padding
+              || preferredLeft + modalWidth > window.innerWidth - padding
+
+            if (preferredOverflows) {
+              const fallbackSide = preferredSide === 'right' ? 'left' : 'right'
+              const fallbackLeft = fallbackSide === 'left'
+                ? anchorRect.left - modalWidth - sideGap
+                : anchorRect.right + sideGap
+              const fallbackFits = fallbackLeft >= padding
+                && fallbackLeft + modalWidth <= window.innerWidth - padding
+
+              finalPosition = {
+                ...position,
+                left: fallbackFits
+                  ? fallbackLeft
+                  : Math.max(padding, Math.min(fallbackLeft, window.innerWidth - modalWidth - padding)),
+              }
+              newAppliedSide = fallbackFits ? fallbackSide : null
+              smartPositionAppliedRef.current = true
+            }
+          }
+
+          const popoverTop = typeof finalPosition.top === 'number' ? finalPosition.top : 0
           const anchorCenterY = anchorRect.top + anchorRect.height / 2
           newArrowOffset = Math.max(12, Math.min(anchorCenterY - popoverTop, modalHeight - 12))
         } else if (
@@ -734,7 +762,7 @@ export const useModal = <
   useEffect(() => {
     if (!options.hovering) return
 
-    if (options.persistOnManualOpen && options.show) {
+    if (options.persistOnManualOpen && isShowModal) {
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current)
         hoverTimeoutRef.current = null
@@ -776,7 +804,6 @@ export const useModal = <
     isShowModal,
     options.hovering,
     options.onClose,
-    options.show,
     options.persistOnManualOpen,
   ])
 

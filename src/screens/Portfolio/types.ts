@@ -27,4 +27,22 @@ export type PortfolioFeaturedBlogPost = {
     width: number
     height: number
   }
+  translations: Partial<Record<Language, {
+    slug: string
+    title: string
+    subtitle?: string
+    excerpt: string
+    markdown: string
+    category: string | null
+  }>> & {
+    ptbr: {
+      slug: string
+      title: string
+      subtitle?: string
+      excerpt: string
+      markdown: string
+      category: string | null
+    }
+  }
 }
+import type { Language } from "@/constants/intl"

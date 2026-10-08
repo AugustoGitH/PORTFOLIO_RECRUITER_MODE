@@ -92,20 +92,27 @@ export const AboutSection = (props: AboutSectionProps) => {
                 ))}
               </>
             )}
-            <div className="mt-5 flex flex-wrap items-center gap-2">
+            <div className="mt-5 grid grid-cols-4 items-center gap-2 sm:flex sm:flex-wrap">
               {
-                GROUP_LINKS.main.map(link => (
-                  <Button key={link.title} startAdornment={link.icon && <link.icon size={15} />} href={link.href} target="_blank">
+                GROUP_LINKS.main.map((link) => (
+                  <Button
+                    key={link.title}
+                    className="col-span-2 justify-center px-2 text-xs sm:px-5 sm:text-sm"
+                    startAdornment={link.icon && <link.icon size={15} />}
+                    href={link.href}
+                    target="_blank"
+                  >
                     {link.title}
                   </Button>
                 ))
               }
               <Button
-                startAdornment={<BriefcaseBusinessIcon size={20} />}
+                startAdornment={<BriefcaseBusinessIcon className="shrink-0" size={20} />}
                 highlight
                 loading={{ verb: "Downloading", state: isDownloadingResume }}
                 href={resumeHref}
                 onClick={downloadResume}
+                className="col-span-2 justify-center gap-1 px-2 text-xs sm:px-5 sm:text-sm"
               >
                 {intl.t("Resume")}
               </Button>

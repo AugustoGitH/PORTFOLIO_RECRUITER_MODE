@@ -7,12 +7,23 @@ import { blogRepository } from "@backend/blog/repositories"
 import { deletePublicObject, putPublicWebp } from "@backend/media/storage"
 import type {
   BlogPost,
+  BlogCategory,
+  BlogCategoryTranslations,
+  BlogGlossaryEntry,
   BlogPostStatus,
+  BlogPostTranslations,
   PublicBlogPost,
   PublicBlogPostCover,
 } from "@backend/blog/models"
+import { extractGlossaryKeys } from "@/utils/blog"
 
 const publishedTag = "blog:published"
+
+export class InvalidGlossaryReferencesError extends Error {
+  constructor(readonly keys: string[]) {
+    super(`Unknown glossary keys: ${keys.join(", ")}`)
+  }
+}
 type CachedPublishedPost = Omit<BlogPost, "_id" | "categoryId" | "coverMediaId" | "mediaIds" | "createdBy" | "updatedBy"> & {
   _id: string
   categoryId: string
@@ -32,6 +43,26 @@ const toCachedPublishedPost = (post: BlogPost): CachedPublishedPost => ({
   updatedBy: post.updatedBy.toHexString(),
 })
 
+const categoryTranslations = (category: BlogCategory): BlogCategoryTranslations =>
+  category.translations ?? {
+    ptbr: {
+      slug: category.slug,
+      name: category.name,
+      description: category.description,
+    },
+  }
+
+const postTranslations = (post: Pick<BlogPost, "translations" | "slug" | "title" | "subtitle" | "excerpt" | "markdown">): BlogPostTranslations =>
+  post.translations ?? {
+    ptbr: {
+      slug: post.slug,
+      title: post.title,
+      subtitle: post.subtitle,
+      excerpt: post.excerpt,
+      markdown: post.markdown,
+    },
+  }
+
 const published = unstable_cache(
   async () => (await blogRepository.listPosts("published")).map(toCachedPublishedPost),
   [publishedTag, "v3"],
@@ -45,6 +76,7 @@ const toPublicPost = (
   totals: { views: number; likes: number } = { views: 0, likes: 0 },
   cover?: PublicBlogPostCover,
 ): PublicBlogPost => ({
+  translations: postTranslations(post),
   slug: post.slug,
   title: post.title,
   subtitle: post.subtitle,
@@ -63,10 +95,10 @@ const toPublicCover = (
     ? { url: media.publicUrl, width: media.width, height: media.height }
     : undefined
 
-const revalidatePublicPost = (slug: string) => {
+const revalidatePublicPost = (...slugs: string[]) => {
   revalidateTag(publishedTag, { expire: 0 })
   revalidatePath("/blog")
-  revalidatePath(`/blog/${slug}`)
+  slugs.forEach((slug) => revalidatePath(`/blog/${slug}`))
 }
 
 const rankedPublished = unstable_cache(async () => {
@@ -93,7 +125,35 @@ const rankedPublished = unstable_cache(async () => {
 }, [publishedTag, "ranked", "v3"], { revalidate: 60, tags: [publishedTag] })
 
 export const blogService = {
-  categories: () => blogRepository.listCategories(),
+  async glossaryEntries(keys?: string[]) {
+    return blogRepository.listGlossaryEntries(keys)
+  },
+
+  async saveGlossaryEntry(
+    id: string | undefined,
+    input: Omit<BlogGlossaryEntry, "_id" | "createdAt" | "updatedAt">,
+  ) {
+    const saved = await blogRepository.saveGlossaryEntry(id, input)
+    if (saved) revalidatePath("/blog", "layout")
+    return saved
+  },
+
+  async deleteGlossaryEntry(id: string) {
+    const current = await blogRepository.findGlossaryEntry(id)
+    if (!current) return false
+    if (await blogRepository.hasGlossaryReferences(current.key)) return null
+
+    const removed = await blogRepository.deleteGlossaryEntry(id)
+    if (removed) revalidatePath("/blog", "layout")
+    return removed
+  },
+
+  async categories() {
+    return (await blogRepository.listCategories()).map((category) => ({
+      ...category,
+      translations: categoryTranslations(category),
+    }))
+  },
   posts: (status?: BlogPostStatus) => blogRepository.listPosts(status),
 
   async adminPosts() {
@@ -113,6 +173,7 @@ export const blogService = {
 
       return {
         ...post,
+        translations: postTranslations(post),
         cover: cover
           ? {
               id: cover._id.toHexString(),
@@ -129,7 +190,7 @@ export const blogService = {
     })
   },
 
-  saveCategory(id: string | undefined, input: { slug: string; name: string; description?: string }) {
+  saveCategory(id: string | undefined, input: Omit<BlogCategory, "_id" | "createdAt" | "updatedAt">) {
     return blogRepository.saveCategory(id, input)
   },
 
@@ -144,7 +205,10 @@ export const blogService = {
   },
 
   async publishedPost(slug: string): Promise<PublicBlogPost | null> {
-    const post = (await published()).find((item) => item.slug === slug)
+    const post = (await published()).find((item) => {
+      const translations = postTranslations(item)
+      return item.slug === slug || Object.values(translations).some((translation) => translation?.slug === slug)
+    })
     if (!post) return null
 
     const [totals, cover] = await Promise.all([
@@ -181,6 +245,21 @@ export const blogService = {
     actorId: string,
     input: Omit<BlogPost, "_id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">,
   ) {
+    if (input.status === "published") {
+      const referencedKeys = [
+        ...new Set(Object.values(input.translations ?? {}).flatMap((translation) =>
+          translation ? extractGlossaryKeys(translation.markdown) : [],
+        )),
+      ]
+      const glossaryEntries = await blogRepository.listGlossaryEntries(referencedKeys)
+      const availableKeys = new Set(glossaryEntries.map((entry) => entry.key))
+      const missingKeys = referencedKeys.filter((key) => !availableKeys.has(key))
+
+      if (missingKeys.length) {
+        throw new InvalidGlossaryReferencesError(missingKeys)
+      }
+    }
+
     const current = id ? await blogRepository.findPost(id) : null
     const saved = await blogRepository.savePost(id, {
       ...input,
@@ -192,8 +271,16 @@ export const blogService = {
 
     revalidateTag(publishedTag, { expire: 0 })
     revalidatePath("/blog")
-    if (current?.slug) revalidatePath(`/blog/${current.slug}`)
-    if (input.status === "published") revalidatePath(`/blog/${input.slug}`)
+    if (current) {
+      Object.values(postTranslations(current)).forEach((translation) => {
+        if (translation) revalidatePath(`/blog/${translation.slug}`)
+      })
+    }
+    if (input.status === "published") {
+      Object.values(input.translations ?? {}).forEach((translation) => {
+        if (translation) revalidatePath(`/blog/${translation.slug}`)
+      })
+    }
 
     return saved
   },
@@ -218,7 +305,11 @@ export const blogService = {
 
     revalidateTag(publishedTag, { expire: 0 })
     revalidatePath("/blog")
-    if (current?.slug) revalidatePath(`/blog/${current.slug}`)
+    if (current) {
+      Object.values(postTranslations(current)).forEach((translation) => {
+        if (translation) revalidatePath(`/blog/${translation.slug}`)
+      })
+    }
 
     return true
   },
@@ -275,7 +366,11 @@ export const blogService = {
         at: new Date(),
       })
 
-      if (purpose === "cover") revalidatePublicPost(post.slug)
+      if (purpose === "cover") {
+        revalidatePublicPost(
+          ...Object.values(postTranslations(post)).flatMap((translation) => translation ? [translation.slug] : []),
+        )
+      }
 
       return {
         mediaId: mediaId.toHexString(),
@@ -316,7 +411,9 @@ export const blogService = {
       action: isCover ? "cover_removed" : "updated",
       at: new Date(),
     })
-    revalidatePublicPost(post.slug)
+    revalidatePublicPost(
+      ...Object.values(postTranslations(post)).flatMap((translation) => translation ? [translation.slug] : []),
+    )
 
     return true
   },

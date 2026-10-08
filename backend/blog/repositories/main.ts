@@ -3,10 +3,12 @@ import { ObjectId } from "mongodb"
 import { getMongoDb } from "@backend/libs/db/mongo"
 import {
   getBlogCategoriesCollection,
+  getBlogGlossaryCollection,
   getBlogAuditsCollection,
   getBlogMetricsCollection,
   getBlogPostsCollection,
   type BlogCategory,
+  type BlogGlossaryEntry,
   type BlogAudit,
   type BlogPost,
   type BlogPostStatus,
@@ -22,7 +24,17 @@ const ensureIndexes = async () => {
 
       await Promise.all([
         getBlogCategoriesCollection(db).createIndex({ slug: 1 }, { unique: true }),
+        getBlogGlossaryCollection(db).createIndex({ key: 1 }, { unique: true }),
+        getBlogGlossaryCollection(db).createIndex({ status: 1, key: 1 }),
         getBlogPostsCollection(db).createIndex({ slug: 1 }, { unique: true }),
+        getBlogCategoriesCollection(db).createIndex(
+          { "translations.en.slug": 1 },
+          { unique: true, sparse: true },
+        ),
+        getBlogPostsCollection(db).createIndex(
+          { "translations.en.slug": 1 },
+          { unique: true, sparse: true },
+        ),
         getBlogPostsCollection(db).createIndex({ status: 1, publishedAt: -1 }),
         getBlogPostsCollection(db).createIndex({ categoryId: 1, status: 1, publishedAt: -1 }),
         getBlogMetricsCollection(db).createIndex({ postId: 1, visitorId: 1 }, { unique: true }),
@@ -37,6 +49,62 @@ const ensureIndexes = async () => {
 }
 
 export const blogRepository = {
+  async listGlossaryEntries(keys?: string[]) {
+    await ensureIndexes()
+    return getBlogGlossaryCollection(await getMongoDb())
+      .find(keys?.length ? { key: { $in: keys } } : {})
+      .sort({ key: 1 })
+      .toArray()
+  },
+
+  async findGlossaryEntry(id: string) {
+    if (!ObjectId.isValid(id)) return null
+    return getBlogGlossaryCollection(await getMongoDb()).findOne({ _id: new ObjectId(id) })
+  },
+
+  async saveGlossaryEntry(
+    id: string | undefined,
+    input: Omit<BlogGlossaryEntry, "_id" | "createdAt" | "updatedAt">,
+  ) {
+    await ensureIndexes()
+    const collection = getBlogGlossaryCollection(await getMongoDb())
+    const now = new Date()
+
+    if (id && ObjectId.isValid(id)) {
+      const current = await collection.findOne({ _id: new ObjectId(id) })
+      if (!current) return null
+      const result = await collection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { ...input, key: current.key, updatedAt: now } },
+      )
+      return result.matchedCount === 1 ? current._id : null
+    }
+
+    return (await collection.insertOne({
+      ...input,
+      createdAt: now,
+      updatedAt: now,
+    } as BlogGlossaryEntry)).insertedId
+  },
+
+  async deleteGlossaryEntry(id: string) {
+    if (!ObjectId.isValid(id)) return false
+    return (await getBlogGlossaryCollection(await getMongoDb()).deleteOne({
+      _id: new ObjectId(id),
+    })).deletedCount === 1
+  },
+
+  async hasGlossaryReferences(key: string) {
+    const reference = new RegExp(`#glossary:${key}(?:\\)|\\s)`)
+    return Boolean(await getBlogPostsCollection(await getMongoDb()).findOne({
+      $or: [
+        { markdown: reference },
+        { "translations.ptbr.markdown": reference },
+        { "translations.en.markdown": reference },
+      ],
+    }, { projection: { _id: 1 } }))
+  },
+
   async listCategories() {
     await ensureIndexes()
     return getBlogCategoriesCollection(await getMongoDb()).find({}).sort({ name: 1 }).toArray()
@@ -74,7 +142,13 @@ export const blogRepository = {
 
   async findPostBySlug(slug: string) {
     await ensureIndexes()
-    return getBlogPostsCollection(await getMongoDb()).findOne({ slug })
+    return getBlogPostsCollection(await getMongoDb()).findOne({
+      $or: [
+        { slug },
+        { "translations.ptbr.slug": slug },
+        { "translations.en.slug": slug },
+      ],
+    })
   },
 
   async findPost(id: string) {

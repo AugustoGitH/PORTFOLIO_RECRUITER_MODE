@@ -16,7 +16,7 @@ export const TestimonialCard = (props: TestimonialCardProps) => {
   return (
     <article className={cn(
       "relative flex min-h-44 min-w-0 flex-col rounded-md border border-ud-neutral-300 bg-ud-neutral-100 p-4",
-      props.featured && "min-h-80",
+      props.featured && "md:min-h-80",
       props.className,
     )}>
       <div>
@@ -26,12 +26,12 @@ export const TestimonialCard = (props: TestimonialCardProps) => {
           </span>
           {props.testimonial.enterprise.name && <Chip size="sm">{props.testimonial.enterprise.name}</Chip>}
         </div>
-        <div className={cn("mt-3 flex items-start gap-2", props.featured && "mt-5")}>
+        <div className={cn("mt-3 flex items-start gap-2", props.featured && "md:mt-5")}>
           <span aria-hidden="true" className="-mt-3 text-5xl font-bold leading-none text-ud-auxiliary-purple">“</span>
-          <p className={cn("text-xs leading-relaxed text-ud-neutral-900", props.featured && "text-sm")}>{content}</p>
+          <p className={cn("text-xs leading-relaxed text-ud-neutral-900", props.featured && "md:text-sm")}>{content}</p>
         </div>
       </div>
-      <div className={cn("mt-auto flex items-center gap-3 pt-4", props.featured && "relative min-h-24 pr-28")}>
+      <div className={cn("mt-auto flex items-center gap-3 pt-4", props.featured && "md:relative md:min-h-24 md:pr-28")}>
         {
           props.testimonial.author.image ? (
             <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-ud-neutral-300 object-cover">
@@ -54,7 +54,7 @@ export const TestimonialCard = (props: TestimonialCardProps) => {
             columns={72}
             rows={30}
             palette="source"
-            wrapperClassName="absolute -right-1 -bottom-2 w-32"
+            wrapperClassName="absolute -right-1 -bottom-2 hidden w-32 md:flex"
           />
         )}
       </div>

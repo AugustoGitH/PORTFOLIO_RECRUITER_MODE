@@ -30,6 +30,7 @@ export const InfoWrapper = (props: InfoWrapperProps) => {
           hovering
           allowModalHover
           persistOnManualOpen
+          autoRepositionOnOverflow
           arrow
           origin={props.origin ?? "center"}
           direction={props.direction ?? "bottom"}

@@ -24,6 +24,8 @@ export const CongratulationsSection = (props: CongratulationsSectionProps) => {
   const intl = useINTLContext()
   const { isRecruiterMode } = useRecruiterModeContext()
   const [isActionHovered, setIsActionHovered] = useState(false)
+  const [isActionFocused, setIsActionFocused] = useState(false)
+  const [isFeedbackFocused, setIsFeedbackFocused] = useState(false)
   const likeMutation = useMetricLikeMutation()
   const { showToast } = useToast()
   const liked = likeMutation.data?.liked ?? props.initialLiked
@@ -60,11 +62,11 @@ export const CongratulationsSection = (props: CongratulationsSectionProps) => {
     ...createAsciiArtProps({
       states: [
         {
-          active: isActionHovered,
+          active: isActionHovered || isActionFocused || isFeedbackFocused,
           art: { src: hoverArtSrc, alt: ABOUT.name }
         },
         {
-          active: !isActionHovered,
+          active: !(isActionHovered || isActionFocused || isFeedbackFocused),
           art: { src: stableArtSrc, alt: ABOUT.name }
         },
       ],
@@ -80,8 +82,8 @@ export const CongratulationsSection = (props: CongratulationsSectionProps) => {
   const actionEvents = {
     onMouseEnter: () => setIsActionHovered(true),
     onMouseLeave: () => setIsActionHovered(false),
-    onFocus: () => setIsActionHovered(true),
-    onBlur: () => setIsActionHovered(false),
+    onFocus: () => setIsActionFocused(true),
+    onBlur: () => setIsActionFocused(false),
   }
 
   return (
@@ -127,14 +129,14 @@ export const CongratulationsSection = (props: CongratulationsSectionProps) => {
             </div>
           ) : (
             <div className="mt-8">
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="grid items-center gap-3 sm:flex sm:flex-wrap">
                 <Button
                   startAdornment={<HeartIcon size={24} aria-hidden="true" />}
                   loading={{ verb: liked ? intl.t("Liked") : intl.t("Liking"), state: likeMutation.isPending }}
                   onClick={() => toggleLike()}
                   disabled={likeMutation.isPending}
                   className={cn(
-                    "min-h-12",
+                    "min-h-12 w-full justify-center sm:w-auto",
                     liked && "border-ud-semantic-error bg-ud-semantic-error hover:border-ud-semantic-error text-ud-neutral-0 hover:text-ud-neutral-0 hover:bg-ud-semantic-error ",
                   )}
                   {...actionEvents}
@@ -145,7 +147,7 @@ export const CongratulationsSection = (props: CongratulationsSectionProps) => {
                   highlight
                   startAdornment={<MessageCircleIcon size={24} aria-hidden="true" />}
                   onClick={() => document.getElementById("portfolio-feedback-message")?.focus()}
-                  className="min-h-12"
+                  className="min-h-12 w-full justify-center sm:w-auto"
                   {...actionEvents}
                 >
                   {intl.t("GiveFeedback")}
@@ -155,6 +157,7 @@ export const CongratulationsSection = (props: CongratulationsSectionProps) => {
                 className="mt-6"
                 title={intl.t("LeaveYourFeedback")}
                 description={intl.t("ShareYourOpinion")}
+                onMessageFocusChange={setIsFeedbackFocused}
               />
             </div>
           )}

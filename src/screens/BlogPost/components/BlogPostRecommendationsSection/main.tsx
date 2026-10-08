@@ -6,23 +6,25 @@ import { ArrowRight, Clock3 } from "lucide-react"
 import { Chip } from "@/components/action/Chip"
 import { Container } from "@/components/layout/Container"
 import { useINTLContext } from "@/providers/intl"
+import { getLocalizedValue } from "@/utils/intl"
 import type { BlogPostRecommendation } from "../../types"
 import type { BlogPostRecommendationsSectionProps } from "./types"
 
 const RecommendationCard = ({ post }: { post: BlogPostRecommendation }) => {
   const intl = useINTLContext()
+  const localizedPost = getLocalizedValue(post.translations, intl.language)
 
   return (
     <article className="group grid min-h-44 grid-cols-[1fr_7rem] overflow-hidden rounded-md border border-ud-neutral-300 bg-white sm:grid-cols-[1fr_9rem]">
       <div className="flex min-w-0 flex-col p-5">
-        <Chip size="sm">{post.category}</Chip>
+          <Chip size="sm">{localizedPost.category}</Chip>
         <h3 className="mt-3 line-clamp-2 text-base font-bold leading-snug text-ud-neutral-999 sm:text-lg">
-          <Link href={`/blog/${post.slug}`} className="focus-visible:outline-2 focus-visible:outline-ud-auxiliary-purple">{post.title}</Link>
+          <Link href={`/blog/${localizedPost.slug}`} className="focus-visible:outline-2 focus-visible:outline-ud-auxiliary-purple">{localizedPost.title}</Link>
         </h3>
-        {post.subtitle && <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ud-secondary-600">{post.subtitle}</p>}
+        {localizedPost.subtitle && <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ud-secondary-600">{localizedPost.subtitle}</p>}
         <div className="mt-auto flex items-center justify-between gap-2 pt-4 text-xs">
-          <span className="inline-flex items-center gap-1.5 text-ud-secondary-600"><Clock3 size={14} aria-hidden="true" />{intl.t("BlogReadingMinutes", { minutes: post.minutes })}</span>
-          <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1 font-medium text-ud-auxiliary-purple hover:underline">{intl.t("BlogContinueReading")} <ArrowRight size={14} aria-hidden="true" /></Link>
+          <span className="inline-flex items-center gap-1.5 text-ud-secondary-600"><Clock3 size={14} aria-hidden="true" />{intl.t("BlogReadingMinutes", { minutes: localizedPost.minutes })}</span>
+          <Link href={`/blog/${localizedPost.slug}`} className="inline-flex items-center gap-1 font-medium text-ud-auxiliary-purple hover:underline">{intl.t("BlogContinueReading")} <ArrowRight size={14} aria-hidden="true" /></Link>
         </div>
       </div>
       <div className="relative bg-ud-auxiliary-purple-light">

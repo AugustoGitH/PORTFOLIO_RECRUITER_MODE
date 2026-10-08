@@ -15,6 +15,7 @@ A primeira versão oferece:
 - criação, edição, publicação, arquivamento e remoção no painel;
 - editor Markdown com abas **Editar** e **Prévia**;
 - upload administrativo de imagens para o R2;
+- glossário global com citações reutilizáveis no Markdown;
 - uma curtida e uma visualização por visitante técnico, com métricas agregadas.
 
 Ficam fora de escopo: comentários, newsletter, tags livres, busca full-text, autoria múltipla, agendamento de publicação, importação de CMS externo, embed arbitrário, MDX/JSX executável e métricas individuais identificáveis.
@@ -25,31 +26,45 @@ Usar `react-markdown` com `remark-gfm` para a prévia do painel e a renderizaç�
 
 O editor é deliberadamente simples: `Textarea` reutilizável como fonte do Markdown e duas abas locais:
 
-- **Editar:** campo Markdown e botão para anexar imagem;
+- **Editar:** barra de ferramentas de formatação (títulos, negrito, itálico, tachado, código, listas, tarefas, citação, link, imagem por URL, bloco de código, tabela e divisor; atalhos Ctrl/Cmd+B, I, K e E), campo Markdown e botão para anexar imagem;
 - **Prévia:** o mesmo conteúdo renderizado pelo componente compartilhado `MarkdownContent`.
 
 Não adotar WYSIWYG na Fase 1. Editores como MDXEditor suportam upload por callback, mas não são necessários para o fluxo inicial e exigem fronteira client-only no App Router. [MDXEditor: imagens](https://mdxeditor.dev/editor/docs/images), [MDXEditor: Next.js](https://mdxeditor.dev/editor/docs/getting-started)
+
+As citações do glossário usam links Markdown com fragmento reservado:
+
+```md
+O React entra na fase de [commit](#glossary:react-commit).
+```
+
+`MarkdownContent` reconhece apenas o prefixo `#glossary:` e troca esse link por um termo interativo com o `Popover` compartilhado. Links comuns continuam seguindo o comportamento normal. O painel **Glossário** do editor reage ao contexto:
+
+- com texto selecionado, sugere termos ativos por chave, termo ou alias (correspondência exata em destaque) e aplica a citação sobre a seleção;
+- com o cursor sobre uma citação existente, mostra o termo e a definição, avisa se a chave está arquivada ou inexistente e permite trocar o termo ou remover a referência;
+- sem seleção, lista termos do glossário mencionados no texto sem referência (fora de código e de citações existentes) e seleciona a ocorrência ao clicar;
+- avisa sobre chaves inexistentes no texto, que bloqueiam a publicação.
+- quando a seleção (ou a busca) não corresponde a nenhum termo, oferece **Criar “x” no glossário**: abre, dentro do editor, o formulário de termo (termo e definição por idioma, aliases, chave global sugerida a partir do PT-BR e status). PT-BR é obrigatório e a chave não pode repetir uma existente. Ao salvar, a citação `[x](#glossary:chave)` é aplicada sobre a seleção.
 
 ## Modelo de dados
 
 ```ts
 type BlogCategory = {
   _id: ObjectId
-  slug: string                 // único, minúsculo e estável
-  name: string
-  description?: string
+  translations: {
+    ptbr: BlogCategoryTranslation
+    en?: BlogCategoryTranslation
+  }
   createdAt: Date
   updatedAt: Date
 }
 
 type BlogPost = {
   _id: ObjectId
-  slug: string                 // único, minúsculo e estável
   status: "draft" | "published" | "archived"
-  title: string
-  subtitle?: string            // complemento editorial exibido sob o título
-  excerpt: string              // resumo editorial, texto simples
-  markdown: string             // fonte canônica; nunca HTML compilado
+  translations: {
+    ptbr: BlogPostTranslation
+    en?: BlogPostTranslation
+  }
   categoryId: ObjectId
   coverMediaId?: ObjectId
   publishedAt?: Date
@@ -58,6 +73,20 @@ type BlogPost = {
   updatedBy: ObjectId
   createdAt: Date
   updatedAt: Date
+}
+
+type BlogPostTranslation = {
+  slug: string                 // único dentro do idioma
+  title: string
+  subtitle?: string
+  excerpt: string
+  markdown: string             // fonte canônica; nunca HTML compilado
+}
+
+type BlogCategoryTranslation = {
+  slug: string
+  name: string
+  description?: string
 }
 
 type BlogMetric = {
@@ -69,18 +98,40 @@ type BlogMetric = {
   createdAt: Date
   updatedAt: Date
 }
+
+type BlogGlossaryEntry = {
+  _id: ObjectId
+  key: string
+  status: "active" | "archived"
+  translations: {
+    ptbr: BlogGlossaryTranslation
+    en?: BlogGlossaryTranslation
+  }
+  createdAt: Date
+  updatedAt: Date
+}
+
+type BlogGlossaryTranslation = {
+  term: string
+  definition: string
+  aliases?: string[]
+}
 ```
 
-Coleções: `blog_categories`, `blog_posts` e `blog_metrics`.
+Coleções: `blog_categories`, `blog_posts`, `blog_glossary` e `blog_metrics`.
 
 Índices obrigatórios:
 
-- `blog_categories.slug` único;
-- `blog_posts.slug` único;
+- `blog_categories.translations.<idioma>.slug` único quando presente;
+- `blog_posts.translations.<idioma>.slug` único quando presente;
 - `blog_posts.status + publishedAt` descendente;
 - `blog_posts.categoryId + status + publishedAt` descendente;
 - `blog_metrics.postId + visitorId` único;
 - `blog_metrics.postId + viewedAt` para agregação.
+- `blog_glossary.key` único;
+- `blog_glossary.status + key` para listagem administrativa.
+
+Chaves do glossário são globais, imutáveis depois da criação, normalizadas em lowercase kebab-case e independentes do idioma. Uma chave arquivada continua resolvendo citações existentes, mas deixa de aparecer nas recomendações para novas citações. Entradas referenciadas por algum post não podem ser removidas definitivamente. A publicação é recusada enquanto o Markdown contiver uma chave inexistente.
 
 Categorias são um catálogo fechado administrado no painel. Um post tem exatamente uma categoria na Fase 1; não aceitar categorias livres no payload. Não permitir apagar categoria que tenha posts associados: o administrador deve reclassificar ou arquivar esses posts primeiro.
 
@@ -88,11 +139,11 @@ Categorias são um catálogo fechado administrado no painel. Um post tem exatame
 
 Campos administrativos são validados com Zod e payload estrito:
 
-- `slug`: `^[a-z0-9-]+$`, único;
-- `title`: 1–160 caracteres;
-- `subtitle`: opcional, 1–220 caracteres quando informado;
-- `excerpt`: 1–320 caracteres, texto simples;
-- `markdown`: 1–50.000 caracteres;
+- por idioma, `slug`: `^[a-z0-9-]+$`, único;
+- por idioma, `title`: 1–160 caracteres;
+- por idioma, `subtitle`: opcional, 1–220 caracteres quando informado;
+- por idioma, `excerpt`: 1–320 caracteres, texto simples;
+- por idioma, `markdown`: 1–50.000 caracteres;
 - categoria existente e explícita;
 - apenas transições `draft → published`, `published → archived`, `archived → published`.
 
@@ -129,6 +180,8 @@ As ações públicas usam `visitor_id` first-party existente, same-origin, paylo
 
 - `GET|POST /api/admin/blog/categories` — `blog.read`/`blog.manage`;
 - `PATCH|DELETE /api/admin/blog/categories/[id]` — `blog.manage`;
+- `POST /api/admin/blog/glossary` — `blog.manage`;
+- `PATCH|DELETE /api/admin/blog/glossary/[id]` — `blog.manage`;
 - `GET|POST /api/admin/blog/posts` — `blog.read`/`blog.manage`;
 - `PATCH|DELETE /api/admin/blog/posts/[id]` — `blog.manage`;
 - `POST /api/admin/media/blog-image` — `blog.manage`.
@@ -151,6 +204,10 @@ Criar `/admin/blog` como página protegida, com link no painel principal. Ela us
 5. invalidar `['admin-blog-posts']` e `['admin-blog-categories']` após toda mutação.
 
 O formulário possui título, subtítulo opcional, slug, resumo, seletor de categoria, editor, preview, capa opcional e ações editoriais. O subtítulo complementa o título nos cards e na página individual; o resumo permanece como descrição editorial curta do post. Alterações de texto ficam locais até **Salvar alterações**; não há autosave na primeira fase. A prévia mostra exatamente o componente público, sem contadores falsos nem dados administrativos.
+
+Status, categoria e uploads pertencem ao post e são compartilhados. Slug, título, subtítulo,
+resumo e Markdown pertencem a cada idioma suportado. PT-BR é obrigatório; outras traduções
+podem permanecer incompletas em rascunhos, mas precisam estar completas para publicação.
 
 ## Renderização e cache públicos
 

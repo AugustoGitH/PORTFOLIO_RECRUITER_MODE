@@ -38,15 +38,16 @@ const getFeaturedBlogPost = async () => {
   if (!post) return null
 
   const categoryNames = new Map(
-    categories.map((category) => [String(category._id), category.name]),
+    categories.map((category) => [String(category._id), category.translations]),
   )
+  const localizedCategories = categoryNames.get(post.categoryId)
 
   return {
     slug: post.slug,
     title: post.title,
     subtitle: post.subtitle,
     excerpt: post.excerpt,
-    category: categoryNames.get(post.categoryId) ?? null,
+    category: localizedCategories?.ptbr.name ?? null,
     minutes: estimateReadingMinutes(post.markdown),
     publishedAt: post.publishedAt
       ? new Date(post.publishedAt).toISOString()
@@ -54,6 +55,17 @@ const getFeaturedBlogPost = async () => {
     views: post.views,
     likes: post.likes,
     cover: post.cover,
+    translations: Object.fromEntries(
+      Object.entries(post.translations).map(([language, translation]) => [
+        language,
+        translation && {
+          ...translation,
+          category: localizedCategories?.[language as keyof typeof localizedCategories]?.name
+            ?? localizedCategories?.ptbr.name
+            ?? null,
+        },
+      ]),
+    ) as unknown as NonNullable<InitialPageData["featuredBlogPost"]>["translations"],
   }
 }
 
