@@ -1,5 +1,6 @@
 export const DEFAULT_COLUMNS = 120
 export const DEFAULT_VARIANT = "decode"
+export const FONT_FAMILY = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
 
 export const ACCENT = "text-ud-auxiliary-purple"
 export const TRANSITION = "transition-all duration-500 ease-out motion-reduce:transition-none"

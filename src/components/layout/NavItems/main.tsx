@@ -27,7 +27,7 @@ export const NavItems = (props: NavItemsProps) => {
           "flex items-center gap-2": props.variant === "header"
         })}
       >
-        {props.variant === "header" && <link.icon size={18} />}
+        {props.variant === "header" && <link.icon aria-hidden="true" size={18} />}
         <span className={cn({ "text-xs font-bold": props.variant === "header" })}>
           {intl.t(link.title)}
         </span>

@@ -28,7 +28,14 @@ const RecommendationCard = ({ post }: { post: BlogPostRecommendation }) => {
         </div>
       </div>
       <div className="relative bg-ud-auxiliary-purple-light">
-        <Image src={post.cover?.url ?? "/assets/blog/api-windows.png"} alt="" fill sizes="144px" className={post.cover ? "object-cover" : "object-contain p-4"} />
+        <Image
+          src={post.cover?.url ?? "/assets/blog/api-windows.png"}
+          alt=""
+          fill
+          quality={post.cover ? 60 : 75}
+          sizes="144px"
+          className={post.cover ? "object-cover" : "object-contain p-4"}
+        />
       </div>
     </article>
   )

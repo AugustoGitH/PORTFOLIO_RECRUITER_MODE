@@ -23,7 +23,7 @@ import type { AsciiArtInput, AsciiArtOutput } from './types'
  * const ascii = useAsciiArt({ src: profileImage, columns: 84 })
  */
 export const useAsciiArt = (input: AsciiArtInput): AsciiArtOutput => {
-  const { src, columns, rows: fixedRows, stableSrc, morphRegion, palette = "duotone" } = input
+  const { enabled = true, src, columns, rows: fixedRows, stableSrc, morphRegion, palette = "duotone" } = input
   // #region States
   const [rows, setRows] = useState<AsciiRow[] | null>(null)
   const [source, setSource] = useState<string | null>(null)
@@ -33,6 +33,8 @@ export const useAsciiArt = (input: AsciiArtInput): AsciiArtOutput => {
 
   // #region Effects
   useEffect(() => {
+    if (!enabled) return
+
     let active = true
 
     const loadRows = async (imageSrc: string) => {
@@ -69,7 +71,7 @@ export const useAsciiArt = (input: AsciiArtInput): AsciiArtOutput => {
     return () => {
       active = false
     }
-  }, [src, columns, fixedRows, stableSrc, morphRegion, palette])
+  }, [enabled, src, columns, fixedRows, stableSrc, morphRegion, palette])
 
   // #endregion
 

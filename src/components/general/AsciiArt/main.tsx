@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useState } from "react"
 import { useAsciiArt, useAsciiReveal } from "../../../hooks/media"
 import { useOnceInView } from "../../../hooks/observer"
 import { cn } from "../../../utils/tailwind"
 import type { ArtLayout, AsciiArtProps } from "./types"
 import { CHAR_ASPECT } from "@/constants/ascii"
-import { ACCENT, DEFAULT_COLUMNS, DEFAULT_VARIANT, PULSE, TRANSITION } from "./constants"
+import { ACCENT, DEFAULT_COLUMNS, DEFAULT_VARIANT, FONT_FAMILY, PULSE, TRANSITION } from "./constants"
 import { AsciiRows } from "./components"
 import { getAsciiRunKey, getHorizontalPosition } from "./utils"
 import { setDefaultProps } from "@/utils/preset"
@@ -35,7 +35,12 @@ export const AsciiArt = (_props: AsciiArtProps) => {
     overflowAlign: "right",
   })
 
+  const { ref, inView } = useOnceInView<HTMLDivElement>({
+    rootMargin: "200px 0px",
+    threshold: 0.01,
+  })
   const target = useAsciiArt({
+    enabled: inView,
     src: props.src,
     columns: props.columns,
     rows: props.rows,
@@ -43,8 +48,6 @@ export const AsciiArt = (_props: AsciiArtProps) => {
     stableSrc: props.stableSrc,
     morphRegion: props.morphRegion,
   })
-  const { ref, inView } = useOnceInView<HTMLDivElement>()
-  const preRef = useRef<HTMLPreElement>(null)
   // Spacing, in em, that brings the real glyph advance to CHAR_ASPECT. Block glyphs (█▓▒░) are
   // often not in the monospace font and fall back to another one, so rows would otherwise come out
   // wider than the block and overflow to the right.
@@ -61,6 +64,7 @@ export const AsciiArt = (_props: AsciiArtProps) => {
   const fontSize = activeLayout.width / (props.columns * CHAR_ASPECT)
   const baseFontSize = props.baseWidth / (props.columns * CHAR_ASPECT)
   const cell = { width: activeLayout.width / props.columns, height: fontSize }
+  const fontFamily = props.style?.fontFamily ?? FONT_FAMILY
 
   const ascii = useAsciiReveal({
     rows: target.rows,
@@ -70,8 +74,7 @@ export const AsciiArt = (_props: AsciiArtProps) => {
   })
 
   // Keep the current footprint while a replacement bitmap decodes. A geometry change waits one
-  // committed frame before changing its CSS dimensions, letting the same ASCII grid morph while
-  // width, height and glyph size interpolate instead of replacing the drawing on hover.
+  // committed frame so source and layout switch together instead of exposing an intermediate grid.
   const changesGeometry = activeLayout.width !== props.width || activeLayout.rows !== props.rows
   const geometryQueued = pendingLayout?.width === props.width && pendingLayout.rows === props.rows
 
@@ -84,18 +87,22 @@ export const AsciiArt = (_props: AsciiArtProps) => {
   const hasTextRows = ascii.variant !== "converge" && Boolean(ascii.rows?.length)
 
   useLayoutEffect(() => {
-    const row = preRef.current?.firstElementChild
-    if (letterSpacing !== null || !hasTextRows || !row) return
+    const rowText = target.rows?.[0]?.map((run) => run.text).join("")
+    if (letterSpacing !== null || !hasTextRows || !rowText) return
 
-    const range = document.createRange()
-    range.selectNodeContents(row)
-    const rowFontSize = parseFloat(getComputedStyle(row).fontSize)
-    const glyphs = row.textContent?.length ?? 0
-    const rowWidth = range.getBoundingClientRect().width
-    if (!glyphs || !rowFontSize || !rowWidth) return
+    const context = document.createElement("canvas").getContext("2d")
+    if (!context) return
 
-    setLetterSpacing(CHAR_ASPECT - rowWidth / glyphs / rowFontSize)
-  }, [hasTextRows, letterSpacing, activeLayout.width])
+    context.font = `${props.style?.fontStyle ?? "normal"} ${props.style?.fontWeight ?? 400} ${fontSize}px ${fontFamily}`
+    const rowWidth = context.measureText(rowText).width
+    if (!rowWidth) return
+
+    const frame = requestAnimationFrame(() => {
+      setLetterSpacing(CHAR_ASPECT - rowWidth / rowText.length / fontSize)
+    })
+
+    return () => cancelAnimationFrame(frame)
+  }, [fontFamily, fontSize, hasTextRows, letterSpacing, props.style?.fontStyle, props.style?.fontWeight, target.rows])
 
   useEffect(() => {
     if (!pendingLayout) return
@@ -117,6 +124,7 @@ export const AsciiArt = (_props: AsciiArtProps) => {
       // characters. This keeps the artwork continuous instead of exposing a visible square grid.
       WebkitTextStroke: "0.06em currentColor",
       ...props.style,
+      fontFamily,
       ...getHorizontalPosition(layout),
       width: layout.width,
       minWidth: layout.width,
@@ -147,10 +155,9 @@ export const AsciiArt = (_props: AsciiArtProps) => {
       className="shrink-0"
     >
       <pre
-        ref={preRef}
         aria-hidden="true"
         style={getArtStyle(activeLayout)}
-        className={cn("pointer-events-none m-0 font-mono leading-none select-none text-ud-neutral-999 transition-[width,height,font-size] duration-[1140ms] ease-out motion-reduce:transition-none", props.className)}
+        className={cn("pointer-events-none m-0 font-mono leading-none select-none text-ud-neutral-999", props.className)}
       >
         {ascii.variant === "decode" && <AsciiRows rows={ascii.rows} />}
 

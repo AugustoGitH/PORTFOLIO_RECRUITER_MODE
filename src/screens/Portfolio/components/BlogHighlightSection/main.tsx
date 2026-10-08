@@ -124,6 +124,7 @@ export const BlogHighlightSection = ({ post, className }: BlogHighlightSectionPr
                     src={post.cover.url}
                     alt={localizedPost?.title ?? post.title}
                     fill
+                    quality={60}
                     sizes="(min-width: 1024px) 420px, 100vw"
                     className="object-contain"
                   />

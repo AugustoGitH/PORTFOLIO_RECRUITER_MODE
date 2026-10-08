@@ -35,7 +35,15 @@ export const BlogFeaturedSection = () => {
             </div>
             {featured.cover && (
               <div className="pointer-events-none absolute inset-y-4 right-3 hidden w-[40%] items-center justify-center sm:flex lg:w-[42%]">
-                <Image src={featured.cover.url} alt={featured.title} width={featured.cover.width} height={featured.cover.height} sizes="(min-width: 1152px) 320px, 40vw" className="max-h-full w-full object-contain" />
+                <Image
+                  src={featured.cover.url}
+                  alt={featured.title}
+                  width={featured.cover.width}
+                  height={featured.cover.height}
+                  quality={60}
+                  sizes="(min-width: 1152px) 320px, 40vw"
+                  className="max-h-full w-full object-contain"
+                />
               </div>
             )}
             <div className="relative z-10 mt-auto flex flex-col items-start gap-3 pt-7">
@@ -56,7 +64,15 @@ export const BlogFeaturedSection = () => {
                 </div>
                 {post.cover && (
                   <div className="pointer-events-none absolute inset-y-3 right-3 hidden w-[29%] items-center justify-center sm:flex">
-                    <Image src={post.cover.url} alt={post.title} width={post.cover.width} height={post.cover.height} sizes="(min-width: 1024px) 140px, 30vw" className="max-h-full w-full object-contain" />
+                    <Image
+                      src={post.cover.url}
+                      alt={post.title}
+                      width={post.cover.width}
+                      height={post.cover.height}
+                      quality={60}
+                      sizes="(min-width: 1024px) 140px, 30vw"
+                      className="max-h-full w-full object-contain"
+                    />
                   </div>
                 )}
                 <div className="relative z-10 mt-auto flex flex-col items-start gap-2 pt-4">

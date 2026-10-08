@@ -3,6 +3,7 @@ import { getVerifiedAdminSession } from "@backend/admin/authorization"
 import { blogService } from "@backend/blog"
 import { estimateReadingMinutes } from "@/utils/date"
 import { extractGlossaryKeys } from "@/utils/blog"
+import { getPublishedBlogPost } from "../data"
 import type { BlogPostPageData } from "./types"
 import { getBlogPostHeadings } from "./utils"
 
@@ -10,7 +11,7 @@ export const getBlogPostPageData = async (
   slug: string,
 ): Promise<BlogPostPageData | null> => {
   const [post, posts, categories, adminSession] = await Promise.all([
-    blogService.publishedPost(slug),
+    getPublishedBlogPost(slug),
     blogService.publishedPosts(),
     blogService.categories().catch(() => []),
     getVerifiedAdminSession(),

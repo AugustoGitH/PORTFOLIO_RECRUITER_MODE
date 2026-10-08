@@ -8,7 +8,23 @@ const r2ImagePatterns = [r2PublicBaseUrl, legacyR2PublicBaseUrl]
   .map((url) => new URL(`${url.replace(/\/$/, "")}/**`))
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/assets/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            // Rename/version an asset whenever its contents change.
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ]
+  },
   images: {
+    formats: ["image/avif", "image/webp"],
+    qualities: [60, 75],
     remotePatterns: r2ImagePatterns,
   },
   serverExternalPackages: ["@react-pdf/renderer"],

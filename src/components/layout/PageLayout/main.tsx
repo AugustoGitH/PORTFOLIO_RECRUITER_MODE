@@ -6,7 +6,7 @@ export const PageLayout = (props: PageLayoutProps) => {
   return (
     <>
       <Header hasAdminSession={props.hasAdminSession} variant={props.headerVariant} />
-      {props.children}
+      <main>{props.children}</main>
       <Footer />
     </>
   )

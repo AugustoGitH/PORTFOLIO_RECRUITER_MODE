@@ -17,7 +17,11 @@ export const Button = (_props: ButtonProps) => {
 
   const content = (
     <>
-      {startAdornment}
+      {startAdornment && (
+        <span aria-hidden="true" className="inline-flex shrink-0">
+          {startAdornment}
+        </span>
+      )}
       <span>
         {isLoading ? loadingLabel : children}
         {isLoading && (
@@ -34,7 +38,11 @@ export const Button = (_props: ButtonProps) => {
           </span>
         )}
       </span>
-      {endAdornment}
+      {endAdornment && (
+        <span aria-hidden="true" className="inline-flex shrink-0">
+          {endAdornment}
+        </span>
+      )}
     </>
   )
 

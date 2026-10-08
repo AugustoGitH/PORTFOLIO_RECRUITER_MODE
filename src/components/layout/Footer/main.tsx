@@ -39,9 +39,9 @@ export const Footer = () => {
                 rel="noreferrer noopener"
                 aria-label={link.title}
                 title={link.title}
-                className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-ud-auxiliary-purple-light hover:text-ud-auxiliary-purple"
+                className="flex size-11 items-center justify-center rounded-full transition-colors hover:bg-ud-auxiliary-purple-light hover:text-ud-auxiliary-purple"
               >
-                {link.icon && <link.icon size={20} />}
+                {link.icon && <link.icon aria-hidden="true" size={20} />}
               </a>
             ))}
           </nav>

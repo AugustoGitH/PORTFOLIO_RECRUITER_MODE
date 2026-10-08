@@ -45,7 +45,7 @@ export const EvidenceTab = (props: EvidenceTabProps) => {
                 >
                   <div className="flex items-center gap-3">
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-ud-auxiliary-purple-light text-ud-auxiliary-purple">
-                      {entry.skill.icon ? <entry.skill.icon size={27} /> : <Code2Icon size={27} aria-hidden="true" />}
+                      {entry.skill.icon ? <entry.skill.icon aria-hidden="true" size={27} /> : <Code2Icon size={27} aria-hidden="true" />}
                     </span>
                     <h4 className="min-w-0 flex-1 text-xl font-extrabold text-ud-neutral-950">{entry.skill.title}</h4>
                     <ChevronRightIcon className="shrink-0 text-ud-neutral-700" size={20} aria-hidden="true" />

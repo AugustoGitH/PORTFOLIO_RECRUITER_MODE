@@ -30,7 +30,7 @@ export const ProjectCard = ({ project, featured = false, className, style }: Pro
       <div className="flex items-start justify-between gap-2">
         <Chip size="sm">{intl.t(PROJECT_KIND_TERM[project.kind])}</Chip>
         {project.links && project.links.length > 0 && (
-          <nav className="flex shrink-0 items-center gap-2" aria-label={`${intl.t("ViewProject")}: ${project.title}`}>
+          <nav className="flex shrink-0 items-center gap-1" aria-label={`${intl.t("ViewProject")}: ${project.title}`}>
             {project.links.map((link) => (
               <a
                 key={link.href}
@@ -39,9 +39,9 @@ export const ProjectCard = ({ project, featured = false, className, style }: Pro
                 rel="noopener noreferrer"
                 title={link.title}
                 aria-label={link.title}
-                className="text-ud-neutral-950 transition-colors hover:text-ud-auxiliary-purple"
+                className="flex size-11 items-center justify-center rounded-md text-ud-neutral-950 transition-colors hover:bg-ud-auxiliary-purple-light hover:text-ud-auxiliary-purple focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ud-auxiliary-purple"
               >
-                {link.icon && <link.icon size={featured ? 17 : 15} />}
+                {link.icon && <link.icon aria-hidden="true" size={featured ? 17 : 15} />}
               </a>
             ))}
           </nav>
@@ -49,7 +49,7 @@ export const ProjectCard = ({ project, featured = false, className, style }: Pro
       </div>
 
       <div className={cn("mt-1 flex items-center gap-2 text-ud-neutral-950", featured && "mt-3")}>
-        {project.icon && <project.icon size={featured ? 25 : 19} />}
+        {project.icon && <project.icon aria-hidden="true" size={featured ? 25 : 19} />}
         <h3 className={cn("font-bold leading-tight", featured ? "text-xl" : "text-sm")}>{project.title}</h3>
       </div>
 
@@ -67,10 +67,10 @@ export const ProjectCard = ({ project, featured = false, className, style }: Pro
               href={projectLink.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-ud-auxiliary-purple hover:underline"
+              className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-md px-3 text-xs font-semibold text-ud-auxiliary-purple hover:bg-ud-auxiliary-purple-light hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ud-auxiliary-purple"
             >
               {intl.t("ViewProject")}
-              <ArrowRightIcon size={15} />
+              <ArrowRightIcon aria-hidden="true" size={15} />
             </a>
           )}
           <ResponsiveAsciiArt

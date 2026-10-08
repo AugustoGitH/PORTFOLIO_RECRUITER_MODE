@@ -4,12 +4,13 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Bookmark, Check, Share2 } from "lucide-react"
+import { Bookmark, Check } from "lucide-react"
 import { Chip } from "@/components/action/Chip"
 import { Container } from "@/components/layout/Container"
 import { ABOUT } from "@/constants/profile"
 import { useINTLContext } from "@/providers/intl"
 import { getLocalizedValue } from "@/utils/intl"
+import { BlogPostShare } from "../BlogPostShare"
 import type { BlogPostHeaderSectionProps } from "./types"
 
 const savedPostKey = (slug: string) => `blog:saved:${slug}`
@@ -20,7 +21,6 @@ export const BlogPostHeaderSection = ({ post }: BlogPostHeaderSectionProps) => {
   const pathname = usePathname()
   const router = useRouter()
   const [isSaved, setIsSaved] = useState(false)
-  const [didShare, setDidShare] = useState(false)
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -36,19 +36,6 @@ export const BlogPostHeaderSection = ({ post }: BlogPostHeaderSectionProps) => {
     const next = !isSaved
     localStorage.setItem(savedPostKey(post.slug), String(next))
     setIsSaved(next)
-  }
-
-  const share = async () => {
-    const shareData = { title: localizedPost.title, text: localizedPost.excerpt, url: window.location.href }
-
-    if (navigator.share) {
-      await navigator.share(shareData).catch(() => undefined)
-      return
-    }
-
-    await navigator.clipboard.writeText(window.location.href)
-    setDidShare(true)
-    window.setTimeout(() => setDidShare(false), 1800)
   }
 
   const formattedDate = post.publishedAt
@@ -91,16 +78,25 @@ export const BlogPostHeaderSection = ({ post }: BlogPostHeaderSectionProps) => {
                   {isSaved ? <Check size={16} aria-hidden="true" /> : <Bookmark size={16} aria-hidden="true" />}
                   {intl.t(isSaved ? "BlogSaved" : "BlogSave")}
                 </button>
-                <button type="button" onClick={() => void share()} className="inline-flex items-center gap-2 rounded-md border border-ud-neutral-300 px-4 py-2 text-sm font-medium transition hover:border-ud-auxiliary-purple hover:text-ud-auxiliary-purple focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ud-auxiliary-purple">
-                  {didShare ? <Check size={16} aria-hidden="true" /> : <Share2 size={16} aria-hidden="true" />}
-                  {intl.t(didShare ? "BlogLinkCopied" : "BlogShare")}
-                </button>
+                <BlogPostShare
+                  slug={localizedPost.slug}
+                  title={localizedPost.title}
+                  excerpt={localizedPost.excerpt}
+                />
               </div>
             </div>
           </div>
 
           <div className="relative min-h-72 lg:min-h-full">
-            <Image src={post.cover?.url ?? "/assets/blog/cache-blocks.png"} alt={post.cover ? localizedPost.title : intl.t("BlogCacheArtAlt")} fill priority sizes="(min-width: 1024px) 390px, 100vw" className={post.cover ? "object-contain" : "object-contain p-8 sm:p-12"} />
+            <Image
+              src={post.cover?.url ?? "/assets/blog/cache-blocks.png"}
+              alt={post.cover ? localizedPost.title : intl.t("BlogCacheArtAlt")}
+              fill
+              priority
+              quality={post.cover ? 60 : 75}
+              sizes="(min-width: 1024px) 390px, 100vw"
+              className={post.cover ? "object-contain" : "object-contain p-8 sm:p-12"}
+            />
           </div>
         </div>
       </header>

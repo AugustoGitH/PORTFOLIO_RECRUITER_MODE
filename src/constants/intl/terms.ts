@@ -1123,6 +1123,26 @@ export const INTL_TERMS = {
     ptbr: "Link copiado",
     en: "Link copied"
   },
+  BlogCopyLink: {
+    ptbr: "Copiar link",
+    en: "Copy link"
+  },
+  BlogShareWith: {
+    ptbr: "Compartilhar com",
+    en: "Share with"
+  },
+  BlogShareEmail: {
+    ptbr: "E-mail",
+    en: "Email"
+  },
+  BlogMoreShareOptions: {
+    ptbr: "Mais opções",
+    en: "More options"
+  },
+  BlogSharePreviewAlt: {
+    ptbr: "Prévia da imagem de compartilhamento do artigo",
+    en: "Article sharing image preview"
+  },
   BlogTableOfContents: {
     ptbr: "Sumário do artigo",
     en: "Article contents"

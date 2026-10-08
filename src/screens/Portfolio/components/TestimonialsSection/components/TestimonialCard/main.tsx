@@ -1,5 +1,6 @@
 import type { TestimonialCardProps } from "./types"
 import { Building2Icon, UserRoundIcon } from "lucide-react"
+import Image from "next/image"
 import { Chip } from "../../../../../../components/action/Chip"
 import { ResponsiveAsciiArt } from "../../../../../../components/general/AsciiArt"
 import { useINTLContext } from "../../../../../../providers/intl"
@@ -22,7 +23,7 @@ export const TestimonialCard = (props: TestimonialCardProps) => {
       <div>
         <div className="flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded border border-ud-neutral-300 text-ud-neutral-900">
-            <Building2Icon size={16} />
+            <Building2Icon aria-hidden="true" size={16} />
           </span>
           {props.testimonial.enterprise.name && <Chip size="sm">{props.testimonial.enterprise.name}</Chip>}
         </div>
@@ -35,10 +36,18 @@ export const TestimonialCard = (props: TestimonialCardProps) => {
         {
           props.testimonial.author.image ? (
             <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-ud-neutral-300 object-cover">
-              <img width={40} height={40} className="h-full w-full object-cover" src={props.testimonial.author.image.src} alt={props.testimonial.author.image.alt} />
+              <Image
+                width={40}
+                height={40}
+                quality={60}
+                sizes="36px"
+                className="h-full w-full object-cover"
+                src={props.testimonial.author.image.src}
+                alt={props.testimonial.author.image.alt}
+              />
             </div>
           ) : (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ud-neutral-300"><UserRoundIcon size={18} /></div>
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ud-neutral-300"><UserRoundIcon aria-hidden="true" size={18} /></div>
           )
         }
 

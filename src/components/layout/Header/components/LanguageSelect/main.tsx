@@ -20,9 +20,9 @@ export const LanguageSelect = () => {
         ref: anchorRef,
         element: (state) => (
           <button ref={anchorRef} onClick={state.onToggleShow} className="flex items-center gap-2">
-            <GlobeIcon size={15} />
+            <GlobeIcon aria-hidden="true" size={15} />
             <span className="text-xs font-bold">{current.short}</span>
-            <ChevronDown size={15} />
+            <ChevronDown aria-hidden="true" size={15} />
           </button>
         ),
       }}
@@ -42,7 +42,7 @@ export const LanguageSelect = () => {
               )}
             >
               <span>{language.label}</span>
-              {language.value === intl.language && <CheckIcon size={14} />}
+              {language.value === intl.language && <CheckIcon aria-hidden="true" size={14} />}
             </button>
           ))}
         </div>
