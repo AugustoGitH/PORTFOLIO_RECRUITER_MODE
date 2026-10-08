@@ -31,6 +31,7 @@ import {
   TIME_SINCE_LAST_RECALC_THRESHOLD_MS,
 } from './constants'
 import type {
+  AnchoredPlacement,
   AppliedSideFallback,
   ModalOptions,
   ModalPosition,
@@ -40,6 +41,7 @@ import {
   buildModalStyle,
   calculateInitialPosition,
   calculatePositionByOrigin,
+  calculateAnchoredPosition,
   calculateSmartPosition,
   calculateTooltipDirectionInversion,
   calculateVisibility,
@@ -158,6 +160,7 @@ export const useModal = <
   const [isMouseInTransit, setIsMouseInTransit] = useState(false)
   const [appliedSideFallback, setAppliedSideFallback] = useState<AppliedSideFallback>(null)
   const [sideArrowOffset, setSideArrowOffset] = useState<number | undefined>(undefined)
+  const [anchoredPlacement, setAnchoredPlacement] = useState<AnchoredPlacement | null>(null)
 
   // #endregion
 
@@ -328,6 +331,7 @@ export const useModal = <
   // #region Constants
 
   const requiresMeasurement =
+    options.anchoredPlacement ||
     options.positionStrategy?.includes('top') ||
     options.positionStrategy?.includes('left') ||
     options.positionStrategy?.includes('right')
@@ -450,7 +454,13 @@ export const useModal = <
         const modalHeight = modalElement?.offsetHeight || 0
         const modalWidth = modalElement?.offsetWidth || 0
 
-        const needsRecalc = (useTopPosition && modalHeight === 0) || (useHorizontalPosition && modalWidth === 0)
+        // Anchored placement needs the real size of the popover: it picks a side by what fits.
+        const anchoredPlacementActive = Boolean(options.anchoredPlacement) && !useHorizontalPosition && Boolean(modalElement)
+        const anchoredMeasured = anchoredPlacementActive && modalWidth > 0 && modalHeight > 0
+
+        const needsRecalc = (useTopPosition && modalHeight === 0)
+          || (useHorizontalPosition && modalWidth === 0)
+          || (anchoredPlacementActive && !anchoredMeasured)
 
         let position: ModalPosition
 
@@ -502,8 +512,26 @@ export const useModal = <
         let finalPosition = position
         let newAppliedSide: AppliedSideFallback = null
         let newArrowOffset: number | undefined = undefined
+        let newAnchoredPlacement: AnchoredPlacement | null = null
 
-        if (useHorizontalPosition) {
+        if (anchoredMeasured) {
+          const anchored = calculateAnchoredPosition({
+            anchorRect,
+            modal: { width: modalWidth, height: modalHeight },
+            viewport: { width: window.innerWidth, height: window.innerHeight },
+            preferred: useTopPosition ? 'top' : 'bottom',
+            origin: options.origin || 'center',
+            padding: options.overflowPadding || DEFAULT_OVERFLOW_PADDING,
+            offset: { top: offsetTop, bottom: offsetBottom },
+          })
+          const onSide = anchored.direction === 'left' || anchored.direction === 'right'
+
+          finalPosition = anchored.position
+          newAnchoredPlacement = { direction: anchored.direction, arrowOffset: anchored.arrowOffset }
+          newAppliedSide = onSide ? anchored.direction as AppliedSideFallback : null
+          newArrowOffset = onSide ? anchored.arrowOffset : undefined
+          smartPositionAppliedRef.current = true
+        } else if (useHorizontalPosition) {
           const preferredSide = useLeftPosition ? 'left' : 'right'
           newAppliedSide = preferredSide
 
@@ -576,6 +604,7 @@ export const useModal = <
 
         setAppliedSideFallback(newAppliedSide)
         setSideArrowOffset(newArrowOffset)
+        setAnchoredPlacement(newAnchoredPlacement)
 
         const isSignificant = isPositionChangeSignificant({
           newPosition: finalPosition,
@@ -616,6 +645,7 @@ export const useModal = <
       options.customPosition,
       options.autoRepositionOnOverflow,
       options.smartPositioning,
+      options.anchoredPlacement,
       options.overflowPadding,
       anchorElementRef,
       options.positionStrategy,
@@ -1179,7 +1209,10 @@ export const useModal = <
       direction,
       appliedSideFallback,
       sideArrowOffset,
-      wasRepositioned: appliedSideFallback !== null || (direction !== undefined && direction !== options.positionStrategy?.[0]),
+      anchoredPlacement,
+      wasRepositioned: anchoredPlacement
+        ? anchoredPlacement.direction !== options.positionStrategy?.[0]
+        : appliedSideFallback !== null || (direction !== undefined && direction !== options.positionStrategy?.[0]),
     },
   }
 }

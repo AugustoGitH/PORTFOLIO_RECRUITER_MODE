@@ -1,10 +1,11 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useId, useRef, useState } from "react"
 import { EyeIcon, PencilLineIcon } from "lucide-react"
 import { MarkdownContent } from "@/components/blog/MarkdownContent"
 import { Textarea } from "@/components/input/Textarea"
 import { cn } from "@/utils/tailwind"
+import { DEFAULT_LANGUAGE } from "@/constants/intl"
 import type { BlogEditorMode } from "../../types"
 import { GlossaryAssistant } from "./components/GlossaryAssistant"
 import { MarkdownToolbar } from "./components/MarkdownToolbar"
@@ -20,31 +21,30 @@ const MODES: Array<{
   { value: "preview", label: "Prévia", icon: EyeIcon },
 ]
 
-export const MarkdownEditor = ({
-  markdown,
-  onMarkdownChange,
-  languageLabel,
-  language,
-  glossary,
-  required,
-  documentTitle,
-}: MarkdownEditorProps) => {
+const DEFAULT_MAX_LENGTH = 50000
+const DEFAULT_MIN_HEIGHT = "min-h-[32rem]"
+
+export const MarkdownEditor = (props: MarkdownEditorProps) => {
+  const panelId = useId()
   const [mode, setMode] = useState<BlogEditorMode>("edit")
   const [selection, setSelection] = useState({ start: 0, end: 0 })
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const glossaryDictionary = Object.fromEntries(glossary.map((entry) => {
-    const translation = entry.translations[language] ?? entry.translations.ptbr
+  const maxLength = props.maxLength ?? DEFAULT_MAX_LENGTH
+  const minHeight = props.minHeightClassName ?? DEFAULT_MIN_HEIGHT
+  const showPreview = props.preview ?? true
+  const glossaryDictionary = Object.fromEntries((props.glossary ?? []).map((entry) => {
+    const translation = entry.translations[props.language ?? DEFAULT_LANGUAGE] ?? entry.translations.ptbr
     return [entry.key, { key: entry.key, ...translation }]
   }))
 
   const getEditState = () => ({
-    value: markdown,
+    value: props.markdown,
     start: textareaRef.current?.selectionStart ?? selection.start,
     end: textareaRef.current?.selectionEnd ?? selection.end,
   })
 
   const applyEdit = (edit: MarkdownEdit) => {
-    onMarkdownChange(edit.value)
+    props.onMarkdownChange(edit.value)
     setSelection({ start: edit.start, end: edit.end })
     requestAnimationFrame(() => {
       textareaRef.current?.focus()
@@ -62,58 +62,66 @@ export const MarkdownEditor = ({
 
   return (
     <section className="overflow-hidden rounded border border-ud-neutral-300">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ud-neutral-300 bg-ud-neutral-100 px-3 py-2">
-        <div>
-          <h3 className="text-sm font-bold text-ud-neutral-950">Conteúdo do post · {languageLabel}</h3>
-          <p className="text-xs text-ud-secondary-600">Escreva em Markdown e confira o resultado antes de publicar.</p>
-        </div>
-        <div className="flex rounded border border-ud-neutral-300 bg-ud-neutral-0 p-1" role="tablist" aria-label="Modo do editor">
-          {MODES.map((item) => {
-            const isActive = mode === item.value
+      {(props.title || showPreview) && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ud-neutral-300 bg-ud-neutral-100 px-3 py-2">
+          {props.title && (
+            <div>
+              <h3 className="text-sm font-bold text-ud-neutral-950">{props.title}</h3>
+              {props.description && <p className="text-xs text-ud-secondary-600">{props.description}</p>}
+            </div>
+          )}
+          {showPreview && (
+            <div className="ml-auto flex rounded border border-ud-neutral-300 bg-ud-neutral-0 p-1" role="tablist" aria-label="Modo do editor">
+              {MODES.map((item) => {
+                const isActive = mode === item.value
 
-            return (
-              <button
-                key={item.value}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                aria-controls="blog-editor-panel"
-                onClick={() => setMode(item.value)}
-                className={cn(
-                  "flex items-center gap-2 rounded-sm px-3 py-1.5 text-sm transition",
-                  isActive
-                    ? "bg-ud-auxiliary-purple font-bold text-ud-neutral-0"
-                    : "text-ud-secondary-600 hover:text-ud-neutral-950",
-                )}
-              >
-                <item.icon size={15} aria-hidden="true" />
-                {item.label}
-              </button>
-            )
-          })}
+                return (
+                  <button
+                    key={item.value}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-controls={panelId}
+                    onClick={() => setMode(item.value)}
+                    className={cn(
+                      "flex items-center gap-2 rounded-sm px-3 py-1.5 text-sm transition",
+                      isActive
+                        ? "bg-ud-auxiliary-purple font-bold text-ud-neutral-0"
+                        : "text-ud-secondary-600 hover:text-ud-neutral-950",
+                    )}
+                  >
+                    <item.icon size={15} aria-hidden="true" />
+                    {item.label}
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
-      <div id="blog-editor-panel" role="tabpanel" className="bg-ud-neutral-0">
+      <div id={panelId} role="tabpanel" className="bg-ud-neutral-0">
         {mode === "edit" ? (
           <>
-            <MarkdownToolbar getState={getEditState} onApply={applyEdit} />
-            <GlossaryAssistant
-              markdown={markdown}
-              selection={selection}
-              language={language}
-              glossary={glossary}
-              onApply={applyEdit}
-              onSelectRange={selectRange}
-            />
+            <MarkdownToolbar actions={props.toolbarActions} getState={getEditState} onApply={applyEdit} />
+            {props.glossary && props.language && (
+              <GlossaryAssistant
+                markdown={props.markdown}
+                selection={selection}
+                language={props.language}
+                glossary={props.glossary}
+                onApply={applyEdit}
+                onSelectRange={selectRange}
+              />
+            )}
             <Textarea
               ref={textareaRef}
-              name="markdown"
-              value={markdown}
-              onChange={(event) => onMarkdownChange(event.currentTarget.value)}
+              name={props.name}
+              value={props.markdown}
+              onChange={(event) => props.onMarkdownChange(event.currentTarget.value)}
               onKeyDown={(event) => {
                 if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey) return
-                const action = findShortcutAction(event.key)
+                const action = findShortcutAction(event.key, props.toolbarActions)
                 if (!action) return
                 event.preventDefault()
                 applyEdit(action.run(getEditState()))
@@ -126,22 +134,25 @@ export const MarkdownEditor = ({
                 }
                 setSelection(nextSelection)
               }}
-              placeholder="# Título\n\nEscreva o conteúdo do post em Markdown."
-              className="min-h-[32rem] resize-y rounded-none border-0 p-4 font-mono leading-6 focus:ring-inset"
+              placeholder={props.placeholder}
+              className={cn("resize-y rounded-none border-0 p-4 font-mono leading-6 focus:ring-inset", minHeight)}
+              maxLength={props.maxLength}
               spellCheck
-              required={required}
+              required={props.required}
             />
             <div className="border-t border-ud-neutral-300 px-4 py-2 text-right text-xs text-ud-secondary-600">
-              {markdown.length.toLocaleString("pt-BR")} / 50.000 caracteres
+              {props.markdown.length.toLocaleString("pt-BR")} / {maxLength.toLocaleString("pt-BR")} caracteres
             </div>
           </>
         ) : (
-          <div className="min-h-[32rem] overflow-auto p-5">
-            <MarkdownContent
-              markdown={markdown || "# Prévia\n\nComece a escrever para visualizar o post."}
-              documentTitle={documentTitle}
-              glossary={glossaryDictionary}
-            />
+          <div className={cn("overflow-auto bg-ud-neutral-100 p-5", minHeight)}>
+            {props.renderPreview ? props.renderPreview(props.markdown) : (
+              <MarkdownContent
+                markdown={props.markdown || "# Prévia\n\nComece a escrever para visualizar o post."}
+                documentTitle={props.documentTitle}
+                glossary={glossaryDictionary}
+              />
+            )}
           </div>
         )}
       </div>

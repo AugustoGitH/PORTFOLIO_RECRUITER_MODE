@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { useAsciiArt, useAsciiReveal } from "../../../hooks/media"
 import { useOnceInView } from "../../../hooks/observer"
 import { cn } from "../../../utils/tailwind"
@@ -44,6 +44,11 @@ export const AsciiArt = (_props: AsciiArtProps) => {
     morphRegion: props.morphRegion,
   })
   const { ref, inView } = useOnceInView<HTMLDivElement>()
+  const preRef = useRef<HTMLPreElement>(null)
+  // Spacing, in em, that brings the real glyph advance to CHAR_ASPECT. Block glyphs (█▓▒░) are
+  // often not in the monospace font and fall back to another one, so rows would otherwise come out
+  // wider than the block and overflow to the right.
+  const [letterSpacing, setLetterSpacing] = useState<number | null>(null)
 
   const [activeSource, setActiveSource] = useState(props.src)
   const [activeLayout, setActiveLayout] = useState<ArtLayout>({
@@ -76,6 +81,22 @@ export const AsciiArt = (_props: AsciiArtProps) => {
     else setActiveLayout({ width: props.width, rows: props.rows, overflowAlign: props.overflowAlign })
   }
 
+  const hasTextRows = ascii.variant !== "converge" && Boolean(ascii.rows?.length)
+
+  useLayoutEffect(() => {
+    const row = preRef.current?.firstElementChild
+    if (letterSpacing !== null || !hasTextRows || !row) return
+
+    const range = document.createRange()
+    range.selectNodeContents(row)
+    const rowFontSize = parseFloat(getComputedStyle(row).fontSize)
+    const glyphs = row.textContent?.length ?? 0
+    const rowWidth = range.getBoundingClientRect().width
+    if (!glyphs || !rowFontSize || !rowWidth) return
+
+    setLetterSpacing(CHAR_ASPECT - rowWidth / glyphs / rowFontSize)
+  }, [hasTextRows, letterSpacing, activeLayout.width])
+
   useEffect(() => {
     if (!pendingLayout) return
 
@@ -103,6 +124,7 @@ export const AsciiArt = (_props: AsciiArtProps) => {
       boxSizing: "border-box" as const,
       height: layout.rows ? layout.rows * layoutFontSize : props.variant === "converge" ? (target.rows?.length ?? 0) * layoutFontSize : undefined,
       fontSize: layoutFontSize,
+      letterSpacing: letterSpacing === null ? undefined : `${letterSpacing}em`,
       position: "absolute" as const,
     }
   }
@@ -125,6 +147,7 @@ export const AsciiArt = (_props: AsciiArtProps) => {
       className="shrink-0"
     >
       <pre
+        ref={preRef}
         aria-hidden="true"
         style={getArtStyle(activeLayout)}
         className={cn("pointer-events-none m-0 font-mono leading-none select-none text-ud-neutral-999 transition-[width,height,font-size] duration-[1140ms] ease-out motion-reduce:transition-none", props.className)}

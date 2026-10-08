@@ -41,7 +41,10 @@ const ARROW_SIDE_COMPOUND: Partial<Record<PopoverDirection, string>> = {
 }
 
 export const popoverVariant = ({ direction = 'bottom', origin = 'center' }: PopoverVariantParams) => ({
-  wrapper: 'w-fit z-popover overflow-visible',
+  // `w-max` instead of `w-fit`: the wrapper is `position: fixed`, so fit-content would shrink it to the
+  // space left between its `left` and the viewport edge, wrapping the text and inflating its height
+  // before the position is corrected. The cap keeps it from outgrowing the viewport.
+  wrapper: 'w-max max-w-[calc(100vw-2rem)] z-popover overflow-visible',
   content:
     'p-1 w-full origin-top-right rounded-md  shadow-lg focus:outline-none border z-popover overflow-visible bg-ud-neutral-0 border-ud-neutral-300',
   arrow: cn(

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { BookOpenIcon, LinkIcon, PlusIcon, SearchIcon, Unlink2Icon } from "lucide-react"
+import { SUPPORTED_LANGUAGES } from "@/constants/intl"
 import { cn } from "@/utils/tailwind"
 import { extractGlossaryKeys } from "@/utils/blog"
 import {
@@ -12,7 +13,7 @@ import {
   rankGlossary,
   removeGlossaryReference,
 } from "../../glossary"
-import { GlossaryTermForm } from "../GlossaryTermForm"
+import { GlossaryTermForm } from "../../../GlossaryTermForm"
 import type { MarkdownEditState } from "../../types"
 import type { GlossaryAssistantProps } from "./types"
 
@@ -97,11 +98,14 @@ export const GlossaryAssistant = (props: GlossaryAssistantProps) => {
     if (creating) {
       return (
         <GlossaryTermForm
+          className="mt-2"
           initialTerm={creating.term}
           language={language}
           glossary={glossary}
+          description={`Novo termo global. O texto selecionado vira o termo de ${SUPPORTED_LANGUAGES.find((item) => item.value === language)?.short}; PT-BR é obrigatório.`}
+          submitLabel="Criar termo e referenciar"
           onCancel={() => setCreating(undefined)}
-          onCreated={(key, term) => {
+          onSaved={(key, term) => {
             props.onApply(applyGlossaryReference(creating.state, key, term))
             setCreating(undefined)
           }}

@@ -99,3 +99,14 @@ export const insertImage = (state: MarkdownEditState): MarkdownEdit => {
     end: urlStart + "https://".length,
   }
 }
+
+export const insertLineBreak = (state: MarkdownEditState): MarkdownEdit => {
+  const { value, end } = state
+  const cursor = end + 2
+
+  return {
+    value: value.slice(0, end) + "\\\n" + value.slice(end),
+    start: cursor,
+    end: cursor,
+  }
+}

@@ -14,7 +14,6 @@ import {
   useRemoveAdminBlogImageMutation,
   useRemoveAdminBlogPostMutation,
   useSaveAdminBlogCategoryMutation,
-  useSaveAdminBlogGlossaryMutation,
   useSaveAdminBlogPostMutation,
   useUploadAdminBlogImageMutation,
 } from "@/services/blog"
@@ -22,13 +21,12 @@ import type {
   AdminBlogCategory,
   AdminBlogCategoryTranslation,
   AdminBlogGlossaryEntry,
-  AdminBlogGlossaryTranslation,
   AdminBlogPost,
   AdminBlogPostTranslation,
 } from "@/services/blog"
 import { MarkdownEditor } from "./components/MarkdownEditor"
+import { GlossaryTermForm } from "./components/GlossaryTermForm"
 import { getPostBody } from "./utils"
-import { normalizeGlossaryKey } from "@/utils/blog"
 
 export const AdminBlogPanel = () => {
   const [editing, setEditing] = useState<AdminBlogPost | undefined>()
@@ -36,17 +34,12 @@ export const AdminBlogPanel = () => {
   const [editingGlossary, setEditingGlossary] = useState<AdminBlogGlossaryEntry | undefined>()
   const [activeLanguage, setActiveLanguage] = useState<Language>(DEFAULT_LANGUAGE)
   const [activeCategoryLanguage, setActiveCategoryLanguage] = useState<Language>(DEFAULT_LANGUAGE)
-  const [activeGlossaryLanguage, setActiveGlossaryLanguage] = useState<Language>(DEFAULT_LANGUAGE)
-  const [glossaryKey, setGlossaryKey] = useState("")
-  const [glossaryStatus, setGlossaryStatus] = useState<"active" | "archived">("active")
+  const [glossaryFormVersion, setGlossaryFormVersion] = useState(0)
   const [translations, setTranslations] = useState<Partial<Record<Language, AdminBlogPostTranslation>>>({
     ptbr: { slug: "", title: "", excerpt: "", markdown: "" },
   })
   const [categoryTranslations, setCategoryTranslations] = useState<Partial<Record<Language, AdminBlogCategoryTranslation>>>({
     ptbr: { slug: "", name: "" },
-  })
-  const [glossaryTranslations, setGlossaryTranslations] = useState<Partial<Record<Language, AdminBlogGlossaryTranslation>>>({
-    ptbr: { term: "", definition: "" },
   })
   const postFormRef = useRef<HTMLFormElement>(null)
   const categoryFormRef = useRef<HTMLFormElement>(null)
@@ -62,7 +55,6 @@ export const AdminBlogPanel = () => {
     },
   })
   const saveCategory = useSaveAdminBlogCategoryMutation()
-  const saveGlossary = useSaveAdminBlogGlossaryMutation()
   const removePost = useRemoveAdminBlogPostMutation()
   const removeCategory = useRemoveAdminBlogCategoryMutation()
   const removeGlossary = useRemoveAdminBlogGlossaryMutation()
@@ -95,10 +87,6 @@ export const AdminBlogPanel = () => {
     slug: "",
     name: "",
   }
-  const currentGlossaryTranslation = glossaryTranslations[activeGlossaryLanguage] ?? {
-    term: "",
-    definition: "",
-  }
   const updateTranslation = (patch: Partial<AdminBlogPostTranslation>) => {
     setTranslations((current) => ({
       ...current,
@@ -123,16 +111,10 @@ export const AdminBlogPanel = () => {
       },
     }))
   }
-  const updateGlossaryTranslation = (patch: Partial<AdminBlogGlossaryTranslation>) => {
-    setGlossaryTranslations((current) => ({
-      ...current,
-      [activeGlossaryLanguage]: {
-        term: "",
-        definition: "",
-        ...current[activeGlossaryLanguage],
-        ...patch,
-      },
-    }))
+  // Remounts the form (new key) so it starts blank, whether it was saved, cancelled or reset.
+  const resetGlossaryForm = () => {
+    setEditingGlossary(undefined)
+    setGlossaryFormVersion((version) => version + 1)
   }
   const completeTranslations = Object.fromEntries(
     Object.entries(translations).filter(([, translation]) =>
@@ -413,8 +395,11 @@ export const AdminBlogPanel = () => {
 
           <MarkdownEditor
             key={`${editing?._id ?? "new-editor"}-${activeLanguage}`}
+            name="markdown"
             markdown={currentTranslation.markdown}
-            languageLabel={SUPPORTED_LANGUAGES.find((language) => language.value === activeLanguage)?.label ?? activeLanguage}
+            title={`Conteúdo do post · ${SUPPORTED_LANGUAGES.find((language) => language.value === activeLanguage)?.label ?? activeLanguage}`}
+            description="Escreva em Markdown e confira o resultado antes de publicar."
+            placeholder={"# Título\n\nEscreva o conteúdo do post em Markdown."}
             language={activeLanguage}
             glossary={glossary}
             onMarkdownChange={(markdown) => updateTranslation({ markdown })}
@@ -471,146 +456,24 @@ export const AdminBlogPanel = () => {
             <Button
               type="button"
               startAdornment={<PlusIcon size={15} />}
-              onClick={() => {
-                setEditingGlossary(undefined)
-                setGlossaryKey("")
-                setGlossaryStatus("active")
-                setGlossaryTranslations({ ptbr: { term: "", definition: "" } })
-                setActiveGlossaryLanguage(DEFAULT_LANGUAGE)
-              }}
+              onClick={resetGlossaryForm}
             >
               Novo termo
             </Button>
           )}
         </div>
 
-        <form
-          key={editingGlossary?._id ?? "new-glossary-entry"}
-          className="mt-4 grid gap-4 rounded border border-ud-neutral-300 bg-ud-neutral-0 p-4 md:grid-cols-2"
-          onSubmit={(event) => {
-            event.preventDefault()
-            const completeGlossaryTranslations = Object.fromEntries(
-              Object.entries(glossaryTranslations).filter(([, translation]) =>
-                Boolean(translation?.term || translation?.definition || translation?.aliases?.length),
-              ),
-            )
-
-            saveGlossary.mutate({
-              id: editingGlossary?._id,
-              body: {
-                key: glossaryKey,
-                status: glossaryStatus,
-                translations: completeGlossaryTranslations,
-              },
-            }, {
-              onSuccess: () => {
-                setEditingGlossary(undefined)
-                setGlossaryKey("")
-                setGlossaryStatus("active")
-                setGlossaryTranslations({ ptbr: { term: "", definition: "" } })
-                setActiveGlossaryLanguage(DEFAULT_LANGUAGE)
-              },
-            })
-          }}
-        >
-          <div className="flex flex-wrap items-center justify-between gap-3 md:col-span-2">
-            <div>
-              <p className="text-sm font-bold text-ud-neutral-950">Idioma do termo</p>
-              <p className="text-xs text-ud-secondary-600">A chave permanece igual em todos os idiomas.</p>
-            </div>
-            <div className="flex rounded border border-ud-neutral-300 bg-ud-neutral-100 p-1" role="tablist" aria-label="Idioma do glossário">
-              {SUPPORTED_LANGUAGES.map((language) => (
-                <button
-                  key={language.value}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeGlossaryLanguage === language.value}
-                  onClick={() => setActiveGlossaryLanguage(language.value)}
-                  className={`rounded-sm px-3 py-1.5 text-sm transition ${activeGlossaryLanguage === language.value ? "bg-ud-auxiliary-purple font-bold text-white" : "text-ud-secondary-600 hover:text-ud-neutral-950"}`}
-                >
-                  {language.short}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <Input
-            name={`glossary-term-${activeGlossaryLanguage}`}
-            label="Termo"
-            value={currentGlossaryTranslation.term}
-            onChange={(event) => {
-              const term = event.currentTarget.value
-              updateGlossaryTranslation({ term })
-              if (!editingGlossary && activeGlossaryLanguage === DEFAULT_LANGUAGE) {
-                setGlossaryKey(normalizeGlossaryKey(term))
-              }
-            }}
-            required={activeGlossaryLanguage === DEFAULT_LANGUAGE}
-          />
-          <Input
-            name="glossary-key"
-            label="Chave global"
-            description="Única, em minúsculas e separada por hífens. É sugerida a partir do termo em PT-BR."
-            value={glossaryKey}
-            onChange={(event) => setGlossaryKey(normalizeGlossaryKey(event.currentTarget.value))}
-            disabled={Boolean(editingGlossary)}
-            pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-            maxLength={80}
-            required
-          />
-          <label className="block text-sm font-bold text-ud-neutral-950 md:col-span-2">
-            Definição {activeGlossaryLanguage === DEFAULT_LANGUAGE && <span aria-hidden="true">*</span>}
-            <Textarea
-              name={`glossary-definition-${activeGlossaryLanguage}`}
-              value={currentGlossaryTranslation.definition}
-              onChange={(event) => updateGlossaryTranslation({ definition: event.currentTarget.value })}
-              className="mt-1 min-h-28 font-normal"
-              maxLength={600}
-              required={activeGlossaryLanguage === DEFAULT_LANGUAGE}
-            />
-          </label>
-          <Input
-            name={`glossary-aliases-${activeGlossaryLanguage}`}
-            label="Aliases (opcional)"
-            description="Separe por vírgulas. Eles também serão usados nas recomendações do editor."
-            value={(currentGlossaryTranslation.aliases ?? []).join(", ")}
-            onChange={(event) => updateGlossaryTranslation({
-              aliases: event.currentTarget.value
-                .split(",")
-                .map((alias) => alias.trim())
-                .filter(Boolean),
-            })}
-          />
-          <label className="block text-sm font-bold text-ud-neutral-950">
-            Status
-            <select
-              value={glossaryStatus}
-              onChange={(event) => setGlossaryStatus(event.currentTarget.value as "active" | "archived")}
-              className="mt-1 block w-full rounded-sm border border-ud-neutral-300 bg-ud-neutral-100 px-3 py-2 text-sm font-normal outline-none transition focus:border-ud-auxiliary-purple focus:ring-2 focus:ring-ud-auxiliary-purple/20"
-            >
-              <option value="active">Ativo</option>
-              <option value="archived">Arquivado</option>
-            </select>
-          </label>
-          <div className="flex flex-wrap gap-2 md:col-span-2">
-            <Button type="submit" highlight loading={{ verb: "Salvando", state: saveGlossary.isPending }}>
-              {editingGlossary ? "Salvar termo" : "Criar termo"}
-            </Button>
-            {editingGlossary && (
-              <Button
-                type="button"
-                onClick={() => {
-                  setEditingGlossary(undefined)
-                  setGlossaryKey("")
-                  setGlossaryStatus("active")
-                  setGlossaryTranslations({ ptbr: { term: "", definition: "" } })
-                }}
-              >
-                Cancelar
-              </Button>
-            )}
-          </div>
-        </form>
+        <GlossaryTermForm
+          key={`${editingGlossary?._id ?? "new-glossary-entry"}-${glossaryFormVersion}`}
+          className="mt-4 p-4"
+          entry={editingGlossary}
+          language={DEFAULT_LANGUAGE}
+          glossary={glossary}
+          description="A chave permanece igual em todos os idiomas."
+          submitLabel={editingGlossary ? "Salvar termo" : "Criar termo"}
+          onSaved={resetGlossaryForm}
+          onCancel={editingGlossary ? resetGlossaryForm : undefined}
+        />
 
         <div className="mt-4 grid gap-2">
           {glossary.map((entry) => (
@@ -620,13 +483,7 @@ export const AdminBlogPanel = () => {
               description={`${entry.key} · ${entry.translations.ptbr.definition}`}
               status={entry.status}
               selected={editingGlossary?._id === entry._id}
-              onSelect={() => {
-                setEditingGlossary(entry)
-                setGlossaryKey(entry.key)
-                setGlossaryStatus(entry.status)
-                setGlossaryTranslations(entry.translations)
-                setActiveGlossaryLanguage(DEFAULT_LANGUAGE)
-              }}
+              onSelect={() => setEditingGlossary(entry)}
               actions={(
                 <Button
                   type="button"

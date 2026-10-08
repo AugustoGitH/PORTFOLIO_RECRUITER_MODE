@@ -52,6 +52,16 @@ export const Popover = <A extends HTMLElement = HTMLElement>(
   // is why arrows never rendered on lateral popovers.
   const shouldShowArrow = Boolean(props.arrow)
 
+  // The arrow follows the anchor along the popover's edge instead of staying at the origin's
+  // default spot: `top` for a popover beside the anchor, `left` for one above or below it.
+  const arrowOffset = popover.variants.arrowOffset
+  const isSideDirection = popover.variants.direction === 'left' || popover.variants.direction === 'right'
+  const arrowStyle = arrowOffset === undefined
+    ? undefined
+    : isSideDirection
+      ? { top: `${arrowOffset}px`, '--tw-translate-y': '-50%' } as React.CSSProperties
+      : { left: `${arrowOffset}px`, '--tw-translate-x': '-50%' } as React.CSSProperties
+
   const content = (
     <div // content
       {...(props.paperProps ?? {})}
@@ -80,11 +90,7 @@ export const Popover = <A extends HTMLElement = HTMLElement>(
               <div // arrow
                 {...(props.arrowProps ?? {})}
                 className={cn(styles.arrow, props.arrowProps?.className)}
-                style={
-                  popover.variants.sideArrowOffset !== undefined
-                    ? { top: `${popover.variants.sideArrowOffset}px`, '--tw-translate-y': '-50%' } as React.CSSProperties
-                    : undefined
-                }
+                style={arrowStyle}
               />
             )}
             {props.hovering ? (

@@ -14,6 +14,16 @@ export type AutoRepositionConfig = {
 
 export type AppliedSideFallback = 'left' | 'right' | null
 
+/** Side of the anchor a popover with an arrow ended up on. */
+export type AnchoredDirection = 'top' | 'bottom' | 'left' | 'right'
+
+export type AnchoredPlacement = {
+  direction: AnchoredDirection
+  /** Distance, in px, from the popover's start edge (left for top/bottom, top for left/right) to the
+   * anchor's center: where the arrow has to sit to keep pointing at the anchor. */
+  arrowOffset: number
+}
+
 export type AutoRepositionOnOverflow = boolean | AutoRepositionConfig
 
 export type ModalPosition = {
@@ -69,6 +79,9 @@ type ModalBaseOptions<A extends HTMLElement> = {
   autoRepositionOnOverflow?: AutoRepositionOnOverflow
   overflowPadding?: number
   smartPositioning?: boolean | SmartPositioningConfig
+  /** Keeps the anchor uncovered and reports where the arrow must sit, instead of the sliding
+   * reposition of `autoRepositionOnOverflow`. Meant for popovers that draw an arrow. */
+  anchoredPlacement?: boolean
 }
 
 export type ModalOptions<A extends HTMLElement = HTMLElement> =
@@ -267,3 +280,18 @@ export type CalculateSideFallbackResult = {
 }
 
 // #endregion
+
+export type CalculateAnchoredPositionOptions = {
+  anchorRect: DOMRect
+  modal: { width: number; height: number }
+  viewport: { width: number; height: number }
+  /** Side the popover prefers; the opposite side and then the lateral ones are fallbacks. */
+  preferred: 'top' | 'bottom'
+  origin: PopoverOrigin
+  padding: number
+  offset: { top: number; bottom: number }
+}
+
+export type CalculateAnchoredPositionResult = {
+  position: ModalPosition
+} & AnchoredPlacement

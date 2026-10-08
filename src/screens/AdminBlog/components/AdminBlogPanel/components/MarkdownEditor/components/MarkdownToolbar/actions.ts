@@ -3,6 +3,7 @@ import {
   BoldIcon,
   CodeIcon,
   Code2Icon,
+  CornerDownLeftIcon,
   Heading2Icon,
   Heading3Icon,
   ImageIcon,
@@ -17,7 +18,7 @@ import {
   TableIcon,
 } from "lucide-react"
 import type { MarkdownEdit, MarkdownEditState } from "../../types"
-import { insertImage, insertLink, insertSnippet, prefixLines, wrapSelection } from "../../utils"
+import { insertImage, insertLineBreak, insertLink, insertSnippet, prefixLines, wrapSelection } from "../../utils"
 
 export type MarkdownToolbarAction = {
   id: string
@@ -38,6 +39,7 @@ export const MARKDOWN_TOOLBAR_GROUPS: MarkdownToolbarAction[][] = [
     { id: "h3", label: "Subtítulo", description: "Subtítulo dentro de uma seção.", syntax: "### Subtítulo", icon: Heading3Icon, run: (s) => prefixLines(s, () => "### ", /^#{1,6}\s+/, "Subtítulo") },
   ],
   [
+    { id: "break", label: "Quebra de linha", description: "Quebra a linha no ponto do cursor sem iniciar um novo parágrafo.", syntax: "\\ + Enter", icon: CornerDownLeftIcon, run: insertLineBreak },
     { id: "bold", label: "Negrito", description: "Destaca o trecho selecionado em negrito.", syntax: "**texto**", shortcut: "Ctrl+B", icon: BoldIcon, run: (s) => wrapSelection(s, "**", "**", "negrito") },
     { id: "italic", label: "Itálico", description: "Deixa o trecho selecionado em itálico.", syntax: "*texto*", shortcut: "Ctrl+I", icon: ItalicIcon, run: (s) => wrapSelection(s, "*", "*", "itálico") },
     { id: "strike", label: "Tachado", description: "Risca o trecho selecionado.", syntax: "~~texto~~", icon: StrikethroughIcon, run: (s) => wrapSelection(s, "~~", "~~", "tachado") },
@@ -71,7 +73,14 @@ export const MARKDOWN_TOOLBAR_GROUPS: MarkdownToolbarAction[][] = [
 
 const SHORTCUTS: Record<string, string> = { b: "bold", i: "italic", k: "link", e: "code" }
 
-export const findShortcutAction = (key: string) => {
+/** Groups reduced to the given action ids, in their canonical order. Undefined keeps everything. */
+export const pickToolbarGroups = (actionIds?: string[]) => actionIds
+  ? MARKDOWN_TOOLBAR_GROUPS
+    .map((group) => group.filter((action) => actionIds.includes(action.id)))
+    .filter((group) => group.length > 0)
+  : MARKDOWN_TOOLBAR_GROUPS
+
+export const findShortcutAction = (key: string, actionIds?: string[]) => {
   const id = SHORTCUTS[key.toLowerCase()]
-  return MARKDOWN_TOOLBAR_GROUPS.flat().find((action) => action.id === id)
+  return pickToolbarGroups(actionIds).flat().find((action) => action.id === id)
 }

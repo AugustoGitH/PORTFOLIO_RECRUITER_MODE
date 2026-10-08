@@ -32,6 +32,7 @@ import type { PopoverProps, PopoverState } from '../../types'
  * @output {string|undefined} variants.origin - Origin for arrow positioning
  * @output {string|null} variants.appliedSideFallback - Applied side fallback direction
  * @output {number|undefined} variants.sideArrowOffset - Offset for side arrow positioning
+ * @output {number|undefined} variants.arrowOffset - Arrow offset along its edge, keeping it on the anchor
  *
  * @returns {Object} Popover state, modal instance, render helpers, and variant props
  *
@@ -110,6 +111,8 @@ export const usePopover = <A extends HTMLElement = HTMLElement>(
     autoRepositionOnOverflow: props.autoRepositionOnOverflow,
     overflowPadding: props.overflowPadding,
     smartPositioning: props.smartPositioning,
+    // A popover that draws an arrow has to keep the arrow on the anchor and the anchor uncovered.
+    anchoredPlacement: Boolean(props.arrow && props.autoRepositionOnOverflow),
     positionStrategy: getPositionStrategy(props.direction),
   })
   const { closeModal, showModal, toggleShowModal } = modal.action
@@ -239,6 +242,11 @@ export const usePopover = <A extends HTMLElement = HTMLElement>(
 
   // Determine effective direction based on side fallback
   const effectiveDirection = (() => {
+    // Anchored placement reports the side it actually used, including flips that the position
+    // alone can't reveal (a flip to the bottom keeps `bottom: auto`).
+    if (modal.layout.anchoredPlacement) {
+      return modal.layout.anchoredPlacement.direction
+    }
     // If side fallback was applied, use that as direction for arrow positioning
     if (modal.layout.appliedSideFallback) {
       return modal.layout.appliedSideFallback
@@ -271,6 +279,8 @@ export const usePopover = <A extends HTMLElement = HTMLElement>(
       origin: modal.layout.appliedSideFallback ? undefined : props.origin,
       appliedSideFallback: modal.layout.appliedSideFallback,
       sideArrowOffset: modal.layout.sideArrowOffset,
+      // Where the arrow sits along its edge, so it keeps pointing at the anchor after a reposition.
+      arrowOffset: modal.layout.anchoredPlacement?.arrowOffset ?? modal.layout.sideArrowOffset,
       wasRepositioned: modal.layout.wasRepositioned,
     },
   }

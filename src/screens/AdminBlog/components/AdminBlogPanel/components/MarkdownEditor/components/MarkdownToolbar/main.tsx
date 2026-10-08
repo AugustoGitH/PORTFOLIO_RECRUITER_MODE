@@ -1,7 +1,7 @@
 import { Fragment, useRef } from "react"
 import { Popover } from "@/components/general/Popover"
 import type { MarkdownToolbarAction } from "./actions"
-import { MARKDOWN_TOOLBAR_GROUPS } from "./actions"
+import { pickToolbarGroups } from "./actions"
 import type { MarkdownToolbarProps } from "./types"
 
 const ToolbarButton = (props: {
@@ -53,13 +53,15 @@ const ToolbarButton = (props: {
 }
 
 export const MarkdownToolbar = (props: MarkdownToolbarProps) => {
+  const groups = pickToolbarGroups(props.actions)
+
   return (
     <div
       role="toolbar"
       aria-label="Formatação Markdown"
       className="flex flex-wrap items-center gap-1 border-b border-ud-neutral-300 bg-ud-neutral-100 px-3 py-2"
     >
-      {MARKDOWN_TOOLBAR_GROUPS.map((group, groupIndex) => (
+      {groups.map((group, groupIndex) => (
         <Fragment key={group[0].id}>
           {groupIndex > 0 && <span className="mx-1 h-5 w-px bg-ud-neutral-300" aria-hidden="true" />}
           {group.map((action) => (

@@ -3,6 +3,7 @@
 import { useRef } from "react"
 import { BookOpenIcon } from "lucide-react"
 import { Popover } from "@/components/general/Popover"
+import { GlossaryDefinitionText } from "../GlossaryDefinitionText"
 import { useINTLContext } from "@/providers/intl"
 import type { GlossaryTermProps } from "./types"
 
@@ -55,9 +56,7 @@ export const GlossaryTerm = ({ entry, referenceKey, children }: GlossaryTermProp
         <p className="mt-2 text-base font-extrabold leading-tight text-ud-neutral-950">
           {entry.term}
         </p>
-        <p className="mt-2 text-sm leading-6 text-ud-secondary-600">
-          {entry.definition}
-        </p>
+        <GlossaryDefinitionText className="mt-2 text-sm leading-6 text-ud-secondary-600" markdown={entry.definition} />
       </div>
     </Popover>
   )

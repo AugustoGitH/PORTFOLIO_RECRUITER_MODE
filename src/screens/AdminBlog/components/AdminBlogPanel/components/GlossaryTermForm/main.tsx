@@ -3,13 +3,17 @@
 import { useState } from "react"
 import { Button } from "@/components/action/Button"
 import { Input } from "@/components/input/Input"
-import { Textarea } from "@/components/input/Textarea"
+import { GlossaryDefinitionText } from "@/components/blog/GlossaryDefinitionText"
 import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, type Language } from "@/constants/intl"
 import { useSaveAdminBlogGlossaryMutation } from "@/services/blog"
 import type { AdminBlogGlossaryTranslation } from "@/services/blog"
 import { normalizeGlossaryKey } from "@/utils/blog"
+import { cn } from "@/utils/tailwind"
+import { MarkdownEditor } from "../MarkdownEditor"
 import type { GlossaryTermFormProps } from "./types"
 
+const DEFINITION_MAX_LENGTH = 600
+const DEFINITION_TOOLBAR_ACTIONS = ["break", "bold", "italic"]
 const EMPTY: AdminBlogGlossaryTranslation = { term: "", definition: "" }
 
 // Rendered inside the post <form>: no nested <form>, no native required/pattern
@@ -21,17 +25,17 @@ const blockEnter = (event: React.KeyboardEvent) => {
 export const GlossaryTermForm = (props: GlossaryTermFormProps) => {
   const save = useSaveAdminBlogGlossaryMutation()
   const [activeLanguage, setActiveLanguage] = useState<Language>(props.language)
-  const [translations, setTranslations] = useState<Partial<Record<Language, AdminBlogGlossaryTranslation>>>({
-    [props.language]: { ...EMPTY, term: props.initialTerm },
-  })
-  const [key, setKey] = useState(normalizeGlossaryKey(props.initialTerm))
+  const [translations, setTranslations] = useState<Partial<Record<Language, AdminBlogGlossaryTranslation>>>(
+    props.entry?.translations ?? { [props.language]: { ...EMPTY, term: props.initialTerm ?? "" } },
+  )
+  const [key, setKey] = useState(props.entry?.key ?? normalizeGlossaryKey(props.initialTerm ?? ""))
   const [keyEdited, setKeyEdited] = useState(false)
-  const [status, setStatus] = useState<"active" | "archived">("active")
+  const [status, setStatus] = useState<"active" | "archived">(props.entry?.status ?? "active")
   const [showErrors, setShowErrors] = useState(false)
 
   const current = translations[activeLanguage] ?? EMPTY
   const ptbr = translations[DEFAULT_LANGUAGE]
-  const keyTaken = props.glossary.some((entry) => entry.key === key)
+  const keyTaken = !props.entry && props.glossary.some((entry) => entry.key === key)
   const keyInvalid = !key || key !== normalizeGlossaryKey(key)
   const missingPtbr = !ptbr?.term.trim() || !ptbr?.definition.trim()
   const hasError = keyTaken || keyInvalid || missingPtbr
@@ -45,17 +49,15 @@ export const GlossaryTermForm = (props: GlossaryTermFormProps) => {
     const filled = Object.fromEntries(
       Object.entries(translations).filter(([, value]) => value?.term.trim() || value?.definition.trim() || value?.aliases?.length),
     )
-    save.mutate({ body: { key, status, translations: filled } }, {
-      onSuccess: () => props.onCreated(key, (translations[props.language] ?? ptbr)?.term.trim() || key),
+    save.mutate({ id: props.entry?._id, body: { key, status, translations: filled } }, {
+      onSuccess: () => props.onSaved(key, (translations[props.language] ?? ptbr)?.term.trim() || key),
     })
   }
 
   return (
-    <div className="mt-2 space-y-3 rounded border border-ud-neutral-300 bg-ud-neutral-0 p-3" onKeyDown={blockEnter}>
+    <div className={cn("space-y-3 rounded border border-ud-neutral-300 bg-ud-neutral-0 p-3", props.className)} onKeyDown={blockEnter}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-ud-secondary-600">
-          Novo termo global. O texto selecionado vira o termo de {SUPPORTED_LANGUAGES.find((l) => l.value === props.language)?.short}; PT-BR é obrigatório.
-        </p>
+        <p className="text-xs text-ud-secondary-600">{props.description}</p>
         <div className="flex rounded border border-ud-neutral-300 bg-ud-neutral-100 p-1" role="tablist" aria-label="Idioma do termo">
           {SUPPORTED_LANGUAGES.map((language) => (
             <button
@@ -85,6 +87,7 @@ export const GlossaryTermForm = (props: GlossaryTermFormProps) => {
         <Input
           label="Chave global"
           description="Imutável depois de criada. Sugerida a partir do termo em PT-BR."
+          disabled={Boolean(props.entry)}
           value={key}
           onChange={(event) => {
             setKeyEdited(true)
@@ -96,15 +99,20 @@ export const GlossaryTermForm = (props: GlossaryTermFormProps) => {
       {showErrors && keyTaken && <p className="text-xs font-semibold text-red-600">A chave “{key}” já existe no glossário.</p>}
       {showErrors && keyInvalid && !keyTaken && <p className="text-xs font-semibold text-red-600">Informe uma chave válida (minúsculas e hífens).</p>}
 
-      <label className="block text-sm font-bold text-ud-neutral-950">
-        Definição
-        <Textarea
-          value={current.definition}
-          onChange={(event) => update({ definition: event.currentTarget.value })}
-          className="mt-1 min-h-20 font-normal"
-          maxLength={600}
+      <div>
+        <span className="mb-1 block text-sm font-bold text-ud-neutral-950">Definição</span>
+        <MarkdownEditor
+          markdown={current.definition}
+          onMarkdownChange={(definition) => update({ definition })}
+          toolbarActions={DEFINITION_TOOLBAR_ACTIONS}
+          placeholder="Explique o termo. Aceita **negrito**, *itálico* e quebras de linha."
+          maxLength={DEFINITION_MAX_LENGTH}
+          minHeightClassName="min-h-20"
+          renderPreview={(markdown) => markdown.trim()
+            ? <GlossaryDefinitionText className="text-sm leading-6 text-ud-secondary-600" markdown={markdown} />
+            : <p className="text-sm text-ud-secondary-600">Escreva a definição para visualizar.</p>}
         />
-      </label>
+      </div>
       <Input
         label="Aliases (opcional)"
         description="Separe por vírgulas. Também entram nas sugestões do editor."
@@ -128,9 +136,9 @@ export const GlossaryTermForm = (props: GlossaryTermFormProps) => {
           <option value="archived">Arquivado</option>
         </select>
         <Button type="button" highlight loading={{ verb: "Salvando", state: save.isPending }} onClick={submit}>
-          Criar termo e referenciar
+          {props.submitLabel}
         </Button>
-        <Button type="button" onClick={props.onCancel}>Cancelar</Button>
+        {props.onCancel && <Button type="button" onClick={props.onCancel}>Cancelar</Button>}
       </div>
     </div>
   )
