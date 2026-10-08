@@ -13,9 +13,8 @@ const base = {
   offset: { top: 12, bottom: 4 },
 }
 
-// `left` carries the +width/2 that cancels the translateX(-50%) of the center origin.
-const edgeOf = (result: ReturnType<typeof calculateAnchoredPosition>, width = 330) =>
-  (result.position.left as number) - width / 2
+const edgeOf = (result: ReturnType<typeof calculateAnchoredPosition>) =>
+  result.position.left as number
 
 describe('calculateAnchoredPosition', () => {
   it('centers the popover on the anchor and keeps the arrow in the middle when there is room', () => {
@@ -81,7 +80,7 @@ describe('calculateAnchoredPosition', () => {
     })
 
     expect(result.direction).toBe('right')
-    expect(edgeOf(result, 300)).toBe(130 + base.offset.bottom)
+    expect(edgeOf(result)).toBe(130 + base.offset.bottom)
     expect(result.arrowOffset).toBeCloseTo(195 - (result.position.top as number))
   })
 
@@ -96,5 +95,32 @@ describe('calculateAnchoredPosition', () => {
     const result = calculateAnchoredPosition({ ...base, origin: 'left', anchorRect: rect(20, 300, 20, 20) })
 
     expect(result.position.left).toBe(20)
+  })
+
+  it('falls back from a requested side to a vertical position without covering the anchor', () => {
+    const anchor = rect(340, 300, 15, 15)
+    const result = calculateAnchoredPosition({
+      ...base,
+      preferred: 'right',
+      anchorRect: anchor,
+    })
+
+    expect(result.direction).toBe('bottom')
+    expect(result.position.top).toBe(anchor.bottom + base.offset.bottom)
+    expect((result.position.left as number) + result.arrowOffset).toBeCloseTo(anchor.left + anchor.width / 2)
+  })
+
+  it('uses the opposite lateral side when a requested side overflows', () => {
+    const anchor = rect(700, 300, 15, 15)
+    const result = calculateAnchoredPosition({
+      ...base,
+      viewport: { width: 800, height: 844 },
+      preferred: 'right',
+      anchorRect: anchor,
+    })
+
+    expect(result.direction).toBe('left')
+    expect((result.position.left as number) + base.modal.width).toBe(anchor.left - base.offset.bottom)
+    expect((result.position.top as number) + result.arrowOffset).toBeCloseTo(anchor.top + anchor.height / 2)
   })
 })

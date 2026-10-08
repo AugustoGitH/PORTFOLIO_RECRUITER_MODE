@@ -455,7 +455,7 @@ export const useModal = <
         const modalWidth = modalElement?.offsetWidth || 0
 
         // Anchored placement needs the real size of the popover: it picks a side by what fits.
-        const anchoredPlacementActive = Boolean(options.anchoredPlacement) && !useHorizontalPosition && Boolean(modalElement)
+        const anchoredPlacementActive = Boolean(options.anchoredPlacement) && Boolean(modalElement)
         const anchoredMeasured = anchoredPlacementActive && modalWidth > 0 && modalHeight > 0
 
         const needsRecalc = (useTopPosition && modalHeight === 0)
@@ -519,7 +519,13 @@ export const useModal = <
             anchorRect,
             modal: { width: modalWidth, height: modalHeight },
             viewport: { width: window.innerWidth, height: window.innerHeight },
-            preferred: useTopPosition ? 'top' : 'bottom',
+            preferred: useLeftPosition
+              ? 'left'
+              : useRightPosition
+                ? 'right'
+                : useTopPosition
+                  ? 'top'
+                  : 'bottom',
             origin: options.origin || 'center',
             padding: options.overflowPadding || DEFAULT_OVERFLOW_PADDING,
             offset: { top: offsetTop, bottom: offsetBottom },
@@ -770,6 +776,7 @@ export const useModal = <
       maxWidth: options.maxWidth,
       modalElementParent: modalElementRef.current?.parentElement,
       isHorizontalPosition,
+      anchoredPlacement: Boolean(options.anchoredPlacement),
     })
 
     return {

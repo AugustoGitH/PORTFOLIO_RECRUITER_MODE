@@ -9,19 +9,15 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
  * Places a popover against its anchor without ever covering it, and reports where the arrow has to
  * sit to keep pointing at the anchor's center.
  *
- * The popover takes the preferred side (above/below) when it fits there, then the opposite side,
- * then a lateral side. The popover slides along the edge to stay inside the viewport, and the arrow
+ * The popover takes the preferred side when it fits there, then the opposite side, then one of the
+ * perpendicular sides. The popover slides along the edge to stay inside the viewport, and the arrow
  * does not slide with it: it stays at the anchor, clamped to the popover's edge.
- *
- * Returned `left` already accounts for the `translateX(-50%)` that buildModalStyle applies to the
- * `center` origin, so the caller can use it as is.
  */
 export const calculateAnchoredPosition = (
   options: CalculateAnchoredPositionOptions
 ): CalculateAnchoredPositionResult => {
   const { anchorRect, modal, viewport, padding, origin, offset } = options
   const sideGap = offset.bottom
-  const compensation = origin === 'center' ? modal.width / 2 : 0
 
   const anchorCenterX = anchorRect.left + anchorRect.width / 2
   const anchorCenterY = anchorRect.top + anchorRect.height / 2
@@ -33,7 +29,6 @@ export const calculateAnchoredPosition = (
     right: viewport.width - anchorRect.right - padding - sideGap,
   }
 
-  const other = options.preferred === 'top' ? 'bottom' : 'top'
   const sideOrder = space.left >= space.right ? (['left', 'right'] as const) : (['right', 'left'] as const)
   const verticalFits = (side: 'top' | 'bottom') => modal.height <= space[side]
 
@@ -50,7 +45,7 @@ export const calculateAnchoredPosition = (
       position: {
         top: verticalFits(direction) ? top : clamp(top, padding, viewport.height - padding - modal.height),
         bottom: 'auto',
-        left: left + compensation,
+        left,
         right: 'auto',
       },
       direction,
@@ -63,17 +58,32 @@ export const calculateAnchoredPosition = (
     const top = clamp(anchorCenterY - modal.height / 2, padding, viewport.height - padding - modal.height)
 
     return {
-      position: { top, bottom: 'auto', left: left + compensation, right: 'auto' },
+      position: { top, bottom: 'auto', left, right: 'auto' },
       direction,
       arrowOffset: clamp(anchorCenterY - top, ARROW_INSET, modal.height - ARROW_INSET),
     }
   }
 
-  if (verticalFits(options.preferred)) return buildVertical(options.preferred)
-  if (verticalFits(other)) return buildVertical(other)
+  const horizontalFits = (side: 'left' | 'right') => modal.width <= space[side]
 
-  const side = sideOrder.find((candidate) => modal.width <= space[candidate])
-  if (side) return buildSide(side)
+  if (options.preferred === 'top' || options.preferred === 'bottom') {
+    const opposite = options.preferred === 'top' ? 'bottom' : 'top'
+
+    if (verticalFits(options.preferred)) return buildVertical(options.preferred)
+    if (verticalFits(opposite)) return buildVertical(opposite)
+
+    const side = sideOrder.find(horizontalFits)
+    if (side) return buildSide(side)
+  } else {
+    const opposite = options.preferred === 'left' ? 'right' : 'left'
+
+    if (horizontalFits(options.preferred)) return buildSide(options.preferred)
+    if (horizontalFits(opposite)) return buildSide(opposite)
+
+    const verticalOrder = space.top >= space.bottom ? (['top', 'bottom'] as const) : (['bottom', 'top'] as const)
+    const vertical = verticalOrder.find(verticalFits)
+    if (vertical) return buildVertical(vertical)
+  }
 
   // Nothing fits around the anchor: use the roomier vertical side, kept inside the viewport.
   return buildVertical(space.top > space.bottom ? 'top' : 'bottom')

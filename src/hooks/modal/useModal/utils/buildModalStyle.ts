@@ -70,7 +70,8 @@ export const buildModalStyle = (
   if (
     options.origin === 'center' &&
     options.modalPosition.left !== 'auto' &&
-    !options.isHorizontalPosition
+    !options.isHorizontalPosition &&
+    !options.anchoredPlacement
   ) {
     style.transform = 'translateX(-50%)'
   }

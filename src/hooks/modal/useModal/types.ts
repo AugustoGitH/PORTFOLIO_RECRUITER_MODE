@@ -113,6 +113,8 @@ export type BuildModalStyleOptions = {
   maxWidth?: number | string
   modalElementParent?: HTMLElement | null
   isHorizontalPosition?: boolean
+  /** Anchored positions are already expressed as final viewport coordinates. */
+  anchoredPlacement?: boolean
 }
 
 export type CalculateAdvancedSmartPositionOptions = {
@@ -285,8 +287,8 @@ export type CalculateAnchoredPositionOptions = {
   anchorRect: DOMRect
   modal: { width: number; height: number }
   viewport: { width: number; height: number }
-  /** Side the popover prefers; the opposite side and then the lateral ones are fallbacks. */
-  preferred: 'top' | 'bottom'
+  /** Side the popover prefers; the opposite side and then the perpendicular ones are fallbacks. */
+  preferred: AnchoredDirection
   origin: PopoverOrigin
   padding: number
   offset: { top: number; bottom: number }
